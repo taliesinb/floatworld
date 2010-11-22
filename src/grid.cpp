@@ -12,7 +12,6 @@ const char* interactionnames[] = {"None", "Wastage","Parasitism", "Predation", "
 
 Grid::Grid(int rs, int cs)
     : adam(NULL),
-      lastadam(NULL),
       feeder(NULL),
       energy(rs,cs),
       occupants(NULL)
@@ -43,18 +42,6 @@ Grid::Grid(int rs, int cs)
         creats[i].id = i;
         creats[i].grid = this;
     }
-}
-
-
-void Grid::PushAdam(Matrix* a)
-{
-    lastadam = adam;
-    adam = a;
-}
-
-void Grid::PopAdam()
-{
-    adam = lastadam;
 }
 
 Grid::~Grid()
@@ -400,7 +387,8 @@ float CompeteFunction(int numa, int numb)
 
 float Grid::CompeteScore(Matrix& a, Matrix& b)
 {
-    PushAdam();
+    Matrix* last = adam;
+
     mutation = false;
   
     double scores = 0;
@@ -429,7 +417,7 @@ float Grid::CompeteScore(Matrix& a, Matrix& b)
     }
     scores /= accuracy;
   
-    PopAdam();
+    adam = last;
     mutation = true;
   
     return scores;

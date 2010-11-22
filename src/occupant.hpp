@@ -11,19 +11,21 @@ class Occupant : public Class
 {
   public:
 
-    Occupant(float sig);
+    Occupant(int sig);
     
     Occupant* next; // next occupant on this grid position
     Grid* grid;
     Pos pos;
-    float signature;
+    int signature;
 
     virtual void Interact(Creat& c);
     virtual void Update();
 
     virtual void __Remove();
+
     void Place();
     void Remove();
+    void RemoveFromLL();
     void Move(Pos p);
     
     Creat* Peer(int id);

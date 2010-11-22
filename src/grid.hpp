@@ -54,11 +54,7 @@ public:
 
     int accuracy;
 
-    Matrix* adam;
-    Matrix* lastadam;
-    void PushAdam(Matrix* a = NULL);
-    void PopAdam();
-    
+    Matrix* adam;    
     Occupant** occupants;
 
     // Paint

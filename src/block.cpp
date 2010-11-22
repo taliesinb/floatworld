@@ -86,7 +86,7 @@ SkinnerBlock::SkinnerBlock()
   hue = 0.1;
 }
 
-void SkinnerBlock::Interact(Creat& c)
+void SkinnerBlock::Interact(Creat&)
 {
   if (touch_count++ >= 8)
   {
