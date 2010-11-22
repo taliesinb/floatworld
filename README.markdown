@@ -1,10 +1,12 @@
 #README
 
-### WARNING
+#### WARNING
 
 *THIS PROJECT IS NOT READY FOR PUBLIC CONSUMPTION. IT HAS BEEN PORTED FROM THE ALLEGRO GRAPHICS LIBRARY TO QT AND MANY FEATURES REMAIN TO BE IMPLEMENTED. IT CONTAINS NOTHING INTERESTING FOR NOW. DON'T CHECK IT OUT.*
 
-*Crucibus* is an artificial life environment in which virtual creatures compete for space and energy.
+#### About floatworld
+
+*floatworld* is an artificial life environment in which virtual creatures compete for space and energy.
 
 Each creature is controlled by a neural network and harvests energy in order to reproduce.
 
