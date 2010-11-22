@@ -12,3 +12,6 @@ RESOURCES += gui/floatworld.qrc
 QMAKE_CFLAGS+=-pg
 QMAKE_CXXFLAGS+=-pg
 QMAKE_LFLAGS+=-pg
+
+OTHER_FILES += \
+    README
