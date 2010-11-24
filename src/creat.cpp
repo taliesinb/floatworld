@@ -22,7 +22,7 @@ RegisterVar(Creat, marker);
 int Creat::steps = 0;
 int Creat::maxage = 100;
 int Creat::nonzeroweights = 0;
-float Creat::initialenergy = 15;
+float Creat::initialenergy = 2;
 float Creat::initialmarker = 0.0;
 float Creat::actioncost[NumberActions];
 CreatFunc Creat::actionlookup[NumberActions];
@@ -118,11 +118,11 @@ void Creat::SetupActions()
     actionlookup[ActionRight] = &Creat::TurnRight;
     actionlookup[ActionReproduce] = &Creat::Reproduce;
   
-    actioncost[ActionNone] = 0.1;
-    actioncost[ActionLeft] = 0.5;
+    actioncost[ActionNone] = 0;
+    actioncost[ActionLeft] = 0;
     actioncost[ActionForward] = 1.0;
-    actioncost[ActionRight] = 0.5;
-    actioncost[ActionReproduce] = 50.0;
+    actioncost[ActionRight] = 0;
+    actioncost[ActionReproduce] = 60.0;
 }  
 
 Creat::Creat()
@@ -217,17 +217,12 @@ void Creat::Reproduce()
 
     if (grid->OccupantAt(front)) return;
   
-    if (grid->birth)
-    {
-        Creat& child = grid->_AddCreat(front, Mod(orient+RandSign(),4));
-        child.CopyBrain(*this);
-        child.MutateBrain();
+    Creat& child = grid->_AddCreat(front, Mod(orient+RandSign(),4));
+    child.CopyBrain(*this);
+    child.MutateBrain();
 
-        float excess = state(inputs + hidden + ActionReproduce - 1) - 0.8;
-
-        cout << "Excess: " << excess << endl;
-        TransferEnergy(child, excess * 10);
-    }
+    float excess = state(inputs + hidden + ActionReproduce - 1) - 0.8;
+    TransferEnergy(child, excess * 10);
 
     grid->births++;
 }
@@ -259,7 +254,7 @@ void Creat::TransferEnergy(Creat& other, float de)
     else {
         de = Min(energy, de);
         energy -= de;
-        other.energy += de;
+        other.energy += de * 0.75;
     }
 }
 
@@ -276,7 +271,7 @@ void Creat::Interaction(Creat& other)
             break;
 
         case Wastage:
-            energy -= 10;
+            energy -= 20;
             break;
       
         case Parasitism:
@@ -285,7 +280,7 @@ void Creat::Interaction(Creat& other)
             break;
       
         case Predation: 
-            other.TransferEnergy(*this, RandFloat(5,15));
+            other.TransferEnergy(*this, RandFloat(50,100));
             break;
 
         case Cooperation: 

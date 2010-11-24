@@ -22,7 +22,6 @@ Grid::Grid(int rs, int cs)
     equilineage = false;
     decay = 1.0;
     mutation = true;
-    birth = true;
     respawn = false;
     pathenergy = 0;
 
@@ -324,6 +323,9 @@ void Grid::Step()
     }
 
     if (decay != 1.0) energy *= decay;
+
+    if (ncreats == 0 && respawn)
+        AddCreats(50, true);
 
     timestep++;
 }

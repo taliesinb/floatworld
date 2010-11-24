@@ -31,13 +31,14 @@ MainWindow::MainWindow(QWidget *parent)
     // setup creatures
     Creat::Setup();
 
-    Creat::mprofile.proba = 0.2 / Creat::nonzeroweights;
-    Creat::mprofile.probb = 0.4 / Creat::nonzeroweights;
-    Creat::mprofile.scale = 0.05;
-    Creat::mprofile.noise = 0.05;
+    Creat::mprofile.proba = 0.05 / Creat::nonzeroweights;
+    Creat::mprofile.probb = 0.05 / Creat::nonzeroweights;
+    Creat::mprofile.probc = 0.5 / Creat::nonzeroweights;
+    Creat::mprofile.scale = 0.1;
+    Creat::mprofile.noise = 0.1;
     Creat::drawspecial = false;
     Creat::drawoutline = false;
-    grid.interaction = NoInteraction;
+    grid.interaction = Predation;
     Creat::mprofile.colordrift = true;
 
     // setup adam:
@@ -45,25 +46,52 @@ MainWindow::MainWindow(QWidget *parent)
     adam.SetZero();
     enum {
         energyF = 0, energyL, energyR, creatF, creatL, creatR,
-        cons, energy, age,
+        cons, energy, age, random,
         move = Creat::inputs + Creat::hidden,
         left,
         right,
         breed,
     };
-    adam(breed,cons) = -5.0;
-    adam(breed,energy) = 1.0;
-    adam(move,cons) = 1.0;
 
-    for (int i = 0; i < 10; i++)
+    adam(breed,energy) = 1.0;
+    adam(move,cons) = 1.1;
+    adam(left,random) = 1.05;
+
+    Creat::maxage = 1000;
+
+    for (int i = 0; i < 3; i++)
     {
         Circle* c = new Circle;
         c->Place(grid, grid.RandomCell());
-        c->radius = 15;
+        c->radius = 16;
         c->p_jump = 0.01;
+        for (int k = 0; k < 10; k++) c->Update();
     }
 
-    grid.AddCreats(20, true);
+    for (int i = 0; i < 3; i++)
+    {
+        Circle* c = new Circle;
+        c->Place(grid, grid.RandomCell());
+        c->radius = 23;
+        c->energy = 0.25;
+        c->p_jump = 0.005;
+        for (int k = 0; k < 10; k++) c->Update();
+    }
+
+    for (int i = 0; i < 2; i++)
+    {
+        Circle* c = new Circle;
+        c->Place(grid, grid.RandomCell());
+        c->radius = 8;
+        c->energy = 3.0;
+        c->p_jump = 0.01;
+        for (int k = 0; k < 10; k++) c->Update();
+    }
+
+    grid.decay = 0.92;
+    grid.respawn = true;
+
+    grid.AddCreats(40, true);
 
     connect(&timer1, SIGNAL(timeout()), this, SLOT(takeStep()));
     timer1.start(5);
@@ -124,7 +152,7 @@ void MainWindow::takeStep()
             stepper = 0;
             grid.Step();
         }
-    } else grid.Run(int(round(speed)));
+    } else grid.Run(int(round(speed)), 500);
 
     gridWidget->rerender();
     gridWidget->update();

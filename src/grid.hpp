@@ -29,7 +29,7 @@ class Grid
 {
 public:      
     
-    static const int maxcreats = 1000;
+    static const int maxcreats = 3000;
     Creat creats[maxcreats];
     int freespot;
 

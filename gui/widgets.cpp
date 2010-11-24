@@ -2,13 +2,15 @@
 
 #include <QPainter>
 
+int sz = 80;
+
 GridWidget::GridWidget(QWidget* parent)
         : QWidget(parent),
-        grid(100, 100),
-        pixmap(100, 100, QImage::Format_RGB32)
+        grid(sz, sz),
+        pixmap(sz, sz, QImage::Format_RGB32)
 {
     renders = 0;
-    scale = 5;
+    scale = 4;
     draw_type = draw_plain;
     setAttribute(Qt::WA_PaintOnScreen);
     setAttribute(Qt::WA_OpaquePaintEvent);
@@ -21,8 +23,8 @@ GridWidget::GridWidget(QWidget* parent)
 void GridWidget::paintEvent(QPaintEvent*)
 {
     QPainter painter(this);
-    painter.drawImage(QRect(0,0,scale*100,scale*100),pixmap,QRect(0,0,100,100));
-    //painter.drawPixmap(0,0,100,100,pixmap);
+    painter.drawImage(QRect(0,0,scale*sz,scale*sz),pixmap,QRect(0,0,sz,sz));
+    //painter.drawPixmap(0,0,200,200,pixmap);
 }
 
 void GridWidget::rerender()
@@ -38,10 +40,18 @@ void GridWidget::rerender()
             if (Creat* creat = dynamic_cast<Creat*>(grid.OccupantAt(Pos(i,j))))
             {
                 float intensity = 255;
-                if (draw_type == draw_age)    intensity = creat->age * 3;
-                if (draw_type == draw_energy) intensity = creat->energy * 6;
-                if (draw_type == draw_color)  color.setHsv((int(creat->marker * 20) + (100 * 255)) % 255, 220, 220);
-                else color.setRgb(intensity > 255 ? 255 : intensity, 0, 0);
+                if (draw_type == draw_age)
+                {
+                    float stage = float(creat->age) / Creat::maxage;
+                    if (stage < 0.3) color.setRgb(0,128,0);
+                    else if (stage < 0.6) color.setRgb(128,128,0);
+                    else if (stage < 0.95) color.setRgb(128,0,0);
+                    else if (stage < 1.0) color.setRgb(250,250,250);
+                } else {
+                    if (draw_type == draw_energy) intensity = creat->energy * 6;
+                    if (draw_type == draw_color)  color.setHsv((int(creat->marker * 20) + (100 * 255)) % 255, 220, 220);
+                    else color.setRgb(intensity > 255 ? 255 : intensity, 0, 0);
+                }
 
                 *line1++ = color.rgb();
             } else
