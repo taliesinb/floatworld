@@ -117,7 +117,6 @@ void Creat::SetupActions()
     actionlookup[ActionLeft] = &Creat::TurnLeft;
     actionlookup[ActionRight] = &Creat::TurnRight;
     actionlookup[ActionReproduce] = &Creat::Reproduce;
-    actionlookup[ActionDie] = &Creat::Remove;
   
     actioncost[ActionNone] = 0.1;
     actioncost[ActionLeft] = 0.5;
@@ -215,8 +214,6 @@ Pos SelectRandomWeight()
 void Creat::Reproduce()
 {
     Pos front = (Front() + Pos(RandInt(-3,3), RandInt(-3,3))).Wrap(grid->rows, grid->cols);
-  
-    float excess = state(inputs + hidden + ActionReproduce - 1) - 0.8;
 
     if (grid->OccupantAt(front)) return;
   
@@ -225,9 +222,11 @@ void Creat::Reproduce()
         Creat& child = grid->_AddCreat(front, Mod(orient+RandSign(),4));
         child.CopyBrain(*this);
         child.MutateBrain();
-        //cout << "New child: " << endl;
-        //child.Write(cout);
-        //cout << endl;
+
+        float excess = state(inputs + hidden + ActionReproduce - 1) - 0.8;
+
+        cout << "Excess: " << excess << endl;
+        TransferEnergy(child, excess * 10);
     }
 
     grid->births++;
@@ -444,21 +443,16 @@ void Creat::Step()
 
     // CALCULATE ACTION COST
     energy -= actioncost[action];
-    if (energy < 0 || age > maxage) {
-        //cout << "Creat died:" << endl;
-        //Write(cout);
-        action = ActionDie;
-    }
 
-    //cout << "Updating Creat at " << pos << " " << " age " << age << endl;
-  
     // UPDATE AGE
     age++;
     steps++;  
     special = false;
 
     // PERFORM ACTION
-    (this->*(actionlookup[action]))();
+    if (energy > 0) (this->*(actionlookup[action]))();
+
+    if (energy < 0 || age > maxage) Remove();
 }
 
 void Creat::__Remove()
