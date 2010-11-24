@@ -54,20 +54,23 @@ static inline float ClipFloat(float x, float min = 0.0, float max = 1.0) {
   return x > max ? max : (x < min ? min : x);
 }
 
-inline int RandInt(int n) {
-  return rand_r(&randomstate) % (n + 1);
-}
+int RandInt(int n);
 
 inline int RandInt(int a, int b) {
   return a + RandInt(b - a);
 }
 
 inline float RandFloat(float a=1.0) {
-  return a * RandInt(1e7) / 1e7;
+  return (a * RandInt(1e5)) / 1e5;
 }
 
 inline float RandFloat(float a, float b) {
   return a + RandFloat(b - a);
+}
+
+inline bool RandBool(float p)
+{
+  return RandFloat() < p;
 }
 
 float RandGauss();
@@ -83,6 +86,8 @@ inline int RandBit() {
 inline int RandSign() {
   return 1 - 2 * RandBit();
 }
+
+void SetRandomSeed(int seed);
 
 inline float SymF(float x) { return -1.0 + 2.0 * x; }
 

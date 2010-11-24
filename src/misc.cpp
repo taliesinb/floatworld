@@ -1,6 +1,6 @@
 #include "misc.hpp"
 
-unsigned int randomstate = 5;
+unsigned int randomstate;
 
 float RandGauss()
 {
@@ -9,4 +9,13 @@ float RandGauss()
   return 3.4739 * (x - (n * n)/2.0) / n; // A good approximation
 }  
 
+void SetRandomSeed(int seed)
+{
+  randomstate = seed;
+}
+
+int RandInt(int n)
+{
+  return abs((rand() * rand() + rand() + rand())) % (n + 1);
+}
 

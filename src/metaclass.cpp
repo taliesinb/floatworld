@@ -25,13 +25,18 @@ MetaClass* Class::GetMetaClass()
     return MetaClass::Lookup(Name());
 }
 
-void Class::Write(ostream& os)
+void Class::Write(ostream& os, int indent)
 {
-    GetMetaClass()->Write(this, os);
+    cout << ntabs[indent] << "{\n";
+    GetMetaClass()->Write(this, os, indent+1);
+    cout << ntabs[indent] << "}\n";
 }
 
 void Class::Read(istream& is)
 {
+    std::string str;
+    is >> str;
+    assert(str == Name());
     GetMetaClass()->Read(this, is);
 }
 
@@ -77,15 +82,24 @@ void MetaClass::Read(Class* occ, istream& is)
     MetaClass* parent = Lookup(pname);
     if (parent) parent->Read(occ, is);
     for (int i = 0; i < nvars; i++)
+    {
         (*readers[i])(occ, is);
+    }
 }
 
-void MetaClass::Write(Class* occ, ostream& os)
+void MetaClass::Write(Class* occ, ostream& os, int indent)
 {
     MetaClass* parent = Lookup(pname);
-    if (parent) parent->Write(occ, os);
+    if (parent)
+    {
+        parent->Write(occ, os, indent);
+        os << ", \n";
+    }
     for (int i = 0; i < nvars; i++)
-        (*writers[i])(occ, os);
+    {
+        if (i != 0) os << ", \n";
+        (*writers[i])(occ, os, indent);
+    }
 }
 
 Registrator::Registrator(MetaClass& metaclass, const char* name, ClassReader read, ClassWriter write)

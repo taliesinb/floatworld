@@ -383,10 +383,16 @@ ostream& operator<<(ostream& os, const Matrix::PrettyWrapper& w)
 
 ostream& operator<<(ostream& os, const Matrix& m)
 {
-    os << m.rows << " " << m.cols << endl;
+    os << "{\"rows\": " << m.rows << ", ";
+    os << "\"cols\": " << m.cols << ", ";
+    os << "\"data\": " << "[";
     os.precision(50);
     for (int i = 0; i < m.rows * m.cols; i++)
-        os << m.data[i] << " ";
+    {
+        if (i != 0) os << ", ";
+        os << m.data[i];
+    }
+    os << "]}";
     return os;
 }
 

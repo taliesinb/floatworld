@@ -3,6 +3,8 @@
 
 #include <iostream>
 
+static const char* ntabs[] = {"", "\t", "\t\t", "\t\t\t", "\t\t\t\t", "\t\t\t\t\t"};
+
 class MetaClass;
 
 class Class
@@ -10,13 +12,13 @@ class Class
 public:
     virtual void dummy();
     MetaClass* GetMetaClass();
-    void Write(std::ostream& os);
+    void Write(std::ostream& os, int indent=0);
     void Read(std::istream& is);
     const char* Name();
 };
 
 typedef Class* (*ClassMaker)();
-typedef void (*ClassWriter)(Class*, std::ostream&);
+typedef void (*ClassWriter)(Class*, std::ostream&, int indent);
 typedef void (*ClassReader)(Class*, std::istream&);
 
 class MetaClass
@@ -39,7 +41,7 @@ public:
 
     MetaClass(const char* _name, const char* _pname, ClassMaker func);
     void Read(Class* occ, std::istream& is);
-    void Write(Class* occ, std::ostream& os);    
+    void Write(Class* occ, std::ostream& os, int indent=0);
 };
 
 class Registrator
@@ -56,7 +58,7 @@ Class* META_##ThisClass##New() { return new ThisClass; }                  \
   MetaClass META_##ThisClass##MetaClass(#ThisClass, #ParentClass, NULL);
 
 #define RegisterVar(ThisClass, Name)                                             \
-  void META_##ThisClass##Name##Writer(Class* occ, std::ostream& os) { os << (dynamic_cast<ThisClass*>(occ))->Name << std::endl; } \
+  void META_##ThisClass##Name##Writer(Class* occ, std::ostream& os, int indent) { os << ntabs[indent] << '"' << #Name << "\": " << (dynamic_cast<ThisClass*>(occ))->Name; } \
           void META_##ThisClass##Name##Reader(Class* occ, std::istream& is) { is >> (dynamic_cast<ThisClass*>(occ))->Name; } \
           Registrator META_##ThisClass##Name##Registrator(META_##ThisClass##MetaClass, #Name, &META_##ThisClass##Name##Reader, &META_##ThisClass##Name##Writer);
 
