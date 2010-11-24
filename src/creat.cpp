@@ -84,6 +84,7 @@ void Creat::SetupMutation()
     mprofile.colordrift = true;
     mprofile.proba = 0.0;
     mprofile.probb = 0.0;
+    mprofile.probc = 0.0;
     mprofile.noise = 0.0;
     mprofile.scale = 0.0;
 }
@@ -126,7 +127,7 @@ void Creat::SetupActions()
 }  
 
 Creat::Creat()
-    : Occupant(1.0),
+    : Occupant(1),
       weights(neurons, neurons),
       state(neurons, 1),
       state2(neurons, 1)
@@ -140,7 +141,7 @@ Creat::Creat()
 }
 
 Creat::Creat(const Creat& c)
-    : Occupant(1.0),
+    : Occupant(1),
       weights(1,1),
       state(1,1),
       state2(1,1)
@@ -155,7 +156,6 @@ void Creat::Reset()
     action = ActionNone;
     possessed = false;
     alive = false;
-    action = ActionNone;
     marker = initialmarker;
     energy = initialenergy;
     lineage = NULL;
@@ -214,8 +214,10 @@ Pos SelectRandomWeight()
 
 void Creat::Reproduce()
 {
-    Pos front = Front();
+    Pos front = (Front() + Pos(RandInt(-3,3), RandInt(-3,3))).Wrap(grid->rows, grid->cols);
   
+    float excess = state(inputs + hidden + ActionReproduce - 1) - 0.8;
+
     if (grid->OccupantAt(front)) return;
   
     if (grid->birth)
@@ -223,6 +225,9 @@ void Creat::Reproduce()
         Creat& child = grid->_AddCreat(front, Mod(orient+RandSign(),4));
         child.CopyBrain(*this);
         child.MutateBrain();
+        //cout << "New child: " << endl;
+        //child.Write(cout);
+        //cout << endl;
     }
 
     grid->births++;
@@ -317,7 +322,7 @@ void Creat::Interaction(Creat& other)
 
 void Creat::MutateBrain()
 {
-    while (RandFloat(0,1) < mprofile.proba * nonzeroweights)
+    while (RandBool(mprofile.proba * nonzeroweights))
     {
         Pos w = SelectRandomWeight();
         weights(w) += RandFloat(-mprofile.noise, +mprofile.noise);
@@ -325,10 +330,18 @@ void Creat::MutateBrain()
         if (lineages) AddToLineage(w);
     }
 
-    while (RandFloat(0,1) < mprofile.probb * nonzeroweights)
+    while (RandBool(mprofile.probb * nonzeroweights))
     {
         Pos w = SelectRandomWeight();
         weights(w) = RandGauss(weights(w), mprofile.scale  * weights(w));
+
+        if (lineages) AddToLineage(w);
+    }
+
+    while (RandBool(mprofile.probc * nonzeroweights))
+    {
+        Pos w = SelectRandomWeight();
+        weights(w) = RandFloat(-3.0, 3.0);
 
         if (lineages) AddToLineage(w);
     }
@@ -381,6 +394,10 @@ static inline void tf3(float &f) {
     f = 1.0 / (1 + exp(-f));
 }
 
+static inline void tf4(float &f) {
+    f = atanh(f);
+}
+
 static inline float Kernel(Occupant* occ) { occ ? occ->signature : 0; }
 
 #define CREATKERNEL(offset)                     \
@@ -400,19 +417,20 @@ void Creat::Step()
 
     // SETUP INTERNAL INPUTS
     state(extinputs + 0) = 1.0;
-    state(extinputs + 1) = energy / 50.;
-    state(extinputs + 2) = log(1+age);
+    state(extinputs + 1) = (energy - 50.) / 50.;
+    state(extinputs + 2) = (float(age) - (maxage / 2)) / maxage;
+    state(extinputs + 3) = RandFloat(-1.0, 1.0);
 
     // CALCULATE BRAIN STEP
     FastMultiplyA(weights.data, state.data, state2.data);
-    for (int i = 0; i < hiddena; i++) tf1(state2(inputs + i));
-    for (int i = 0; i < hiddenb; i++) tf2(state2(inputs + hiddena + i));
+    for (int i = 0; i < hiddena; i++) tf4(state2(inputs + i));
+    for (int i = 0; i < hiddenb; i++) tf4(state2(inputs + hiddena + i));
     FastMultiplyB(weights.data, state.data, state2.data);
     SwapContents(state, state2);
 
     // CALCULATE ACTION
     action = ActionNone;
-    float maxaction = 1.0;
+    float maxaction = 0.8;
     float* output = &state(inputs + hidden);
     for (int i = 0; i < NumberActions-1; i++)
     {
@@ -426,7 +444,13 @@ void Creat::Step()
 
     // CALCULATE ACTION COST
     energy -= actioncost[action];
-    if (energy < 0 || age > maxage) action = ActionDie;
+    if (energy < 0 || age > maxage) {
+        //cout << "Creat died:" << endl;
+        //Write(cout);
+        action = ActionDie;
+    }
+
+    //cout << "Updating Creat at " << pos << " " << " age " << age << endl;
   
     // UPDATE AGE
     age++;
@@ -463,6 +487,7 @@ void Creat::CopyBrain(Creat& parent)
     weights = parent.weights;
     lineage = parent.lineage; if (lineage) lineage->Increment();
     //  state = parent.state;
+
     marker = parent.marker;
 
     if (desired_id >= 0) BlendBrain(grid->creats[desired_id]);
@@ -470,7 +495,7 @@ void Creat::CopyBrain(Creat& parent)
 
 void Creat::ChooseMate(Creat* other)
 {
-    if (desired_id) grid->creats[desired_id].desirer_id = -1;
+    if (desired_id >= 0) grid->creats[desired_id].desirer_id = -1;
     other->desirer_id = id;
     desired_id = other ? other->id : -1;
 }
@@ -485,6 +510,11 @@ Creat* Creat::Peer(int id)
 {
     if (id < 0) return NULL;
     else return &grid->creats[id];
+}
+
+float Creat::Complexity()
+{
+    return weights.GetHammingNorm();
 }
 
 vector<Matrix> ReconstructBrains(list<LineageNode>& lineage, Matrix& initial, int T)

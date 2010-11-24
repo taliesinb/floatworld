@@ -14,7 +14,6 @@ enum CreatAction
     ActionLeft,
     ActionRight,
     ActionReproduce,
-    ActionDie,
     NumberActions, // dummy for bookkeeping purposes
 };
 
@@ -27,6 +26,7 @@ struct MutationProfile
     bool colordrift;
     float proba;
     float probb;
+    float probc;
     float noise;
     float scale;      
 };
@@ -49,7 +49,7 @@ class Creat : public Occupant
 {
 public:
     static const int extinputs = 6;
-    static const int intinputs = 3;
+    static const int intinputs = 4;
     static const int inputs = extinputs + intinputs;
     static const int hiddena = 2;
     static const int hiddenb = 2;
@@ -126,6 +126,8 @@ public:
     void Interaction(Creat& c);
     void ChooseMate(Creat* other);
     void TransferEnergy(Creat& other, float de);
+
+    float Complexity();
 
     Creat* Peer(int id);
 };
