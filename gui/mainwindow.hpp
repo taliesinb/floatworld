@@ -9,7 +9,6 @@
 #include "../src/pos.hpp"
 #include "../src/matrix.hpp"
 #include "../src/grid.hpp"
-#include "../src/feeder.hpp"
 #include "../src/shape.hpp"
 
 #include "ui_mainwindow.h"
@@ -20,7 +19,6 @@ class MainWindow : public QMainWindow, public Ui::MainWindow
     Q_OBJECT
 
 public:
-    ShapeFeeder feeder;
     Matrix adam;
     QTimer timer1;
     QTimer timer2;

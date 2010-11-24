@@ -1,15 +1,18 @@
 #include "shape.hpp"
 #include "matrix.hpp"
+#include "grid.hpp"
 
 RegisterAbstractClass(Shape, None);
 RegisterVar(Shape, pos);
 RegisterVar(Shape, threshold);
 RegisterVar(Shape, energy);
 RegisterVar(Shape, ratio);
+RegisterVar(Shape, p_jump);
 
 RegisterClass(Circle, Shape);
 RegisterVar(Circle, radius);
 
+/*
 RegisterClass(GaussianCircle, Circle);
 
 RegisterClass(Annalus, Shape);
@@ -22,34 +25,30 @@ RegisterClass(Rectangle, Shape);
 RegisterVar(Rectangle, width);
 RegisterVar(Rectangle, length);
 RegisterVar(Rectangle, angle);
+*/
 
 Shape::Shape()
-  : pos(0, 0),
-    threshold(20),
-    energy(0.2),
-    ratio(1.0)
+  : threshold(15),
+    energy(1.0),
+    ratio(1.0),
+    p_jump(0.01),
+    Occupant(2)
 {
-}
-
-void Shape::RandomPosition()
-{
-  pos.row = RandInt(1e6);
-  pos.col = RandInt(1e6);
 }
 
 void Shape::Draw(Matrix& m)
 {
   if (ratio < 1.0)
-  {
-    int a = Area();
-    DrawStochastic(m, ratio * a);
-  } else
+    DrawStochastic(m, ratio * Area());
+  else
     DrawFull(m);
 }
 
-int Rectangle::Area()
+void Shape::Update()
 {
-	return length * width;
+  Draw(grid->energy);
+  if (RandBool(p_jump))
+    MoveRandom();
 }
 
 Circle::Circle()
@@ -57,9 +56,9 @@ Circle::Circle()
 {
 }
 
-int Circle::Area()
+float Circle::Area()
 {
-  return 3.14159 * radius * radius;
+  return 2 * 3.141519 * radius;
 }
 
 void Circle::DrawFull(Matrix& m)
@@ -87,6 +86,7 @@ void Circle::DrawStochastic(Matrix& m, int n)
   }
 }
 
+/*
 Annalus::Annalus()
   : radius1(5),
     radius2(10),
@@ -240,5 +240,5 @@ void GaussianCircle::DrawStochastic(Matrix& m, int n)
     Inject(m, r, c, de * exp(3*-d/r2));
   }
 }
-
+*/
 

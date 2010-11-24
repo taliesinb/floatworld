@@ -8,8 +8,6 @@
 #include <vector>
 
 class Creat;
-class Feeder;
-
 enum InteractionMode
 {
     NoInteraction,
@@ -31,11 +29,10 @@ class Grid
 {
 public:      
     
-    static const int maxcreats = 500;
+    static const int maxcreats = 1000;
     Creat creats[maxcreats];
     int freespot;
 
-    Feeder* feeder;
     Matrix energy;
     float decay;
 
@@ -69,9 +66,6 @@ public:
     void LoadState(std::istream& is);
     void SaveOccupant(std::ostream& os, Occupant* occ);
     void LoadOccupant(std::istream& is);
-
-    // External class stuff
-    void AttachFeeder(Feeder& f);
 
     // Low-level position
     Pos Wrap(Pos pos) { return pos.Wrap(rows, cols); }

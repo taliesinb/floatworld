@@ -1,5 +1,7 @@
 #include "mainwindow.hpp"
 
+using namespace std;
+
 void MainWindow::viewtype_set(QAction* action)
 {
     if (action == actionAge) gridWidget->draw_type = GridWidget::draw_age;
@@ -28,7 +30,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // setup creatures
     Creat::Setup();
-    cout << "Non zero weights: " << Creat::nonzeroweights;
+
     Creat::mprofile.proba = 0.2 / Creat::nonzeroweights;
     Creat::mprofile.probb = 0.4 / Creat::nonzeroweights;
     Creat::mprofile.scale = 0.05;
@@ -53,28 +55,20 @@ MainWindow::MainWindow(QWidget *parent)
     adam(breed,energy) = 1.0;
     adam(move,cons) = 1.0;
 
-    // setup feeder
-    grid.AttachFeeder(feeder);
-    feeder.moveprob = 0.005;
-
-    for (int n = 0; n < 10; n++)
+    for (int i = 0; i < 10; i++)
     {
-        GaussianCircle* g = new GaussianCircle;
-        g->RandomPosition();
-        g->radius = RandInt(6,20);
-        g->ratio = 0.05;
-        g->energy = RandFloat(0.1,0.5);
-        feeder.AddShape(g);
+        Circle* c = new Circle;
+        c->Place(grid, grid.RandomCell());
+        c->radius = 15;
+        c->p_jump = 0.01;
     }
-    feeder.maxdensity = 15;
-    feeder.InitialFeed();
 
-    grid.AddCreats(50, true);
+    grid.AddCreats(20, true);
 
     connect(&timer1, SIGNAL(timeout()), this, SLOT(takeStep()));
     timer1.start(5);
-    connect(&timer2, SIGNAL(timeout()), this, SLOT(reportFPS()));
-    timer2.start(5000);
+//    connect(&timer2, SIGNAL(timeout()), this, SLOT(reportFPS()));
+//    timer2.start(5000);
 
     gridWidget->rerender();
     gridWidget->repaint();

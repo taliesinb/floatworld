@@ -1,6 +1,5 @@
 #include "grid.hpp"
 #include "creat.hpp"
-#include "feeder.hpp"
 #include <fstream>
 #include  <assert.h>
 
@@ -12,7 +11,6 @@ const char* interactionnames[] = {"None", "Wastage","Parasitism", "Predation", "
 
 Grid::Grid(int rs, int cs)
     : adam(NULL),
-      feeder(NULL),
       energy(rs,cs),
       occupants(NULL)
 {
@@ -46,7 +44,6 @@ Grid::Grid(int rs, int cs)
 
 Grid::~Grid()
 {
-    if (feeder) feeder->grid = NULL;
     // for (unsigned int i = 0; i < watchers.size(); i++)
     //    watchers[i]->grid = NULL;
 }
@@ -61,15 +58,7 @@ void Grid::Resize(int r, int c)
     occupants = new Occupant*[rows * cols];
     for (int i = 0; i < rows * cols; i++) occupants[i] = NULL;
 
-    if (feeder) feeder->Resize();
-
     cout << "Resized to dimensions " << rows << ", " << cols << endl;
-}
-
-void Grid::AttachFeeder(Feeder& f)
-{
-    feeder = &f;
-    feeder->SetGrid(this);
 }
 
 Pos Grid::RandomCell()
@@ -81,6 +70,7 @@ Pos Grid::EmptyCell()
 {
     Pos pos = RandomCell();
     while (OccupantAt(pos)) pos = RandomCell();
+
     return pos;
 }
 
@@ -163,13 +153,11 @@ Creat* Grid::FindCreat(float marker)
     return c;
 }
 
-#define NEWKERNEL
-#define KERNEL(x,y) data[cs * Mod(r + x, rs) + Mod(c + y, cs)]  
+#define KERNEL(r2,c2) data[cs * Mod(r + r2, rs) + Mod(c + c2, cs)]
 #define KERNEL2(x,y) Kernel2(occupants[cs * Mod(r + x, rs) + Mod(c + y, cs)])
 static inline float Kernel2(Occupant* occ)
 { return occ ? occ->signature : 0; }
 
-#ifdef NEWKERNEL
 float Grid::EnergyKernel(Pos pos, int dir)
 {
     int r = pos.row, c = pos.col;
@@ -180,7 +168,7 @@ float Grid::EnergyKernel(Pos pos, int dir)
         case 3:
             return
                 2 * KERNEL(0,-1) 
-                + 0.5 * (KERNEL(0,-2) + KERNEL(-1,-1) + KERNEL(-1,-1));
+                + 0.5 * (KERNEL(0,-2) + KERNEL(-1,-1) + KERNEL(1,-1));
         case 2:
             return
                 2 * KERNEL(1,0) 
@@ -188,7 +176,7 @@ float Grid::EnergyKernel(Pos pos, int dir)
         case 1:
             return
                 2 * KERNEL(0,1) 
-                + 0.5 * (KERNEL(0,2) + KERNEL(-1,1) + KERNEL(-1,1));
+                + 0.5 * (KERNEL(0,2) + KERNEL(-1,1) + KERNEL(1,1));
         case 0:
             return
                 2 * KERNEL(-1,0) 
@@ -205,7 +193,7 @@ float Grid::CreatKernel(Pos pos, int dir)
         case 3:
             return 
                 2 * KERNEL2(0,-1) 
-                + 0.5 * (KERNEL2(0,-2) + KERNEL2(-1,-1) + KERNEL2(-1,-1));
+                + 0.5 * (KERNEL2(0,-2) + KERNEL2(-1,-1) + KERNEL2(1,-1));
         case 2:
             return
                 2 * KERNEL2(1,0) 
@@ -213,65 +201,13 @@ float Grid::CreatKernel(Pos pos, int dir)
         case 1:
             return
                 2 * KERNEL2(0,1) 
-                + 0.5 * (KERNEL2(0,2) + KERNEL2(-1,1) + KERNEL2(-1,1));
+                + 0.5 * (KERNEL2(0,2) + KERNEL2(-1,1) + KERNEL2(1,1));
         case 0:
             return
                 2 * KERNEL2(-1,0) 
                 + 0.5 * (KERNEL2(-2,0) + KERNEL2(-1,-1) + KERNEL2(-1,1));
     }
 }
-#else
-float Grid::EnergyKernel(Pos pos, int dir)
-{
-    int r = pos.row, c = pos.col;
-    int cs = cols, rs = rows;
-    float* data = energy.data;
-    switch(Mod(dir, 4))
-    {
-        case 3:
-            return
-                2 * KERNEL(0,-1) 
-                + 0.5 * (KERNEL(0,-2) + KERNEL(-1,-2) + KERNEL(1,-2) + KERNEL(-1,-1) + KERNEL(-1,-1));
-        case 2:
-            return
-                2 * KERNEL(1,0) 
-                + 0.5 * (KERNEL(2,0) + KERNEL(2,-1) + KERNEL(2,1) + KERNEL(1,-1) + KERNEL(1,1));
-        case 1:
-            return
-                2 * KERNEL(0,1) 
-                + 0.5 * (KERNEL(0,2) + KERNEL(-1,2) + KERNEL(1,2) + KERNEL(-1,1) + KERNEL(-1,1));
-        case 0:
-            return
-                2 * KERNEL(-1,0) 
-                + 0.5 * (KERNEL(-2,0) + KERNEL(-2,-1) + KERNEL(-2,1) + KERNEL(-1,-1) + KERNEL(-1,1));
-    }
-}
-float Grid::CreatKernel(Pos pos, int dir)
-{
-    int r = pos.row, c = pos.col;
-    int cs = cols, rs = rows;
-    switch(Mod(dir, 4))
-    {
-        case 3:
-            return 
-                2 * KERNEL2(0,-1) 
-                + 0.5 * (KERNEL2(0,-2) + KERNEL2(-1,-2) + KERNEL2(1,-2) + KERNEL2(-1,-1) + KERNEL2(-1,-1));
-        case 2:
-            return
-                2 * KERNEL2(1,0) 
-                + 0.5 * (KERNEL2(2,0) + KERNEL2(2,-1) + KERNEL2(2,1) + KERNEL2(1,-1) + KERNEL2(1,1));
-        case 1:
-            return
-                2 * KERNEL2(0,1) 
-                + 0.5 * (KERNEL2(0,2) + KERNEL2(-1,2) + KERNEL2(1,2) + KERNEL2(-1,1) + KERNEL2(-1,1));
-        case 0:
-            return
-                2 * KERNEL2(-1,0) 
-                + 0.5 * (KERNEL2(-2,0) + KERNEL2(-2,-1) + KERNEL2(-2,1) + KERNEL2(-1,-1) + KERNEL2(-1,1));
-    }
-}
-#endif
-
 
 float aligned(Creat* creat, int d)
 {
@@ -285,10 +221,9 @@ float aligned(Creat* creat, int d)
 
 void Grid::Run(int steps, int report)
 {
-    timestep = 0;
-    for (int i = 0; i < steps && ncreats; i++)
+    for (int i = 0; i < steps; i++)
     {
-        if (report && i % report == 0) Report();
+        if (report && (timestep % report) == 0) Report();
         Step();
     }
 }
@@ -360,7 +295,15 @@ void Grid::RunLineage(const char* file, int steps, int every)
 
 void Grid::Report()
 {
-    cout << "Time, Pop      = \t" << timestep << "\t" << ncreats << endl;
+    float avgcomplexity = 0;
+
+    for (int i = 0; i < maxcreats; i++)
+        if (creats[i].alive)
+            avgcomplexity += creats[i].Complexity();
+
+    avgcomplexity /= ncreats ? ncreats : 1;
+    cout << "Time, Pop, Synapses = " << timestep << " " << ncreats << " " << avgcomplexity << endl;
+
     flush(cout);
 }
 
@@ -370,9 +313,15 @@ void Grid::Step()
         if (creats[i].alive) creats[i].Step();
   
     for (int i = 0; i < rows * cols; i++)
-        if (occupants[i]) occupants[i]->Update();  
-
-    if (feeder and feeding) feeder->Feed();
+    {
+      Occupant* occ = occupants[i];
+      while (occ)
+      {
+        Occupant* next = occ->next;
+        occ->Update();
+        occ = next;
+      }
+    }
 
     if (decay != 1.0) energy *= decay;
 
@@ -395,7 +344,6 @@ float Grid::CompeteScore(Matrix& a, Matrix& b)
     for (int m = 0; m < accuracy; m++)
     {
         RemoveAllCreats();
-        feeder->InitialFeed();
 
         for (int i = 0; i < 50; i++)
         {
@@ -463,8 +411,6 @@ void Grid::SaveState(ostream& os)
         if (occupants[i]) SaveOccupant(os, occupants[i]);
   
   
-    if (feeder) feeder->SaveState(os);
-
     cout << "Grid state saved." << endl;
 }
 
@@ -499,8 +445,6 @@ void Grid::LoadState(istream& is)
 
     SanityCheck();
   
-    if (feeder) feeder->LoadState(is);
-
     cout << "Grid state loaded." << endl;
 }
 
@@ -572,7 +516,6 @@ Matrix Grid::Evolve(int steps)
 {
     // cout << "Beginning evolution of " << steps << " steps." << endl;
     RemoveAllCreats();
-    feeder->InitialFeed();
     AddCreats(50,true);
     Run(steps);//, steps/5);
     return FindDominantGenome();
