@@ -8,7 +8,7 @@ RegisterVar(Occupant, pos)
 RegisterVar(Occupant, signature)
 
 Occupant::Occupant(int sig)
-  : grid(NULL), signature(sig)
+  : grid(NULL), signature(sig), next(NULL), pos(0,0)
 {
 }
 
@@ -20,6 +20,13 @@ void Occupant::Interact(Creat&)
 void Occupant::__Remove()
 {
 	
+}
+
+void Occupant::Place(Grid& g, Pos p)
+{
+  grid = &g;
+  pos = p;
+  Place();
 }
 
 // add an occupant for the first time
@@ -63,6 +70,13 @@ void Occupant::Move(Pos pos2)
 {
   RemoveFromLL();
   pos = pos2;
+  Place();
+}
+
+void Occupant::MoveRandom()
+{
+  RemoveFromLL();
+  pos = grid->RandomCell();
   Place();
 }
 

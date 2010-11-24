@@ -23,10 +23,12 @@ class Occupant : public Class
 
     virtual void __Remove();
 
+    void Place(Grid& grid, Pos pos);
     void Place();
     void Remove();
     void RemoveFromLL();
     void Move(Pos p);
+    void MoveRandom();
     
     Creat* Peer(int id);
 };
