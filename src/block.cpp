@@ -47,7 +47,7 @@ void EnergyBlock::Update()
 {
   if (grid->timestep % 5)
   {
-    GaussianCircle spot;
+    Circle spot;
     spot.pos = pos;
     spot.radius = 5;
     spot.energy = de;
@@ -91,7 +91,7 @@ void SkinnerBlock::Interact(Creat&)
   if (touch_count++ >= 8)
   {
     touch_count = 0;
-    GaussianCircle spot;
+    Circle spot;
     spot.pos = pos;
     spot.radius = 5;
     spot.energy = 15;
@@ -129,7 +129,7 @@ void PhasedSkinnerBlock::Interact(Creat& c)
   if (phase and touch_count++ >= 8)
   {
     touch_count = 0;
-    GaussianCircle spot;
+    Circle spot;
     spot.pos = pos;
     spot.radius = 5;
     spot.energy = 30;
