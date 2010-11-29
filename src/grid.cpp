@@ -386,7 +386,6 @@ int Grid::CountCreatsByMarker(float marker)
 void Grid::SaveState(ostream& os)
 {
     assert (interaction <= Cooperation);
-    SanityCheck();
 
     os << rows << " "
        << cols << endl
@@ -445,8 +444,6 @@ void Grid::LoadState(istream& is)
     is >> noccupants;
     while (noccupants--) LoadOccupant(is);
 
-    SanityCheck();
-  
     cout << "Grid state loaded." << endl;
 }
 
@@ -478,29 +475,6 @@ void Grid::SaveOccupant(std::ostream& os, Occupant* occ)
        << occ->Name() << endl;
 
     occ->Write(os);
-}
-
-void Grid::SanityCheck()
-{
-    // ofstream os("sanity");
-    // SaveState(os);
-    // os.close();
-    for (int i = 0; i < rows * cols; i++)
-    {
-        if (Creat* c = dynamic_cast<Creat*>(occupants[i]))
-        {
-            assert(c->alive);
-        }
-    }
-    for (int i = 0; i < maxcreats; i++)
-    {
-        if (creats[i].alive)
-        {
-            assert(creats[i].pos.Inside(rows, cols));
-            assert(OccupantAt(creats[i].pos) == &creats[i]);
-            creats[i].SanityCheck();
-        }
-    }
 }
 
 Matrix Grid::FindDominantGenome()

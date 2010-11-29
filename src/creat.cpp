@@ -301,39 +301,6 @@ void Creat::MutateBrain()
     if (mprofile.color_drift)
         marker += RandFloat(-0.015, 0.015);
 }
-
-void Creat::SanityCheck()
-{
-    bool insane = false;
-    for (int i = 0; i < neurons; i++)
-    {
-        if (isinf(state(i)) || isnan(state(i)))
-        {
-            cout << "Neuron " << i  << " is insane!" << endl;
-            flush(cout);
-            insane = true;
-        }
-        for (int j = 0; j < neurons; j++)
-        {
-            float w = weights.Get(i,j);
-            if (isinf(w) || isnan(w) || fabs(w) > 1000)
-            {
-                cout << "Weight " << i << ", " << j << " is insane!" << endl;
-                insane = true;
-            }
-        }
-    }
-    if  (insane)
-    {
-        PRINT(marker);
-        PRINT(pos.row);
-        PRINT(pos.col);
-        PRINT(weights);
-        PRINT(state);
-        PRINT(state2);
-    }
-    assert(!insane);
-}
   
 void Creat::Step()
 {

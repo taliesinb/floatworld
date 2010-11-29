@@ -98,9 +98,6 @@ public:
     void Report();
     Matrix Evolve(int steps);
 
-    // Bug-checking
-    void SanityCheck();
-
     // Creature vision functions
     float CreatKernel(Pos pos, int dir);
     float EnergyKernel(Pos pos, int dir);
