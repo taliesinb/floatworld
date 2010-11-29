@@ -19,18 +19,9 @@ RegisterVar(Creat, special);
 RegisterVar(Creat, energy);
 RegisterVar(Creat, marker);
 
-int Creat::steps = 0;
-int Creat::maxage = 100;
-
-float Creat::initialenergy = 2;
-float Creat::initialmarker = 0.0;
-float Creat::actioncost[NumberActions];
-CreatFunc Creat::actionlookup[NumberActions];
-Matrix Creat::weightmask(Creat::neurons, Creat::neurons);
-bool Creat::lineages = false;
 
 LineageNode::LineageNode(LineageNode* p)
-    : pos(0,0), prev(p), refs(1)
+    : pos(0,0), refs(1),  prev(p)
 {
 }
 
@@ -48,43 +39,9 @@ void LineageNode::Decrement()
 
 void Creat::Setup()
 {
-    SetupMask(true);
-    SetupActions();
 }
 
-void Creat::SetupMask(bool hid)
-{
-    int inl =  0;
-    int inr =  Creat::inputs - 1;
-    int hidl = Creat::inputs;
-    int hidr = Creat::inputs + Creat::hidden - 1;
-    int outl = hidr + 1;
-    int outr = hidr + Creat::outputs;
 
-    weightmask.SetZero();
-    if (hid)
-    {
-        weightmask.SetSubMatrix(hidl, inl, hidr, inr, 1.0);
-        weightmask.SetSubMatrix(outl, hidl, outr, hidr, 1.0);
-        weightmask.SetSubMatrix(hidl, hidl, hidr, hidr, 1.0);
-    }
-    weightmask.SetSubMatrix(outl, inl, outr, inr, 1.0);
-}
-
-void Creat::SetupActions()
-{
-    actionlookup[ActionNone] = &Creat::DoNothing;
-    actionlookup[ActionForward] = &Creat::MoveForward;
-    actionlookup[ActionLeft] = &Creat::TurnLeft;
-    actionlookup[ActionRight] = &Creat::TurnRight;
-    actionlookup[ActionReproduce] = &Creat::Reproduce;
-  
-    actioncost[ActionNone] = 0;
-    actioncost[ActionLeft] = 0;
-    actioncost[ActionForward] = 1.0;
-    actioncost[ActionRight] = 0;
-    actioncost[ActionReproduce] = 60.0;
-}  
 
 Creat::Creat()
     : Occupant(1),
@@ -116,8 +73,8 @@ void Creat::Reset()
     action = ActionNone;
     possessed = false;
     alive = false;
-    marker = initialmarker;
-    energy = initialenergy;
+    marker = grid ? grid->initial_marker : 0;
+    energy = grid ? grid->initial_energy : 0;
     lineage = NULL;
     desired_id = -1;
     desirer_id = -1;
@@ -162,13 +119,13 @@ list<LineageNode> Creat::ReconstructLineage()
     return stack;
 }
 
-Pos SelectRandomWeight()
+Pos Creat::SelectRandomWeight()
 {
     int j, k;
     do { 
         j = RandInt(Creat::neurons-1);
         k = RandInt(Creat::neurons-1);
-    } while (Creat::weightmask(j,k) == 0.0);
+    } while (grid->weight_mask(j,k) == 0.0);
     return Pos(j,k);
 }
 
@@ -201,7 +158,7 @@ void Creat::MoveForward()
         Move(front);
         float de = grid->energy(front);
         energy += de;
-        grid->energy(pos) = grid->pathenergy / 2.0;
+        grid->energy(pos) = grid->path_energy / 2.0;
     }
 }
 
@@ -226,7 +183,7 @@ void Creat::Interact(Creat& creat)
 
 void Creat::Interaction(Creat& other)
 {
-    switch (grid->interaction)
+    switch (grid->interaction_type)
     {
         case NoInteraction:
             break;
@@ -282,7 +239,7 @@ void Creat::MutateBrain()
         Pos w = SelectRandomWeight();
         weights(w) += RandGauss(0, grid->mutation_sd);
 
-        if (lineages) AddToLineage(w);
+        if (grid->record_lineages) AddToLineage(w);
     }
 
     if (grid->mutation_color_drift)
@@ -304,7 +261,7 @@ void Creat::Step()
     // SETUP INTERNAL INPUTS
     state(extinputs + 0) = 1.0;
     state(extinputs + 1) = (energy - 50.) / 50.;
-    state(extinputs + 2) = (float(age) - (maxage / 2)) / maxage;
+    state(extinputs + 2) = (float(age) - (grid->max_age / 2)) / grid->max_age;
     state(extinputs + 3) = RandFloat(-1.0, 1.0);
 
     // CALCULATE BRAIN STEP
@@ -348,23 +305,23 @@ void Creat::Step()
     if (possessed) { action = ActionNone; possessed = false; }
 
     // CALCULATE ACTION COST
-    energy -= actioncost[action];
+    energy -= grid->action_cost[action];
 
     // UPDATE AGE
     age++;
-    steps++;  
+    grid->total_steps++;
     special = false;
 
     // PERFORM ACTION
-    if (energy > 0) (this->*(actionlookup[action]))();
+    if (energy > 0) (this->*(grid->action_lookup[action]))();
 
-    if (energy < 0 || age > maxage) Remove();
+    if (energy < 0 || age > grid->max_age) Remove();
 }
 
 void Creat::__Remove()
 {
     alive = false;
-    grid->ncreats--;
+    grid->num_creats--;
     if (lineage) lineage->Decrement();
     if (desired_id >= 0) grid->creats[desired_id].desirer_id = -1;
     if (desirer_id >= 0) grid->creats[desirer_id].desired_id = -1;	

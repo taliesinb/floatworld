@@ -31,10 +31,10 @@ MainWindow::MainWindow(QWidget *parent)
     // setup creatures
     Creat::Setup();
 
-    grid.interaction = Predation;
+    grid.interaction_type = Predation;
 
     // setup adam:
-    grid.adam = &adam;
+    grid.initial_brain = &adam;
     adam.SetZero();
     enum {
         energyF = 0, energyL, energyR, creatF, creatL, creatR,
@@ -49,7 +49,7 @@ MainWindow::MainWindow(QWidget *parent)
     adam(move,cons) = 1.1;
     adam(left,random) = 1.05;
 
-    Creat::maxage = 1000;
+    grid.max_age = 1000;
 
     for (int i = 0; i < 3; i++)
     {
@@ -80,8 +80,8 @@ MainWindow::MainWindow(QWidget *parent)
         for (int k = 0; k < 10; k++) c->Update();
     }
 
-    grid.decay = 0.92;
-    grid.respawn = true;
+    grid.energy_decay_rate = 0.08;
+    grid.enable_respawn = true;
 
     grid.AddCreats(40, true);
 

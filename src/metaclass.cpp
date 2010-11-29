@@ -4,6 +4,14 @@
 
 #include "metaclass.hpp"
 
+static const char* ntabs[6] = {"", "\t", "\t\t", "\t\t\t", "\t\t\t\t", "\t\t\t\t\t"};
+
+const char* make_tabs(int n)
+{
+    if (n < 6) return ntabs[n];
+    return ntabs[5];
+}
+
 using namespace std;
 
 int MetaClass::nmetaclasses = 0;
@@ -27,9 +35,9 @@ MetaClass* Class::GetMetaClass()
 
 void Class::Write(ostream& os, int indent)
 {
-    cout << ntabs[indent] << "{\n";
+    cout << make_tabs(indent) << "{\n";
     GetMetaClass()->Write(this, os, indent+1);
-    cout << ntabs[indent] << "}\n";
+    cout << make_tabs(indent) << "}\n";
 }
 
 void Class::Read(istream& is)
@@ -41,10 +49,10 @@ void Class::Read(istream& is)
 }
 
 MetaClass::MetaClass(const char* _name, const char* _pname, ClassMaker func)
-    : nvars(0),
-      name(_name),
+    : name(_name),
       pname(_pname),
-      maker(func)
+      maker(func),
+      nvars(0)
 {
     metaclasses[nmetaclasses] = this;
     nmetaclasses++;
@@ -106,5 +114,6 @@ Registrator::Registrator(MetaClass& metaclass, const char* name, ClassReader rea
 {
     metaclass.writers[metaclass.nvars] = write;
     metaclass.readers[metaclass.nvars] = read;
+    metaclass.varname[metaclass.nvars] = name;
     metaclass.nvars++;
 }

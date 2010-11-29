@@ -162,7 +162,7 @@ void CloneBlock::Update()
   {
     Creat& child = grid->_AddCreat(grid->FairCell(), RandInt(3));
     child.CopyBrain(*creat);
-    if (grid->mutation) child.MutateBrain();
+    if (grid->enable_mutation) child.MutateBrain();
     fill = true;
     creat = NULL;
   } else fill = false;

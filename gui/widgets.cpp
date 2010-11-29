@@ -42,7 +42,7 @@ void GridWidget::rerender()
                 float intensity = 255;
                 if (draw_type == draw_age)
                 {
-                    float stage = float(creat->age) / Creat::maxage;
+                    float stage = float(creat->age) / grid.max_age;
                     if (stage < 0.3) color.setRgb(0,128,0);
                     else if (stage < 0.6) color.setRgb(128,128,0);
                     else if (stage < 0.95) color.setRgb(128,0,0);

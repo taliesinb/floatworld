@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-static const char* ntabs[] = {"", "\t", "\t\t", "\t\t\t", "\t\t\t\t", "\t\t\t\t\t"};
+const char* make_tabs(int n);
 
 class MetaClass;
 
@@ -38,6 +38,7 @@ public:
     int nvars;
     ClassWriter writers[32];
     ClassReader readers[32];
+    const char* varname[32];
 
     MetaClass(const char* _name, const char* _pname, ClassMaker func);
     void Read(Class* occ, std::istream& is);
@@ -58,7 +59,7 @@ Class* META_##ThisClass##New() { return new ThisClass; }                  \
   MetaClass META_##ThisClass##MetaClass(#ThisClass, #ParentClass, NULL);
 
 #define RegisterVar(ThisClass, Name)                                             \
-  void META_##ThisClass##Name##Writer(Class* occ, std::ostream& os, int indent) { os << ntabs[indent] << '"' << #Name << "\": " << (dynamic_cast<ThisClass*>(occ))->Name; } \
+  void META_##ThisClass##Name##Writer(Class* occ, std::ostream& os, int indent) { os << make_tabs(indent) << '"' << #Name << "\": " << (dynamic_cast<ThisClass*>(occ))->Name; } \
           void META_##ThisClass##Name##Reader(Class* occ, std::istream& is) { is >> (dynamic_cast<ThisClass*>(occ))->Name; } \
           Registrator META_##ThisClass##Name##Registrator(META_##ThisClass##MetaClass, #Name, &META_##ThisClass##Name##Reader, &META_##ThisClass##Name##Writer);
 

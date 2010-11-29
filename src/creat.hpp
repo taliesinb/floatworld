@@ -45,19 +45,7 @@ public:
     static const int outputs = 4;
     static const int neurons = inputs + hidden + outputs;
 
-    static bool lineages;
-    
-    static float actioncost[NumberActions];
-    static CreatFunc actionlookup[NumberActions];
-    static float initialenergy;
-    static float initialmarker;
-    static int maxage;
-    static int steps;
-
-    static Matrix weightmask;
     static void Setup();
-    static void SetupMask(bool);
-    static void SetupActions();
 
     int desired_id;
     int desirer_id;
@@ -100,6 +88,7 @@ public:
     void MutateBrain();
     void CopyBrain(Creat& parent);
     void BlendBrain(Creat& other);
+    Pos SelectRandomWeight();
 
     // INTERACTION CODE
     void Interaction(Creat& c);

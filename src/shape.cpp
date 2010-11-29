@@ -28,11 +28,11 @@ RegisterVar(Rectangle, angle);
 */
 
 Shape::Shape()
-  : threshold(15),
+  : Occupant(2),
+    threshold(15),
     energy(1.0),
     ratio(1.0),
-    p_jump(0.01),
-    Occupant(2)
+    p_jump(0.01)
 {
 }
 

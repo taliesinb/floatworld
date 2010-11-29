@@ -29,25 +29,34 @@ class Grid
 {
 public:      
     
-    static const int maxcreats = 3000;
-    Creat creats[maxcreats];
+    static const int max_creats = 3000;
+    Creat creats[max_creats];
     int freespot;
 
     Matrix energy;
-    float decay;
+    float energy_decay_rate;
 
     int timestep;
     int births;
     int rows, cols;
-    int ncreats;
-    int interaction;
+    int num_creats;
+    int interaction_type;
 
-    bool equilineage;
-    bool mutation;
-    bool birth;
-    bool respawn;
-    bool feeding;
-    int pathenergy;
+    bool enable_mutation;
+    bool enable_respawn;
+
+    int path_energy;
+    bool record_lineages;
+
+    float action_cost[NumberActions];
+    CreatFunc action_lookup[NumberActions];
+    float initial_energy;
+    float initial_marker;
+    Matrix* initial_brain;
+    int max_age;
+    int total_steps;
+
+    Matrix weight_mask;
 
     int accuracy;
 
@@ -55,7 +64,6 @@ public:
     float mutation_prob;
     float mutation_sd;
 
-    Matrix* adam;    
     Occupant** occupants;
 
     // Paint
@@ -65,6 +73,11 @@ public:
     // State change
     Grid(int rws, int cls);
     ~Grid();
+
+    // Setup
+    void SetupMask(bool);
+    void SetupActions();
+
     void Resize(int rws, int cls);
     void SaveState(std::ostream& os);
     void LoadState(std::istream& is);

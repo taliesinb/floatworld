@@ -8,7 +8,7 @@ RegisterVar(Occupant, pos)
 RegisterVar(Occupant, signature)
 
 Occupant::Occupant(int sig)
-  : grid(NULL), signature(sig), next(NULL), pos(0,0)
+  : next(NULL), grid(NULL), pos(0,0), signature(sig)
 {
 }
 
