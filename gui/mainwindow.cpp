@@ -31,8 +31,6 @@ MainWindow::MainWindow(QWidget *parent)
     // setup creatures
     Creat::Setup();
 
-    Creat::drawspecial = false;
-    Creat::drawoutline = false;
     grid.interaction = Predation;
 
     // setup adam:

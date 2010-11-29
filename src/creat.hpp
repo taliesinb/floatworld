@@ -47,18 +47,12 @@ public:
 
     static bool lineages;
     
-    static bool drawbirth;
-    static bool drawoutline;
-    static bool drawtrails;
-    static bool drawspecial;
-
     static float actioncost[NumberActions];
     static CreatFunc actionlookup[NumberActions];
     static float initialenergy;
     static float initialmarker;
     static int maxage;
     static int steps;
-    static int maxtraillen;
 
     static Matrix weightmask;
     static void Setup();

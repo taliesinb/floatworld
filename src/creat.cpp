@@ -28,10 +28,6 @@ float Creat::actioncost[NumberActions];
 CreatFunc Creat::actionlookup[NumberActions];
 Matrix Creat::weightmask(Creat::neurons, Creat::neurons);
 bool Creat::lineages = false;
-bool Creat::drawoutline = false;
-bool Creat::drawbirth = true;
-bool Creat::drawtrails = false;
-bool Creat::drawspecial = false;
 
 LineageNode::LineageNode(LineageNode* p)
     : pos(0,0), prev(p), refs(1)
