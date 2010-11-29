@@ -21,7 +21,7 @@ RegisterVar(Creat, marker);
 
 int Creat::steps = 0;
 int Creat::maxage = 100;
-int Creat::nonzeroweights = 0;
+
 float Creat::initialenergy = 2;
 float Creat::initialmarker = 0.0;
 float Creat::actioncost[NumberActions];
@@ -51,27 +51,6 @@ void LineageNode::Decrement()
     if (refs <= 0) delete this;
 }
 
-static inline void FastMultiplyA(float* m1, float* m2, float* m3)
-{
-    int n = Creat::inputs + Creat::hidden;
-    for  (int j = Creat::inputs; j < n; j++) {
-        float v = 0;      
-        for (int k = 0; k < n; k++) v += m1[j * Creat::neurons + k] * m2[k];
-        m3[j] = v;
-    } 
-}
-
-static inline void FastMultiplyB(float* m1, float* m2, float* m3)
-{
-    int n = Creat::inputs + Creat::hidden;
-    for  (int j = n; j < Creat::neurons; j++)
-    {
-        float v = 0;      
-        for (int k = 0; k < n; k++) v += m1[j * Creat::neurons + k] * m2[k];
-        m3[j] = v;
-    }
-}
-
 void Creat::Setup()
 {
     SetupMutation();
@@ -81,12 +60,9 @@ void Creat::Setup()
 
 void Creat::SetupMutation()
 {
-    mprofile.colordrift = true;
-    mprofile.proba = 0.0;
-    mprofile.probb = 0.0;
-    mprofile.probc = 0.0;
-    mprofile.noise = 0.0;
-    mprofile.scale = 0.0;
+    mprofile.color_drift = true;
+    mprofile.mutation_prob = 0.0;
+    mprofile.mutation_sd = 3.0;
 }
 
 void Creat::SetupMask(bool hid)
@@ -106,8 +82,6 @@ void Creat::SetupMask(bool hid)
         weightmask.SetSubMatrix(hidl, hidl, hidr, hidr, 1.0);
     }
     weightmask.SetSubMatrix(outl, inl, outr, inr, 1.0);
-
-    nonzeroweights = weightmask.GetHammingNorm();
 }
 
 void Creat::SetupActions()
@@ -316,31 +290,16 @@ void Creat::Interaction(Creat& other)
 
 void Creat::MutateBrain()
 {
-    while (RandBool(mprofile.proba * nonzeroweights))
+    while (RandBool(mprofile.mutation_prob))
     {
         Pos w = SelectRandomWeight();
-        weights(w) += RandFloat(-mprofile.noise, +mprofile.noise);
+        weights(w) += RandGauss(0, mprofile.mutation_sd);
 
         if (lineages) AddToLineage(w);
     }
 
-    while (RandBool(mprofile.probb * nonzeroweights))
-    {
-        Pos w = SelectRandomWeight();
-        weights(w) = RandGauss(weights(w), mprofile.scale  * weights(w));
-
-        if (lineages) AddToLineage(w);
-    }
-
-    while (RandBool(mprofile.probc * nonzeroweights))
-    {
-        Pos w = SelectRandomWeight();
-        weights(w) = RandFloat(-3.0, 3.0);
-
-        if (lineages) AddToLineage(w);
-    }
-
-    if (mprofile.colordrift) marker += RandFloat(-0.015, 0.015);
+    if (mprofile.color_drift)
+        marker += RandFloat(-0.015, 0.015);
 }
 
 void Creat::SanityCheck()
@@ -375,27 +334,6 @@ void Creat::SanityCheck()
     }
     assert(!insane);
 }
-
-static inline void tf1(float &f) {
-    f = cos(f/(10 * 3.1415926));
-}
-
-static inline void tf2(float &f) {
-    f = f > 0 ? 1 : -1;
-}
-
-static inline void tf3(float &f) {
-    f = 1.0 / (1 + exp(-f));
-}
-
-static inline void tf4(float &f) {
-    f = atanh(f);
-}
-
-static inline float Kernel(Occupant* occ) { occ ? occ->signature : 0; }
-
-#define CREATKERNEL(offset)                     \
-    Kernel(grid->OccupantAt(Front(offset)))
   
 void Creat::Step()
 {
@@ -416,10 +354,29 @@ void Creat::Step()
     state(extinputs + 3) = RandFloat(-1.0, 1.0);
 
     // CALCULATE BRAIN STEP
-    FastMultiplyA(weights.data, state.data, state2.data);
-    for (int i = 0; i < hiddena; i++) tf4(state2(inputs + i));
-    for (int i = 0; i < hiddenb; i++) tf4(state2(inputs + hiddena + i));
-    FastMultiplyB(weights.data, state.data, state2.data);
+
+    for  (int j = Creat::inputs; j < Creat::inputs + Creat::hidden; j++)
+    {
+        float v = 0;
+        for (int k = 0; k < Creat::inputs + Creat::hidden; k++)
+            v += weights.data[j * Creat::neurons + k] * state.data[k];
+        state2.data[j] = v;
+    }
+
+    for (int i = 0; i < hidden; i++)
+    {
+        float& h = state2(inputs + i);
+        h = atanh(h);
+    }
+
+    for  (int j = Creat::inputs + Creat::hidden; j < Creat::neurons; j++)
+    {
+        float v = 0;
+        for (int k = 0; k < Creat::inputs + Creat::hidden; k++)
+            v += weights.data[j * Creat::neurons + k] * state.data[k];
+        state2.data[j] = v;
+    }
+
     SwapContents(state, state2);
 
     // CALCULATE ACTION

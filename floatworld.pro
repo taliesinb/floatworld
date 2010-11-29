@@ -14,4 +14,5 @@ QMAKE_CXXFLAGS+=-pg
 QMAKE_LFLAGS+=-pg
 
 OTHER_FILES += \
-    README.markdown
+    README.markdown \
+    PLANS

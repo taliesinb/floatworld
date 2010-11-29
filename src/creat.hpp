@@ -23,12 +23,9 @@ typedef void (Creat::*CreatFunc)();
 
 struct MutationProfile
 {
-    bool colordrift;
-    float proba;
-    float probb;
-    float probc;
-    float noise;
-    float scale;      
+    bool color_drift;
+    float mutation_prob;
+    float mutation_sd;
 };
 
 class LineageNode
@@ -51,9 +48,7 @@ public:
     static const int extinputs = 6;
     static const int intinputs = 4;
     static const int inputs = extinputs + intinputs;
-    static const int hiddena = 2;
-    static const int hiddenb = 2;
-    static const int hidden = hiddena + hiddenb;
+    static const int hidden = 4;
     static const int outputs = 4;
     static const int neurons = inputs + hidden + outputs;
 
@@ -72,7 +67,7 @@ public:
     static int maxage;
     static int steps;
     static int maxtraillen;
-    static int nonzeroweights;
+
     static Matrix weightmask;
     static void Setup();
     static void SetupMutation();

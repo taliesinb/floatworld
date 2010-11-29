@@ -1,0 +1,8 @@
+So remove all kinds of unnec stuff:
+* Mutation other than random weight assignment.
+* Sex.
+* Keep interaction, add 'custom' part.
+* Remove need to count non-zero weights
+* Remove Insanity code
+
+* Add ultruism and also co-operation

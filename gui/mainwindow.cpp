@@ -31,15 +31,12 @@ MainWindow::MainWindow(QWidget *parent)
     // setup creatures
     Creat::Setup();
 
-    Creat::mprofile.proba = 0.05 / Creat::nonzeroweights;
-    Creat::mprofile.probb = 0.05 / Creat::nonzeroweights;
-    Creat::mprofile.probc = 0.5 / Creat::nonzeroweights;
-    Creat::mprofile.scale = 0.1;
-    Creat::mprofile.noise = 0.1;
+    Creat::mprofile.mutation_prob = 0.05;
+    Creat::mprofile.mutation_sd = 3.0;
     Creat::drawspecial = false;
     Creat::drawoutline = false;
     grid.interaction = Predation;
-    Creat::mprofile.colordrift = true;
+    Creat::mprofile.color_drift = true;
 
     // setup adam:
     grid.adam = &adam;
