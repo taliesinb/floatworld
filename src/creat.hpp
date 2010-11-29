@@ -21,13 +21,6 @@ class Grid;
 class Creat;
 typedef void (Creat::*CreatFunc)();
 
-struct MutationProfile
-{
-    bool color_drift;
-    float mutation_prob;
-    float mutation_sd;
-};
-
 class LineageNode
 {
 public:
@@ -58,7 +51,6 @@ public:
     static bool drawoutline;
     static bool drawtrails;
     static bool drawspecial;
-    static MutationProfile mprofile;
 
     static float actioncost[NumberActions];
     static CreatFunc actionlookup[NumberActions];
@@ -70,7 +62,6 @@ public:
 
     static Matrix weightmask;
     static void Setup();
-    static void SetupMutation();
     static void SetupMask(bool);
     static void SetupActions();
 

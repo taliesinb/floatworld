@@ -51,6 +51,10 @@ public:
 
     int accuracy;
 
+    bool mutation_color_drift;
+    float mutation_prob;
+    float mutation_sd;
+
     Matrix* adam;    
     Occupant** occupants;
 

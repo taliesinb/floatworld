@@ -25,6 +25,10 @@ Grid::Grid(int rs, int cs)
     respawn = false;
     pathenergy = 0;
 
+    mutation_color_drift = true;
+    mutation_prob = 0.0;
+    mutation_sd = 3.0;
+
     feeding = true;
     freespot = 0;
     accuracy = 10;

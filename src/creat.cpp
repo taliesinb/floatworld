@@ -27,7 +27,6 @@ float Creat::initialmarker = 0.0;
 float Creat::actioncost[NumberActions];
 CreatFunc Creat::actionlookup[NumberActions];
 Matrix Creat::weightmask(Creat::neurons, Creat::neurons);
-MutationProfile Creat::mprofile;
 bool Creat::lineages = false;
 bool Creat::drawoutline = false;
 bool Creat::drawbirth = true;
@@ -53,16 +52,8 @@ void LineageNode::Decrement()
 
 void Creat::Setup()
 {
-    SetupMutation();
     SetupMask(true);
     SetupActions();
-}
-
-void Creat::SetupMutation()
-{
-    mprofile.color_drift = true;
-    mprofile.mutation_prob = 0.0;
-    mprofile.mutation_sd = 3.0;
 }
 
 void Creat::SetupMask(bool hid)
@@ -290,18 +281,18 @@ void Creat::Interaction(Creat& other)
 
 void Creat::MutateBrain()
 {
-    while (RandBool(mprofile.mutation_prob))
+    while (RandBool(grid->mutation_prob))
     {
         Pos w = SelectRandomWeight();
-        weights(w) += RandGauss(0, mprofile.mutation_sd);
+        weights(w) += RandGauss(0, grid->mutation_sd);
 
         if (lineages) AddToLineage(w);
     }
 
-    if (mprofile.color_drift)
+    if (grid->mutation_color_drift)
         marker += RandFloat(-0.015, 0.015);
 }
-  
+
 void Creat::Step()
 {
     assert(alive);
