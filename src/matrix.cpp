@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <string.h>
+#include "metaclass.hpp"
 
 using namespace std;
 
@@ -383,26 +384,43 @@ ostream& operator<<(ostream& os, const Matrix::PrettyWrapper& w)
 
 ostream& operator<<(ostream& os, const Matrix& m)
 {
-    os << "{\"rows\": " << m.rows << ", ";
-    os << "\"cols\": " << m.cols << ", ";
-    os << "\"data\": " << "[";
     os.precision(50);
-    for (int i = 0; i < m.rows * m.cols; i++)
+    os << "[";
+    for (int i = 0; i < m.rows; i++)
     {
-        if (i != 0) os << ", ";
-        os << m.data[i];
+        if (i != 0) os << "], ";
+        os << endl << "\t[";
+        for (int j = 0; j < m.cols; j++)
+        {
+            if (j != 0) os << ", ";
+            os << m.data[i * m.cols + j];
+        }
     }
-    os << "]}";
+    os << "]\n]";
     return os;
 }
 
 istream& operator>>(istream& is, Matrix& m)
 {
-    int rs, cs;
-    is >> rs >> cs;
-    assert(rs == m.rows && cs == m.cols);
-    for (int i = 0; i < rs * cs; i++)
-        is >> m.data[i];
+    list<list<float> > entries;
+    is >> entries;
+
+    int cols = entries.front().size();
+    int rows = entries.size();
+    for_iterate(r, entries)
+        assert (cols == r->size());
+
+    m.Resize(rows, cols);
+    int i = 0;
+    for_iterate(row, entries)
+    {
+        list<float>& r = *row;
+        for_iterate(col, r)
+        {
+            m.data[i++] = *col;
+        }
+    }
+
     return is;
 }
 
@@ -445,44 +463,6 @@ void DecodeRLE(RLEpair rle[], Matrix& m)
     }
 }
 
-
-#define COUT(X) cout << X << endl               
-\
-void MatrixTest() {
-    cout << "--- TESTING VECTORS --- \n\n";
- 
-    Matrix a(3,1), b(3,1);
-
-    float d[3] = {0.0, 1.0, 0.0};
-    b.Set(d);
-    a.SetRandom(-1.0, 1.0); 
-
-    PRINT(a);
-    PRINT(b);
-    PRINT(a + b);
-    PRINT(a.Len());
-    cout << "\n";
-    PRINTDO(a.Apply(atan));
-    PRINT(a);
-    PRINTDO(a = b);
-    PRINT(a);
-  
-    cout << "\n--- TESTING MATRICES --- \n\n";
-
-    Matrix m(3,3), n(3,3);
-    m.SetChess();
-    n.SetRandom(-1.0, 1.0);
-
-    PRINT(m);
-    PRINT(n);
-
-    PRINTDO(m = n);
-
-    PRINT(m);
-    PRINT(n * a);
-
-    cout << "------------------\n";
-}
 
 void WriteMatrix(const char* file, const Matrix& m, bool append)
 {

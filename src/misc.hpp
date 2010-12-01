@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#define for_iterate(IT, CONT) typedef typeof(CONT) TYPEOF_##IT; for (TYPEOF_##IT::iterator it = CONT.begin(); it != CONT.end(); ++it) 
+#define for_iterate(IT, CONT) typedef typeof(CONT) TYPEOF_##IT; for (TYPEOF_##IT::iterator IT = CONT.begin(); IT != CONT.end(); ++IT)
 
 #define PRINT(X) std::cout << #X << " = " << (X) << std::endl;
 #define PRINTDO(X) std::cout << ">> " << #X << std::endl << std::endl; X;

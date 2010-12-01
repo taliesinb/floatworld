@@ -189,7 +189,7 @@ void Creat::Interaction(Creat& other)
             break;
 
         case Wastage:
-            energy -= 20;
+            energy -= 30;
             break;
       
         case Parasitism:

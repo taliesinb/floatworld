@@ -115,6 +115,4 @@ float SquareMetric(const Matrix& a, const Matrix& b);
 float RootMetric(const Matrix& a, const Matrix& b);
 float HammondMetric(const Matrix& a, const Matrix& b);
 
-void MatrixTest();
-
 #endif

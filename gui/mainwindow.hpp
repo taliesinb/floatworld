@@ -10,6 +10,7 @@
 #include "../src/matrix.hpp"
 #include "../src/grid.hpp"
 #include "../src/shape.hpp"
+#include "../src/block.hpp"
 
 #include "ui_mainwindow.h"
 #include "widgets.hpp"

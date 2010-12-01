@@ -5,9 +5,21 @@
 
 #include <QPainter>
 
+RegisterClass(Grid, None)
+RegisterVar(Grid, energy)
+RegisterVar(Grid, energy_decay_rate)
+
 using namespace std;
 
 const char* interactionnames[] = {"None", "Wastage","Parasitism", "Predation", "Co-operation", "Gene Swap", "Gene Give", "Gene Receive", "Gene Symmetric", NULL};
+
+Grid::Grid() :
+    energy(1,1),
+    initial_brain(NULL),
+    weight_mask(Creat::neurons, Creat::neurons),
+    occupants(NULL)
+{
+}
 
 Grid::Grid(int rs, int cs)
     : energy(rs,cs),

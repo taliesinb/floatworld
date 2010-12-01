@@ -6,6 +6,7 @@
 #include <QImage>
 
 #include "../src/grid.hpp"
+#include "../src/block.hpp"
 
 class GridWidget : public QWidget
 {

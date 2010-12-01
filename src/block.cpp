@@ -93,8 +93,8 @@ void SkinnerBlock::Interact(Creat&)
     touch_count = 0;
     Circle spot;
     spot.pos = pos;
-    spot.radius = 5;
-    spot.energy = 15;
+    spot.radius = 4;
+    spot.energy = 50;
     spot.Draw(grid->energy);
   }
 }

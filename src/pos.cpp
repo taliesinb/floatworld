@@ -1,5 +1,6 @@
 #include <iostream>
 #include "pos.hpp"
+#include "metaclass.hpp"
 
 using namespace std;
 
@@ -11,7 +12,7 @@ ostream& operator<<(ostream& os, const Pos& p)
 
 istream& operator>>(istream& is, Pos& p)
 {
-  is >> p.row >> p.col;
+  is >> "[" >> p.row >> ", " >> p.col >> "]";
   return is;
 }
 

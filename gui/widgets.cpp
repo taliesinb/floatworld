@@ -2,7 +2,7 @@
 
 #include <QPainter>
 
-int sz = 80;
+int sz = 120;
 
 GridWidget::GridWidget(QWidget* parent)
         : QWidget(parent),
@@ -37,6 +37,10 @@ void GridWidget::rerender()
         for (int j = 0; j < grid.cols; j++)
         {
             int val = *line2++ * 5;
+            if (Block* block = dynamic_cast<Block*>(grid.OccupantAt(Pos(i,j))))
+            {
+                *line1++ = qRgb(0, 200, 0);
+            } else
             if (Creat* creat = dynamic_cast<Creat*>(grid.OccupantAt(Pos(i,j))))
             {
                 float intensity = 255;

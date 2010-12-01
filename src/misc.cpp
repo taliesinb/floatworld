@@ -1,4 +1,5 @@
 #include "misc.hpp"
+#include <string>
 
 unsigned int randomstate;
 
@@ -18,4 +19,3 @@ int RandInt(int n)
 {
   return abs((rand() * rand() + rand() + rand())) % (n + 1);
 }
-

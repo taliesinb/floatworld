@@ -25,7 +25,7 @@ class Occupant;
 class QPainter;
 class QImage;
 
-class Grid
+class Grid : public Class
 {
 public:      
     
@@ -71,6 +71,7 @@ public:
     void Paint(QImage& image);
 
     // State change
+    Grid();
     Grid(int rws, int cls);
     ~Grid();
 

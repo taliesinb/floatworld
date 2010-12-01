@@ -1,4 +1,5 @@
 #include "mainwindow.hpp"
+#include <fstream>
 
 using namespace std;
 
@@ -31,7 +32,7 @@ MainWindow::MainWindow(QWidget *parent)
     // setup creatures
     Creat::Setup();
 
-    grid.interaction_type = Predation;
+    grid.interaction_type = Wastage;
 
     // setup adam:
     grid.initial_brain = &adam;
@@ -49,7 +50,7 @@ MainWindow::MainWindow(QWidget *parent)
     adam(move,cons) = 1.1;
     adam(left,random) = 1.05;
 
-    grid.max_age = 1000;
+    grid.max_age = 120;
 
     for (int i = 0; i < 3; i++)
     {
@@ -82,8 +83,32 @@ MainWindow::MainWindow(QWidget *parent)
 
     grid.energy_decay_rate = 0.08;
     grid.enable_respawn = true;
+    grid.mutation_prob = 0.1;
+    grid.path_energy = 0;
 
     grid.AddCreats(40, true);
+
+    for (int k = 0; k < 50; k++)
+    {
+    Occupant* block = new SkinnerBlock();
+    block->Place(grid, grid.RandomCell());
+    }
+
+    ofstream of;
+    of.open("/Users/tali/test.txt");
+    of << grid.creats[0] << endl;
+    of.close();
+
+    Creat creat;
+    ifstream inf;
+    inf.open("/Users/tali/test.txt");
+    inf >> creat;
+    inf.close();
+
+    ofstream of2;
+    of2.open("/Users/tali/test2.txt");
+    of2 << creat << endl;
+    of2.close();
 
     connect(&timer1, SIGNAL(timeout()), this, SLOT(takeStep()));
     timer1.start(5);

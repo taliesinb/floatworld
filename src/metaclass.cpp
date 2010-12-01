@@ -1,18 +1,67 @@
 #include <assert.h>
 #include <typeinfo>
 #include <string.h>
+#include <sstream>
 
 #include "metaclass.hpp"
-
-static const char* ntabs[6] = {"", "\t", "\t\t", "\t\t\t", "\t\t\t\t", "\t\t\t\t\t"};
-
-const char* make_tabs(int n)
-{
-    if (n < 6) return ntabs[n];
-    return ntabs[5];
-}
+#include "misc.hpp"
 
 using namespace std;
+
+const char* whitespace = "\t";
+
+std::istream& operator>>(std::istream& is, const char* str)
+{
+    if (str == whitespace)
+    {
+        char ch;
+        do is.get(ch); while (ch && isspace(ch));
+        is.putback(ch);
+        return is;
+    }
+
+    const char* s = str;
+    char ch;
+
+    do {
+        is.get(ch);
+        if (isspace(ch) && isspace(*s))
+        {
+            while (isspace(*s)) { s++; if (*s == 0) goto done; }
+            while (isspace(ch)) is.get(ch);
+        }
+        if (ch != *s)
+        {
+            cout << "Expectation failed. Rest of stream:" << endl;
+            char s[128];
+            is.read(s, 128);
+            cout << s;
+            throw "error";
+        }
+        s++;
+    } while (*s);
+    done:
+    return is;
+};
+
+
+std::ostream& operator<<(std::ostream& os, Class& c)
+{
+    os << c.Name() << endl;
+    c.Write(os);
+    return os;
+}
+
+std::istream& operator>>(std::istream& is, Class& c)
+{
+    const char* name = c.Name();
+    is >> name;
+    is >> whitespace;
+    c.Read(is);
+    return is;
+}
+
+
 
 int MetaClass::nmetaclasses = 0;
 MetaClass* MetaClass::metaclasses[128];
@@ -33,19 +82,28 @@ MetaClass* Class::GetMetaClass()
     return MetaClass::Lookup(Name());
 }
 
-void Class::Write(ostream& os, int indent)
+void Class::Write(ostream& os)
 {
-    cout << make_tabs(indent) << "{\n";
-    GetMetaClass()->Write(this, os, indent+1);
-    cout << make_tabs(indent) << "}\n";
+    stringstream ostr;
+    string line;
+
+    GetMetaClass()->Write(this, ostr);
+
+    os << "{" << endl;
+    while(std::getline(ostr, line))
+    {
+       os << "\t" << line << endl;
+    }
+    os << "}" << endl;
 }
 
 void Class::Read(istream& is)
 {
-    std::string str;
-    is >> str;
-    assert(str == Name());
+    is >> "{" >> whitespace;
+
     GetMetaClass()->Read(this, is);
+
+    is >> whitespace >> "}";
 }
 
 MetaClass::MetaClass(const char* _name, const char* _pname, ClassMaker func)
@@ -88,25 +146,34 @@ Class* MetaClass::Create(std::istream& is)
 void MetaClass::Read(Class* occ, istream& is)
 {
     MetaClass* parent = Lookup(pname);
-    if (parent) parent->Read(occ, is);
+    if (parent)
+    {
+        parent->Read(occ, is);
+        is >> whitespace >> "," >> whitespace;
+    }
     for (int i = 0; i < nvars; i++)
     {
+        if (i != 0) is >> whitespace >> "," >> whitespace;
+        is >> whitespace >> "\"";
+        is >> varname[i];
+        is >> "\":" >> whitespace;
         (*readers[i])(occ, is);
     }
 }
 
-void MetaClass::Write(Class* occ, ostream& os, int indent)
+void MetaClass::Write(Class* occ, ostream& os)
 {
     MetaClass* parent = Lookup(pname);
     if (parent)
     {
-        parent->Write(occ, os, indent);
+        parent->Write(occ, os);
         os << ", \n";
     }
     for (int i = 0; i < nvars; i++)
     {
         if (i != 0) os << ", \n";
-        (*writers[i])(occ, os, indent);
+        os << '"' << varname[i] << "\": ";
+        (*writers[i])(occ, os);
     }
 }
 

@@ -2,8 +2,10 @@
 #define METACLASS_HPP
 
 #include <iostream>
+#include <list>
 
-const char* make_tabs(int n);
+extern const char* whitespace;
+std::istream& operator>>(std::istream& is, const char* str);
 
 class MetaClass;
 
@@ -12,13 +14,56 @@ class Class
 public:
     virtual void dummy();
     MetaClass* GetMetaClass();
-    void Write(std::ostream& os, int indent=0);
+    void Write(std::ostream& os);
     void Read(std::istream& is);
     const char* Name();
 };
 
+std::ostream& operator<<(std::ostream& os, Class& c);
+std::istream& operator>>(std::istream& os, Class& c);
+
+template<class T>
+std::ostream& operator<<(std::ostream& os, std::list<T>& lst)
+{
+    os << "[";
+    int sz = lst.size();
+    for (int j = 0; j < sz; j++)
+    {
+        if (j) os << ", ";
+        os << lst[j];
+    }
+    os << "]";
+    return os;
+}
+
+template<class T>
+std::istream& operator>>(std::istream& is, std::list<T>& lst)
+{
+    is >> "[" >> whitespace;
+    char ch;
+    while (is.get(ch) && ch)
+    {
+        if (ch == ']') break;
+        else is.putback(ch);
+
+        T t;
+        is >> whitespace >> t >> whitespace;
+        lst.push_back(t);
+
+        is.get(ch);
+        if (ch != ',') is.putback(ch);
+        else is >> whitespace;
+    }
+    return is;
+}
+/*
+template<class T>
+std::ostream& operator<<(std::ostream& os, std::list<T>& ls);
+template<class T>
+std::istream& operator>>(std::istream& os, std::list<T>& ls);
+*/
 typedef Class* (*ClassMaker)();
-typedef void (*ClassWriter)(Class*, std::ostream&, int indent);
+typedef void (*ClassWriter)(Class*, std::ostream&);
 typedef void (*ClassReader)(Class*, std::istream&);
 
 class MetaClass
@@ -42,7 +87,7 @@ public:
 
     MetaClass(const char* _name, const char* _pname, ClassMaker func);
     void Read(Class* occ, std::istream& is);
-    void Write(Class* occ, std::ostream& os, int indent=0);
+    void Write(Class* occ, std::ostream& os);
 };
 
 class Registrator
@@ -59,7 +104,7 @@ Class* META_##ThisClass##New() { return new ThisClass; }                  \
   MetaClass META_##ThisClass##MetaClass(#ThisClass, #ParentClass, NULL);
 
 #define RegisterVar(ThisClass, Name)                                             \
-  void META_##ThisClass##Name##Writer(Class* occ, std::ostream& os, int indent) { os << make_tabs(indent) << '"' << #Name << "\": " << (dynamic_cast<ThisClass*>(occ))->Name; } \
+  void META_##ThisClass##Name##Writer(Class* occ, std::ostream& os) { os << (dynamic_cast<ThisClass*>(occ))->Name; } \
           void META_##ThisClass##Name##Reader(Class* occ, std::istream& is) { is >> (dynamic_cast<ThisClass*>(occ))->Name; } \
           Registrator META_##ThisClass##Name##Registrator(META_##ThisClass##MetaClass, #Name, &META_##ThisClass##Name##Reader, &META_##ThisClass##Name##Writer);
 
