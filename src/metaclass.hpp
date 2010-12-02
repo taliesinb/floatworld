@@ -56,12 +56,7 @@ std::istream& operator>>(std::istream& is, std::list<T>& lst)
     }
     return is;
 }
-/*
-template<class T>
-std::ostream& operator<<(std::ostream& os, std::list<T>& ls);
-template<class T>
-std::istream& operator>>(std::istream& os, std::list<T>& ls);
-*/
+
 typedef Class* (*ClassMaker)();
 typedef void (*ClassWriter)(Class*, std::ostream&);
 typedef void (*ClassReader)(Class*, std::istream&);
@@ -96,27 +91,32 @@ class Registrator
     Registrator(MetaClass& metaclass, const char* name, ClassReader read, ClassWriter write);
 };   
 
-#define RegisterClass(ThisClass, ParentClass)                        \
-Class* META_##ThisClass##New() { return new ThisClass; }                  \
-        MetaClass META_##ThisClass##MetaClass(#ThisClass, #ParentClass, &META_##ThisClass##New);
+#define RegisterClass(ThisClass, ParentClass)                       \
+    Class* ThisClass##Factory() { return new ThisClass; }           \
+    MetaClass ThisClass##MetaClass(#ThisClass, #ParentClass,        \
+                                   &ThisClass##Factory);
 
 #define RegisterAbstractClass(ThisClass, ParentClass)               \
-  MetaClass META_##ThisClass##MetaClass(#ThisClass, #ParentClass, NULL);
+    MetaClass ThisClass##MetaClass(#ThisClass, #ParentClass, NULL);
 
-#define RegisterVar(ThisClass, Name)                                             \
-  void META_##ThisClass##Name##Writer(Class* occ, std::ostream& os) { os << (dynamic_cast<ThisClass*>(occ))->Name; } \
-          void META_##ThisClass##Name##Reader(Class* occ, std::istream& is) { is >> (dynamic_cast<ThisClass*>(occ))->Name; } \
-          Registrator META_##ThisClass##Name##Registrator(META_##ThisClass##MetaClass, #Name, &META_##ThisClass##Name##Reader, &META_##ThisClass##Name##Writer);
+#define RegisterVar(ThisClass, Name)                                \
+    void ThisClass##Name##Writer(Class* occ, std::ostream& os)      \
+    { os << (dynamic_cast<ThisClass*>(occ))->Name; }                \
+    void ThisClass##Name##Reader(Class* occ, std::istream& is)      \
+    { is >> (dynamic_cast<ThisClass*>(occ))->Name; }                \
+    Registrator ThisClass##Name##Registrator(ThisClass##MetaClass,  \
+    #Name, &ThisClass##Name##Reader, &ThisClass##Name##Writer);
 
-#define RegisterCustomVar(ThisClass, CodeSave, CodeLoad)                            \
-  void META_##ThisClass##CustomSave(ThisClass* this, std::ostream& os)                 \
-    CodeSave                                                            \
-    void META_##ThisClass##CustomLoad(ThisClass* this, std::istream& is)               \
-    CodeLoad                                                            \
-    void META_##ThisClass##CustomSave2(Class* occ, std::ostream& os)               \
-    { ThisClass##CustomSave(dynamic_cast<ThisClass *>(this), os); }               \
-    void META_##ThisClass##CustomLoad2(Class* occ, std::istream& is)        \
-    { Class##CustomLoad(dynamic_cast<ThisClass *>(this), is); }             \
-    Registrator META_##ThisClass##CustomRegistrator(META_##ThisClass##MetaClass, "Custom", &META_##ThisClass##CustomLoad2, &META_##ThisClass##CustomSave2);
+#define RegisterCustomVar(ThisClass, CodeSave, CodeLoad)            \
+    void ThisClass##CustomSave(ThisClass* this, std::ostream& os)   \
+    CodeSave                                                        \
+    void ThisClass##CustomLoad(ThisClass* this, std::istream& is)   \
+    CodeLoad                                                        \
+    void ThisClass##CustomSave2(Class* occ, std::ostream& os)       \
+    { ThisClass##CustomSave(dynamic_cast<ThisClass *>(this), os); } \
+    void ThisClass##CustomLoad2(Class* occ, std::istream& is)       \
+    { Class##CustomLoad(dynamic_cast<ThisClass *>(this), is); }     \
+    Registrator ThisClass##CustomRegistrator(ThisClass##MetaClass,  \
+    "Custom", &ThisClass##CustomLoad2, &ThisClass##CustomSave2);
 
 #endif

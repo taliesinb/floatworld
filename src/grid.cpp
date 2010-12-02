@@ -8,6 +8,28 @@
 RegisterClass(Grid, None)
 RegisterVar(Grid, energy)
 RegisterVar(Grid, energy_decay_rate)
+RegisterVar(Grid, timestep)
+RegisterVar(Grid, births)
+RegisterVar(Grid, rows)
+RegisterVar(Grid, cols)
+RegisterVar(Grid, num_creats)
+RegisterVar(Grid, interaction_type)
+RegisterVar(Grid, enable_mutation)
+RegisterVar(Grid, enable_respawn)
+RegisterVar(Grid, path_energy)
+RegisterVar(Grid, record_lineages)
+//RegisterVar(Grid, action_cost)
+RegisterVar(Grid, initial_energy)
+RegisterVar(Grid, initial_marker)
+//RegisterVar(Grid, initial_brain)
+RegisterVar(Grid, max_age)
+RegisterVar(Grid, total_steps)
+RegisterVar(Grid, weight_mask)
+//RegisterVar(Grid, initial_brain)
+RegisterVar(Grid, mutation_color_drift)
+RegisterVar(Grid, mutation_prob)
+RegisterVar(Grid, mutation_sd)
+
 
 using namespace std;
 
