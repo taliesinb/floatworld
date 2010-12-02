@@ -143,12 +143,12 @@ Class* MetaClass::Create(std::istream& is)
     return serial;
 }
 
-void MetaClass::Read(Class* occ, istream& is)
+void MetaClass::Read(Class* c, istream& is)
 {
     MetaClass* parent = Lookup(pname);
     if (parent)
     {
-        parent->Read(occ, is);
+        parent->Read(c, is);
         is >> whitespace >> "," >> whitespace;
     }
     for (int i = 0; i < nvars; i++)
@@ -157,23 +157,23 @@ void MetaClass::Read(Class* occ, istream& is)
         is >> whitespace >> "\"";
         is >> varname[i];
         is >> "\":" >> whitespace;
-        (*readers[i])(occ, is);
+        (*readers[i])(c, is);
     }
 }
 
-void MetaClass::Write(Class* occ, ostream& os)
+void MetaClass::Write(Class* c, ostream& os)
 {
     MetaClass* parent = Lookup(pname);
     if (parent)
     {
-        parent->Write(occ, os);
+        parent->Write(c, os);
         os << ", \n";
     }
     for (int i = 0; i < nvars; i++)
     {
         if (i != 0) os << ", \n";
         os << '"' << varname[i] << "\": ";
-        (*writers[i])(occ, os);
+        (*writers[i])(c, os);
     }
 }
 
