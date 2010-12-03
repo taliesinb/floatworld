@@ -41,7 +41,7 @@ Grid::Grid() :
     energy(1,1), weight_mask(Creat::neurons, Creat::neurons)
 {
     initial_brain = NULL;
-    occupants = NULL;
+    occupant_grid = NULL;
 }
 
 Grid::Grid(int rs, int cs)
@@ -49,12 +49,12 @@ Grid::Grid(int rs, int cs)
       weight_mask(Creat::neurons, Creat::neurons)
 {
     initial_brain = NULL;
-    occupants = NULL;
+    occupant_grid = NULL;
 
     cols = cs;
     rows = rs;
-    occupants = new Occupant*[rows * cols];
-    for (int i = 0; i < rows * cols; i++) occupants[i] = NULL;
+    occupant_grid = new Occupant*[rows * cols];
+    for (int i = 0; i < rows * cols; i++) occupant_grid[i] = NULL;
 
     energy_decay_rate = 0.0;
     enable_mutation = true;
@@ -65,8 +65,9 @@ Grid::Grid(int rs, int cs)
     mutation_prob = 0.0;
     mutation_sd = 3.0;
 
-    total_steps = 0;
     max_age = 100;
+    total_steps = 0;
+    next_id = 0;
 
     initial_energy = 2;
     initial_marker = 0.0;
@@ -119,13 +120,13 @@ void Grid::SetupMask(bool hid)
 
 void Grid::Resize(int r, int c)
 {
-    RemoveAllCreats();
+    RemoveOccupants();
 
     rows = r, cols = c;
     energy.Resize(rows, cols);
-    delete[] occupants;
-    occupants = new Occupant*[rows * cols];
-    for (int i = 0; i < rows * cols; i++) occupants[i] = NULL;
+    delete[] occupant_grid;
+    occupant_grid = new Occupant*[rows * cols];
+    for (int i = 0; i < rows * cols; i++) occupant_grid[i] = NULL;
 
     cout << "Resized to dimensions " << rows << ", " << cols << endl;
 }
@@ -189,33 +190,41 @@ Creat& Grid::_AddCreat(Pos pos, int orient)
 {
     num_creats++;  
 
-    Creat* fresh = deadpool.back();
-    deadpool.pop_back();
-    creats.push_front(fresh);
+    Creat* fresh = NULL;
+    if (deadpool.size())
+    {
+        fresh = deadpool.back();
+        deadpool.pop_back();
+    } else {
+        fresh = new Creat;
+        fresh->grid = this;
+    }
 
-    fresh->orient = orient;
-    fresh->pos = pos;
     fresh->Reset();
-    fresh->Place();
+    fresh->Place(*this, pos);
+    fresh->orient = orient;
     fresh->alive = true;
 
     return *fresh;
 }
 
-void Grid::RemoveAllCreats()
+void Grid::RemoveOccupants()
 {
-    while (creats.size())
+    while (occupant_list.size())
     {
-        creats.back()->Remove();
-        creats.pop_back();
+        occupant_list.back()->Remove();
+        occupant_list.pop_back();
     }
 }
   
 Creat* Grid::LookupCreatByID(int id)
 {
-    for_iterate(it, creats)
+    for_iterate(it, occupant_list)
     {
-        if ((*it)->id == id) return *it;
+        if (Creat* creat = dynamic_cast<Creat*>(*it))
+        {
+            if (creat->id == id) return creat;
+        }
     }
     return NULL;
 }
@@ -226,21 +235,23 @@ Creat* Grid::FindCreat(int marker)
   
     Creat* found = NULL;
     float max = 0;
-    for_iterate(it, creats)
+    for_iterate(it, occupant_list)
     {
-        Creat* creat = *it;
-        if (creat->energy > max && (!marker || (creat->marker == marker)))
+        if (Creat* creat = dynamic_cast<Creat*>(*it))
         {
-            max = creat->energy;
-            found = creat;
-            break;
+            if (creat->energy > max && (!marker || (creat->marker == marker)))
+            {
+                max = creat->energy;
+                found = creat;
+                break;
+            }
         }
     }
     return found;
 }
 
 #define KERNEL(r2,c2) data[cs * Mod(r + r2, rs) + Mod(c + c2, cs)]
-#define KERNEL2(x,y) Kernel2(occupants[cs * Mod(r + x, rs) + Mod(c + y, cs)])
+#define KERNEL2(x,y) Kernel2(occupant_grid[cs * Mod(r + x, rs) + Mod(c + y, cs)])
 static inline float Kernel2(Occupant* occ)
 { return occ ? occ->signature : 0; }
 
@@ -305,7 +316,7 @@ float aligned(Creat* creat, int d)
     if (d == 2) return -1;
     return 0;
 }
-#define KERNEL3(x,y) aligned(occupants[cs * Mod(r + x, rs) + Mod(c + y, cs)], creat.orient)
+#define KERNEL3(x,y) aligned(occupant_grid[cs * Mod(r + x, rs) + Mod(c + y, cs)], creat.orient)
 
 void Grid::Run(int steps, int report)
 {
@@ -363,8 +374,13 @@ void Grid::Report()
 {
     float avg_complexity = 0;
 
-    for_iterate(it, creats)
-        avg_complexity += (*it)->Complexity();
+    for_iterate(it, occupant_list)
+    {
+        if (Creat* creat = dynamic_cast<Creat*>(*it))
+        {
+            avg_complexity += creat->Complexity();
+        }
+    }
 
     avg_complexity /= num_creats ? num_creats : 1;
     cout << "Time, Pop, Complexity = " << timestep << " " << num_creats << " " << avg_complexity << endl;
@@ -374,21 +390,10 @@ void Grid::Report()
 
 void Grid::Step()
 {
-    list<Creat*>::iterator it = creats.begin();
-    while (it != creats.end())
+    list<Occupant*>::iterator it = occupant_list.begin();
+    while (it != occupant_list.end())
     {
-        (*it++)->Step();
-    }
-  
-    for (int i = 0; i < rows * cols; i++)
-    {
-      Occupant* occ = occupants[i];
-      while (occ)
-      {
-        Occupant* next = occ->next;
-        occ->Update();
-        occ = next;
-      }
+        (*it++)->Update();
     }
 
     if (energy_decay_rate != 0.0) energy *= (1.0 - energy_decay_rate);
@@ -414,7 +419,7 @@ float Grid::CompeteScore(Matrix& a, Matrix& b)
     double scores = 0;
     for (int m = 0; m < accuracy; m++)
     {
-        RemoveAllCreats();
+        RemoveOccupants();
 
         for (int i = 0; i < 50; i++)
         {
@@ -445,16 +450,19 @@ float Grid::CompeteScore(Matrix& a, Matrix& b)
 int Grid::CountCreatsByMarker(int marker)
 {
   int n = 0;
-  for_iterate(it, creats)
+  for_iterate(it, occupant_list)
   {
-      if ((*it)->marker == marker) n++;
+      if (Creat* creat = dynamic_cast<Creat*>(*it))
+      {
+          if (creat->marker == marker) n++;
+      }
   }
   return n;
 }
 
 void Grid::Reset()
 {
-    RemoveAllCreats();
+    RemoveOccupants();
 }
 /*
 void Grid::LoadOccupant(istream& is)
@@ -501,7 +509,7 @@ Matrix Grid::FindDominantGenome()
 Matrix Grid::Evolve(int steps)
 {
     // cout << "Beginning evolution of " << steps << " steps." << endl;
-    RemoveAllCreats();
+    RemoveOccupants();
     AddCreats(50,true);
     Run(steps);//, steps/5);
     return FindDominantGenome();

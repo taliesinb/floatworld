@@ -45,6 +45,8 @@ public:
     static const int outputs = 4;
     static const int neurons = inputs + hidden + outputs;
 
+    static int global_id;
+
     static void Setup();
 
     int desired_id;
@@ -79,6 +81,7 @@ public:
     Pos Front(int offset=0);
     
     // UPDATE AND ACTION CODE
+    void Update();
     void Step();
     void DoNothing();
     void MoveForward();

@@ -33,6 +33,7 @@ class Occupant : public Class
     Creat* Peer(int id);
 };
 
-
+std::ostream& operator<<(std::ostream& s, Occupant* o);
+std::istream& operator<<(std::istream& i, Occupant* o);
 
 #endif

@@ -20,6 +20,7 @@ RegisterVar(Creat, special);
 RegisterVar(Creat, energy);
 RegisterVar(Creat, marker);
 
+int Creat::global_id = 0;
 
 LineageNode::LineageNode(LineageNode* p)
     : pos(0,0), refs(1),  prev(p)
@@ -66,6 +67,7 @@ void Creat::Reset()
     action = ActionNone;
     possessed = false;
     alive = false;
+    id = grid ? grid->next_id++ : global_id++;
     marker = grid ? grid->initial_marker : 0;
     energy = grid ? grid->initial_energy : 0;
     lineage = NULL;
@@ -239,6 +241,11 @@ void Creat::MutateBrain()
         marker += RandFloat(-0.015, 0.015);
 }
 
+void Creat::Update()
+{
+    Step();
+}
+
 void Creat::Step()
 {
     assert(alive);
@@ -315,7 +322,6 @@ void Creat::__Remove()
 {
     alive = false;
     grid->num_creats--;
-    grid->creats.remove(this);
     grid->deadpool.push_front(this);
     if (lineage) lineage->Decrement();
     if (desired_id >= 0) grid->LookupCreatByID(desired_id)->desirer_id = -1;

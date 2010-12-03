@@ -29,7 +29,7 @@ class Grid : public Class
 {
 public:      
     
-    std::list<Creat*> creats;
+    std::list<Occupant*> occupant_list;
     std::list<Creat*> deadpool;
     int freespot;
 
@@ -56,6 +56,7 @@ public:
     Matrix* initial_brain;
     int max_age;
     int total_steps;
+    int next_id;
 
     Matrix weight_mask;
 
@@ -65,7 +66,7 @@ public:
     float mutation_prob;
     float mutation_sd;
 
-    Occupant** occupants;
+    Occupant** occupant_grid;
 
     // Paint
     void Paint(QPainter& painter);
@@ -93,13 +94,13 @@ public:
     Creat& _AddCreat(Pos pos, int orient=0);
     Creat& AddCreatAt(Pos pos, int orient=0);
     void AddCreats(int number, bool fairly);
-    void RemoveAllCreats();
+    void RemoveOccupants();
     Creat* LookupCreatByID(int id);
     Creat* FindCreat(int marker);
-    Occupant*& OccupantAt(Pos pos)
-    { return occupants[pos.row * cols + pos.col]; }
-    Creat* CreatAt(Pos pos)
-    { return dynamic_cast<Creat*>(occupants[pos.row * cols + pos.col]); }
+    inline Occupant*& OccupantAt(Pos pos)
+    { return occupant_grid[pos.row * cols + pos.col]; }
+    inline Creat* CreatAt(Pos pos)
+    { return dynamic_cast<Creat*>(occupant_grid[pos.row * cols + pos.col]); }
 
     // Scoring
     Matrix FindDominantGenome();
