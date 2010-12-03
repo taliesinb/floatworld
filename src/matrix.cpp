@@ -8,12 +8,8 @@
 
 using namespace std;
 
-Matrix::Matrix(istream& is)
+Matrix::Matrix() : cols(0), rows(0), data(NULL)
 {
-    is >> rows >> cols;
-    data = new float[cols * rows];
-    for (int i = 0; i < rows * cols; i++)
-        is >> data[i];
 }
 
 Matrix::Matrix(int rws, int cls, float* dat)
@@ -34,9 +30,9 @@ Matrix::Matrix(const Matrix& m)
 
 void Matrix::Resize(int rws, int cls)
 {
-    if (rws == rows  && cols == cls) return;
-   
-    delete[] data;
+    if (rws == rows && cols == cls) return;
+
+    if (data) delete[] data;
     rows = rws;
     cols = cls;
     data = new float[cols * rows];
@@ -44,7 +40,8 @@ void Matrix::Resize(int rws, int cls)
 
 Matrix::~Matrix()
 {
-    delete[] data;
+    if (data) delete[] data;
+    data = NULL; // just to be safe
 }
 
 int Matrix::Len() const
@@ -66,7 +63,7 @@ void Matrix::SetBetween(int r, int c, int dr, int dc, int n, float value)
 {
     if (n == -1) n = 1e8;
     for (int i = 0; i < n && r < rows && c < cols; i++, r += dr, c += dc) {
-        Get(r,c) = value;
+        (*this)(r,c) = value;
     }
 }
 
@@ -74,7 +71,7 @@ void Matrix::SetSubMatrix(int r1, int c1, int r2, int c2, float value)
 {
     for (int r = r1; r <= r2; r++)
         for (int c = c1; c <= c2; c++)
-            Get(r,c) = value;
+            (*this)(r,c) = value;
 }
 
 void Matrix::SetConstant(float con)
@@ -110,9 +107,9 @@ void Matrix::ReverseRows()
     for (int i = 0; i < rows; i++)
         for (int j = 0; j < cols / 2; j++)
         {
-            float t = Get(i,j);
-            Get(i,j) = Get(i,cols - 1 - j);
-            Get(i, cols - 1 - j) = t;
+            float t = (*this)(i,j);
+            (*this)(i,j) = (*this)(i,cols - 1 - j);
+            (*this)(i, cols - 1 - j) = t;
         }
 }
 
@@ -121,9 +118,9 @@ void Matrix::ReverseCols()
     for (int j = 0; j < cols; j++)
         for (int i = 0; i < rows / 2; i++)
         {
-            float t = Get(i,j);
-            Get(i,j) = Get(rows - 1 - i, j);
-            Get(rows - 1 - i,j) = t;
+            float t = (*this)(i,j);
+            (*this)(i,j) = (*this)(rows - 1 - i, j);
+            (*this)(rows - 1 - i,j) = t;
         }
 }
 
@@ -185,7 +182,7 @@ Matrix  Matrix::GetSubMatrix(Pos start, Pos size) const
     Matrix m(size.row, size.col);
     for (int i = 0; i < size.row; i++)
         for (int j = 0; j < size.col; j++)
-            m.Get(i,j) = Get(start.row  + i, start.col + j);
+            m(i,j) = (*this)(start.row  + i, start.col + j);
     return m;
 }   
 
@@ -200,24 +197,6 @@ void Matrix::Apply(double f(double))
     for (int i = 0; i < cols * rows; i++)
         data[i] = f(data[i]);
 }
-
-void Matrix::MaskWith(const Matrix& m)
-{
-    assert(m.cols == cols && m.rows == rows);
-
-    for (int i = 0; i < cols * rows; i++)
-        data[i] *= m.data[i];
-}
-
-// float& Matrix::GetRotated(int r, int c, int dir)
-// {
-//    switch(Mod(dir, 4)) {
-//       case 0: return Get(r, c); 
-//       case 1:  return Get((cols - 1) - c, r); 
-//       case 2: return Get((rows - 1) - r, (cols - 1) - c);
-//       case 3:  return Get(c, (rows - 1) - r);
-//    }
-// }
 
 void Matrix::operator=(const Matrix& m)
 {
@@ -236,7 +215,7 @@ bool Matrix::operator==(const Matrix& m) const
     if (rows != m.rows || cols != m.cols) return false;
     for (int i = 0; i < rows; i++)
         for (int j = 0; j < cols; j++)
-            if (Get(i,j) != m.Get(i,j)) return false;
+            if ((*this)(i,j) != m(i,j)) return false;
     return true;
 }
 
@@ -246,9 +225,9 @@ Matrix Matrix::operator*(const Matrix& m) const
     Matrix result(rows, m.cols);
     for  (int i = 0; i < m.cols; i++)
         for  (int j = 0; j < rows; j++) {
-            float& v = result.Get(i,j);
+            float& v = result(i,j);
             v = 0;
-            for (int k = 0; k < cols; k++) v += Get(j,k) * m.Get(k,i);
+            for (int k = 0; k < cols; k++) v += (*this)(j,k) * m(k,i);
         }
     return result;
 }
@@ -332,30 +311,6 @@ void Matrix::operator-=(float c) {
         data[i] -= c;
 }
 
-void Matrix::ToLatex(const char* file)
-{
-    ofstream os;
-    os.open(file);
-   
-    os.precision(2);
-    os.width(6);
-    os.setf(ios::right | ios::fixed);
-
-    os << "\\begin{pmatrix}" << endl;
-    for (int i = 0; i < rows; i++)
-    {
-        for (int j = 0; j < cols; j++)
-        {
-            os << " " << Get(i,j) << " ";
-            if (j != cols-1) os << "&";
-        }
-        if (i != rows-1) os << "\\\\" << endl;
-    }
-    os << endl << "\\end{pmatrix}" << endl;
-    os.close();
-}     
-
-
 void SwapContents(Matrix& m1, Matrix& m2)
 {
     float* temp = m1.data;
@@ -363,28 +318,11 @@ void SwapContents(Matrix& m1, Matrix& m2)
     m2.data = temp;
 }
 
-ostream& operator<<(ostream& os, const Matrix::PrettyWrapper& w)
-{
-    const Matrix& m = *w.m;
-    os << "\n(";
-    for(int i = 0; i < m.rows; i++) {
-        for(int j = 0; j < m.cols; j++) {
-            os.precision(2);
-            os.width(6);
-            os.setf(ios::right | ios::fixed);
-            os << m.Get(i,j);
-            if (j != m.cols - 1) os << ",";
-        }
-        os << ";";
-        if (i != m.rows - 1) os << "\n ";
-    }
-    os << " )";
-    return os;
-}
-
 ostream& operator<<(ostream& os, const Matrix& m)
 {
-    os.precision(50);
+    os.precision(2);
+    os.width(6);
+    os.setf(ios::right | ios::fixed);
     os << "[";
     for (int i = 0; i < m.rows; i++)
     {
@@ -424,127 +362,6 @@ istream& operator>>(istream& is, Matrix& m)
     return is;
 }
 
-
-void EncodeRLE(RLEpair rle[], const Matrix& m)
-{
-    int sz = m.Len();
-    int cell = 0;
-    int index = 0;
-    int count = 1;
-    float old, cur = m.data[0];
-    float* data = m.data;
-    while (cell++ < sz)
-    {
-        old = cur;
-        cur = data[cell] - (cell == sz) * 1e9;
-        if (cur != old)
-        {
-            rle[index].length = count;
-            rle[index].value = old;
-            index++;
-            count = 1;
-        } else count++;
-    }
-}       
-
-void DecodeRLE(RLEpair rle[], Matrix& m)
-{
-    int pos = 0, i = 0;
-    while (pos < m.Len())
-    {
-        float v = rle[i].value;
-        int l = rle[i].length;
-        i++;
-        while (l--)
-        {
-            m.data[pos] = v;
-            pos++;
-        }
-    }
-}
-
-
-void WriteMatrix(const char* file, const Matrix& m, bool append)
-{
-    ofstream os;
-    if (append) os.open(file, ios_base::app);
-    else os.open(file);
-    os << true << endl;
-    os << m << endl;
-    flush(os);
-}
-
-Matrix ReadMatrix(const char* file)
-{
-    ifstream is;
-    bool valid;
-   
-    is.open(file);
-    is >> valid;
-    assert(valid);
-    return Matrix(is);
-}
-
-void WriteMatrices(const char* file, const vector<Matrix>& matrices)
-{
-    int len = matrices.size();
-    ofstream os;
-   
-    os.open(file);
-
-    for (int i = 0; i < len; i++)
-    {
-        os << true << endl;
-        os << matrices[i] << endl;
-    }
-    os << false << endl;
-    flush(os);
-}
-
-void ReadMatrices(const char* file, vector<Matrix>& matrices)
-{
-    ifstream is;
-
-    is.open(file);
-
-    while (1)
-    {
-        bool valid;
-        is >> valid;
-        if (!valid || is.fail()) break;
-        matrices.push_back(Matrix(is));
-    }
-}
-
-float HammondMetric(const Matrix& a, const Matrix& b)
-{
-    assert (a.rows == b.rows && a.cols == b.cols);
-    float f = 0;
-    float* data1 = a.data;
-    float* data2 = b.data;
-    int sz = a.rows * a.cols;
-    for  (int i = 0; i < sz; i++)
-    {
-        if (data1[i] != data2[i]) f++;
-    }
-    return f;
-}
-
-float SquareMetric(const Matrix& a, const Matrix& b)
-{
-    assert (a.rows == b.rows && a.cols == b.cols);
-    float f = 0;
-    float* data1 = a.data;
-    float* data2 = b.data;
-    for  (int i = 0; i < a.rows * a.cols; i++)
-    {
-        float d = data1[i] - data2[i];
-        f += d * d;
-    }
-    return sqrt(f);
-}
-
-
 float Matrix::GetL2Norm() const
 {
     double d = 0;
@@ -553,26 +370,10 @@ float Matrix::GetL2Norm() const
     return sqrt(d);
 }
 
-
-
 float Matrix::GetHammingNorm() const
 {
     float d = 0;
     for (int i = 0; i < rows * cols; i++)
         if (data[i]) d++;
     return d;
-}
-
-float RootMetric(const Matrix& a, const Matrix& b)
-{
-    assert (a.rows == b.rows && a.cols == b.cols);
-    float f = 0;
-    float* data1 = a.data;
-    float* data2 = b.data;
-    for  (int i = 0; i < a.rows * a.cols; i++)
-    {
-        float d = data1[i] - data2[i];
-        f += sqrt(fabs(d));
-    }
-    return f;
 }

@@ -1,5 +1,17 @@
+
 So remove all kinds of unnec stuff:
 * Sex.
 * Keep interaction, add 'custom' part.
 
 * Add ultruism and also co-operation
+
+DeSerialization process for Grid:
+* So there is an occupants pointer array for lookup, but also an occupants pointer list for quick iteration.
+* Occupants list subsumes creats list
+* Occupants list is serialized directly
+* Creats have a special _Remove that ensures that they are added to the 'deadpool'
+* The deadpool is not saved.
+* Id is increment on creature reset. It counts births, basically. This gets rid of determinism problems, because the deadpool
+has no identity.
+* So there is a mixed solution here: everything is an occupant, but creats have the special deadpool mechanism to prevent churn.
+

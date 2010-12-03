@@ -11,6 +11,7 @@ RegisterVar(Creat, desirer_id);
 RegisterVar(Creat, weights);
 RegisterVar(Creat, state);
 RegisterVar(Creat, action);
+RegisterVar(Creat, id);
 RegisterVar(Creat, age);
 RegisterVar(Creat, orient);
 RegisterVar(Creat, possessed);
@@ -41,8 +42,6 @@ void Creat::Setup()
 {
 }
 
-
-
 Creat::Creat()
     : Occupant(1),
       weights(neurons, neurons),
@@ -57,14 +56,8 @@ Creat::Creat()
     pos.row = pos.col = 0;
 }
 
-Creat::Creat(const Creat& c)
-    : Occupant(1),
-      weights(1,1),
-      state(1,1),
-      state2(1,1)
-{
-    assert(0);
-}
+Creat::Creat(const Creat &c) : Occupant(0)
+{ throw "creat being copied"; }
 
 void Creat::Reset()
 {
@@ -322,17 +315,17 @@ void Creat::__Remove()
 {
     alive = false;
     grid->num_creats--;
+    grid->creats.remove(this);
+    grid->deadpool.push_front(this);
     if (lineage) lineage->Decrement();
-    if (desired_id >= 0) grid->creats[desired_id].desirer_id = -1;
-    if (desirer_id >= 0) grid->creats[desirer_id].desired_id = -1;	
+    if (desired_id >= 0) grid->LookupCreatByID(desired_id)->desirer_id = -1;
+    if (desirer_id >= 0) grid->LookupCreatByID(desirer_id)->desired_id = -1;
 }
 
 void Creat::TurnLeft()
 {
     orient = Mod(orient - 1, 4);
 }
-
-
 
 void Creat::TurnRight()
 {
@@ -347,12 +340,12 @@ void Creat::CopyBrain(Creat& parent)
 
     marker = parent.marker;
 
-    if (desired_id >= 0) BlendBrain(grid->creats[desired_id]);
+    if (desired_id >= 0) BlendBrain(*(grid->LookupCreatByID(desired_id)));
 }
 
 void Creat::ChooseMate(Creat* other)
 {
-    if (desired_id >= 0) grid->creats[desired_id].desirer_id = -1;
+    if (desired_id >= 0) grid->LookupCreatByID(desired_id)->desirer_id = -1;
     other->desirer_id = id;
     desired_id = other ? other->id : -1;
 }
@@ -365,8 +358,7 @@ Pos Creat::Front(int offset)
 
 Creat* Creat::Peer(int id)
 {
-    if (id < 0) return NULL;
-    else return &grid->creats[id];
+    return (id < 0) ? NULL : grid->LookupCreatByID(id);
 }
 
 float Creat::Complexity()

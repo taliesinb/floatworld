@@ -82,7 +82,7 @@ void Occupant::MoveRandom()
 
 Creat* Occupant::Peer(int id)
 {
-  return (id < 0) ? NULL : &grid->creats[id];
+  return (id < 0) ? NULL : grid->LookupCreatByID(id);
 }
 
 

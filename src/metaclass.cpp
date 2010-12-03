@@ -73,13 +73,13 @@ const char* Class::Name()
     return name;
 }
 
-void Class::dummy()
+void Class::Reset()
 {
 }
 
-MetaClass* Class::GetMetaClass()
+MetaClass& Class::GetMetaClass()
 {
-    return MetaClass::Lookup(Name());
+    return *MetaClass::Lookup(Name());
 }
 
 void Class::Write(ostream& os)
@@ -87,7 +87,7 @@ void Class::Write(ostream& os)
     stringstream ostr;
     string line;
 
-    GetMetaClass()->Write(this, ostr);
+    GetMetaClass().Write(this, ostr);
 
     os << "{" << endl;
     while(std::getline(ostr, line))
@@ -101,7 +101,7 @@ void Class::Read(istream& is)
 {
     is >> "{" >> whitespace;
 
-    GetMetaClass()->Read(this, is);
+    GetMetaClass().Read(this, is);
 
     is >> whitespace >> "}";
 }
@@ -184,3 +184,5 @@ Registrator::Registrator(MetaClass& metaclass, const char* name, ClassReader rea
     metaclass.varname[metaclass.nvars] = name;
     metaclass.nvars++;
 }
+
+

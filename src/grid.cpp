@@ -35,20 +35,22 @@ using namespace std;
 
 const char* interactionnames[] = {"None", "Wastage","Parasitism", "Predation", "Co-operation", "Gene Swap", "Gene Give", "Gene Receive", "Gene Symmetric", NULL};
 
+const int Grid::max_creats = 2000;
+
 Grid::Grid() :
-    energy(1,1),
-    initial_brain(NULL),
-    weight_mask(Creat::neurons, Creat::neurons),
-    occupants(NULL)
+    energy(1,1), weight_mask(Creat::neurons, Creat::neurons)
 {
+    initial_brain = NULL;
+    occupants = NULL;
 }
 
 Grid::Grid(int rs, int cs)
     : energy(rs,cs),
-      initial_brain(NULL),
-      weight_mask(Creat::neurons, Creat::neurons),
-      occupants(NULL)
+      weight_mask(Creat::neurons, Creat::neurons)
 {
+    initial_brain = NULL;
+    occupants = NULL;
+
     cols = cs;
     rows = rs;
     occupants = new Occupant*[rows * cols];
@@ -80,8 +82,10 @@ Grid::Grid(int rs, int cs)
 
     for (int i = 0; i < max_creats; i++)
     {
-        creats[i].id = i;
-        creats[i].grid = this;
+        Creat* c = new Creat();
+        c->id = i;
+        c->grid = this;
+        deadpool.push_back(c);
     }
 
     SetupMask(true);
@@ -183,55 +187,56 @@ Creat& Grid::AddCreatAt(Pos pos, int orient)
 
 Creat& Grid::_AddCreat(Pos pos, int orient)
 {
-    num_creats++;
-  
-    assert (num_creats <= max_creats);
+    num_creats++;  
 
-    int j = 0;
-    // int j = freespot;
-    // if (j < 0)
-    // {
-    //   j = 0;
-    //   while (creats[j].alive) j++;
+    Creat* fresh = deadpool.back();
+    deadpool.pop_back();
+    creats.push_front(fresh);
 
-    // } else freespot = -1;
-    while (creats[j].alive) j++;
-    if (j >= max_creats) assert(0);
-  
-    Creat& creat = creats[j];
-    creat.orient = orient;
-    creat.pos = pos;
-    creat.Reset();
-    creat.Place();
-    creat.alive = true;
+    fresh->orient = orient;
+    fresh->pos = pos;
+    fresh->Reset();
+    fresh->Place();
+    fresh->alive = true;
 
-    return creat;
+    return *fresh;
 }
 
 void Grid::RemoveAllCreats()
 {
-    for (int i = 0; i < max_creats; i++)
-        creats[i].Remove();
+    while (creats.size())
+    {
+        creats.back()->Remove();
+        creats.pop_back();
+    }
 }
   
-Creat* Grid::FindCreat(float marker)
+Creat* Grid::LookupCreatByID(int id)
+{
+    for_iterate(it, creats)
+    {
+        if ((*it)->id == id) return *it;
+    }
+    return NULL;
+}
+
+Creat* Grid::FindCreat(int marker)
 {
     if (num_creats == 0) return NULL;
   
-    Creat* c = NULL;
+    Creat* found = NULL;
     float max = 0;
-    for (int i = 0; i < max_creats; i++)
+    for_iterate(it, creats)
     {
-        if (creats[i].alive
-            && (!marker || (creats[i].marker == marker))
-            && creats[i].energy > max)
+        Creat* creat = *it;
+        if (creat->energy > max && (!marker || (creat->marker == marker)))
         {
-            max = creats[i].energy;
-            c = &creats[i];
+            max = creat->energy;
+            found = creat;
             break;
         }
     }
-    return c;
+    return found;
 }
 
 #define KERNEL(r2,c2) data[cs * Mod(r + r2, rs) + Mod(c + c2, cs)]
@@ -310,29 +315,7 @@ void Grid::Run(int steps, int report)
         Step();
     }
 }
-
-void Grid::RunHistory(const char* file, int steps, int every)
-{
-    ofstream of;
-    of.open(file);
-    of.close();
-   
-    for (int i = 1; i <= steps && num_creats; i++)
-    {
-        if (i % every == 0)
-        {
-            Report();
-            Matrix m = FindDominantGenome();
-            WriteMatrix(file, m, true);
-        }
-        Step();
-    }
-    if (num_creats == 0)
-    {
-        cout << "Ended history early due to extinction." << endl;
-    }
-}  
-
+/*
 void Grid::RunLineage(const char* file, int steps, int every)
 {
     record_lineages = true;
@@ -374,26 +357,28 @@ void Grid::RunLineage(const char* file, int steps, int every)
 
         WriteMatrices(file, history);
     }
-}
+}*/
 
 void Grid::Report()
 {
-    float avgcomplexity = 0;
+    float avg_complexity = 0;
 
-    for (int i = 0; i < max_creats; i++)
-        if (creats[i].alive)
-            avgcomplexity += creats[i].Complexity();
+    for_iterate(it, creats)
+        avg_complexity += (*it)->Complexity();
 
-    avgcomplexity /= num_creats ? num_creats : 1;
-    cout << "Time, Pop, Synapses = " << timestep << " " << num_creats << " " << avgcomplexity << endl;
+    avg_complexity /= num_creats ? num_creats : 1;
+    cout << "Time, Pop, Complexity = " << timestep << " " << num_creats << " " << avg_complexity << endl;
 
     flush(cout);
 }
 
 void Grid::Step()
 {
-    for (int i = 0; i < max_creats; i++)
-        if (creats[i].alive) creats[i].Step();
+    list<Creat*>::iterator it = creats.begin();
+    while (it != creats.end())
+    {
+        (*it++)->Step();
+    }
   
     for (int i = 0; i < rows * cols; i++)
     {
@@ -457,76 +442,21 @@ float Grid::CompeteScore(Matrix& a, Matrix& b)
     return scores;
 }
 
-int Grid::CountCreatsByMarker(float marker)
+int Grid::CountCreatsByMarker(int marker)
 {
   int n = 0;
-  for (int i = 0; i < max_creats; i++)
+  for_iterate(it, creats)
   {
-    if (creats[i].alive && creats[i].marker == marker) n++;
+      if ((*it)->marker == marker) n++;
   }
   return n;
 }
 
-void Grid::SaveState(ostream& os)
+void Grid::Reset()
 {
-    assert (interaction_type <= Cooperation);
-
-    os << rows << " "
-       << cols << endl
-       << energy << endl
-
-       << randomstate << endl
-  
-       << freespot << endl
-       << energy_decay_rate << endl
-       << timestep << endl
-       << num_creats << endl
-       << interaction_type << endl
-       << enable_mutation << endl
-       << enable_respawn << endl
-       << accuracy << endl;
-
-    int noccupants = 0;
-    for (int i = 0; i < rows * cols; i++) 
-        if (occupants[i]) noccupants++;
-    os << noccupants << endl;
-    for (int i = 0; i < rows * cols; i++) 
-        if (occupants[i]) SaveOccupant(os, occupants[i]);
-  
-  
-    cout << "Grid state saved." << endl;
-}
-
-void Grid::LoadState(istream& is)
-{
-    int rs, cs;
-    is >> rs >> cs;
-    if (rs != rows || cs != cols)
-    {
-        cout << "Resizing to size " << rs << ", " << cs << endl;
-        Resize(rs, cs);
-    }
-
     RemoveAllCreats();
-  
-    is >> energy
-       >> randomstate
-       >> freespot
-       >> energy_decay_rate
-       >> timestep
-       >> num_creats
-       >> interaction_type
-       >> enable_mutation
-       >> enable_respawn
-       >> accuracy;
-
-    int noccupants;
-    is >> noccupants;
-    while (noccupants--) LoadOccupant(is);
-
-    cout << "Grid state loaded." << endl;
 }
-
+/*
 void Grid::LoadOccupant(istream& is)
 {
     int id;
@@ -556,7 +486,7 @@ void Grid::SaveOccupant(std::ostream& os, Occupant* occ)
 
     occ->Write(os);
 }
-
+*/
 Matrix Grid::FindDominantGenome()
 {
     enable_mutation = false;
@@ -601,7 +531,7 @@ void Grid::Paint(QPainter& painter)
     {
         for (int j = 0; j < cols; j++)
         {
-            int value = energy.Get(i,j) * 5;
+            int value = energy(i,j) * 5;
             if (value < 0) value = 0;
             if (value > 255) value = 255;
             painter.fillRect(j,i,1,1,QColor(value,value,value));

@@ -12,10 +12,10 @@ class MetaClass;
 class Class
 {
 public:
-    virtual void dummy();
-    MetaClass* GetMetaClass();
+    MetaClass& GetMetaClass();
     void Write(std::ostream& os);
     void Read(std::istream& is);
+    virtual void Reset();
     const char* Name();
 };
 

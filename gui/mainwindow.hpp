@@ -37,6 +37,10 @@ private slots:
     void on_actionStop_triggered();
     void on_actionFast_triggered();
     void on_actionStep_triggered();
+
+    void on_actionSave_triggered();
+    void on_actionLoad_triggered();
+
     void takeStep();
     void reportFPS();
 };

@@ -66,7 +66,7 @@ public:
 
     // MANAGEMENT
     Creat();
-    Creat(const Creat& c); 
+    Creat(const Creat& c);
     void Reset();
 
     // LINEAGE HANDLING

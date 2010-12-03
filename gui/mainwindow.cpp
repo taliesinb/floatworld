@@ -1,5 +1,6 @@
 #include "mainwindow.hpp"
 #include <fstream>
+#include <QFileDialog>
 
 using namespace std;
 
@@ -52,7 +53,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     grid.max_age = 120;
 
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 2; i++)
     {
         Circle* c = new Circle;
         c->Place(grid, grid.RandomCell());
@@ -61,7 +62,7 @@ MainWindow::MainWindow(QWidget *parent)
         for (int k = 0; k < 10; k++) c->Update();
     }
 
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 2; i++)
     {
         Circle* c = new Circle;
         c->Place(grid, grid.RandomCell());
@@ -76,7 +77,7 @@ MainWindow::MainWindow(QWidget *parent)
         Circle* c = new Circle;
         c->Place(grid, grid.RandomCell());
         c->radius = 8;
-        c->energy = 3.0;
+        c->energy = 2.0;
         c->p_jump = 0.01;
         for (int k = 0; k < 10; k++) c->Update();
     }
@@ -88,27 +89,11 @@ MainWindow::MainWindow(QWidget *parent)
 
     grid.AddCreats(40, true);
 
-    for (int k = 0; k < 50; k++)
+    for (int k = 0; k < 10; k++)
     {
     Occupant* block = new SkinnerBlock();
     block->Place(grid, grid.RandomCell());
     }
-
-    ofstream of;
-    of.open("/Users/tali/test.txt");
-    of << grid.creats[0] << endl;
-    of.close();
-
-    Creat creat;
-    ifstream inf;
-    inf.open("/Users/tali/test.txt");
-    inf >> creat;
-    inf.close();
-
-    ofstream of2;
-    of2.open("/Users/tali/test2.txt");
-    of2 << creat << endl;
-    of2.close();
 
     connect(&timer1, SIGNAL(timeout()), this, SLOT(takeStep()));
     timer1.start(5);
@@ -150,6 +135,35 @@ void MainWindow::on_actionSlow_triggered()
     speed /= speed_multiplier;
 }
 
+void MainWindow::on_actionSave_triggered()
+{
+    QString fileName = QFileDialog::getSaveFileName(this,\
+    "Save World as", "", tr("Floatworlds (*.fw)"));
+
+    if (fileName.size() > 0)
+    {
+        ofstream f;
+        f.open(fileName.toUtf8());
+        f << gridWidget->grid << endl;
+        f.close();
+    }
+}
+
+void MainWindow::on_actionLoad_triggered()
+{
+    QString fileName = QFileDialog::getOpenFileName(this,\
+    "Load World", "", tr("Floatworlds (*.fw)"));
+
+    if (fileName.size() > 0)
+    {
+        ifstream f;
+        f.open(fileName.toUtf8());
+        f >> gridWidget->grid;
+        f.close();
+    }
+}
+
+
 void MainWindow::reportFPS()
 {
     cout << gridWidget->renders << endl;
@@ -174,4 +188,3 @@ void MainWindow::takeStep()
     gridWidget->rerender();
     gridWidget->update();
 }
-

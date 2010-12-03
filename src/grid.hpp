@@ -5,7 +5,7 @@
 #include "creat.hpp"
 
 #include <iostream>
-#include <vector>
+#include <list>
 
 class Creat;
 enum InteractionMode
@@ -29,8 +29,8 @@ class Grid : public Class
 {
 public:      
     
-    static const int max_creats = 3000;
-    Creat creats[max_creats];
+    std::list<Creat*> creats;
+    std::list<Creat*> deadpool;
     int freespot;
 
     Matrix energy;
@@ -40,6 +40,7 @@ public:
     int births;
     int rows, cols;
     int num_creats;
+    static const int max_creats;
     int interaction_type;
 
     bool enable_mutation;
@@ -51,7 +52,7 @@ public:
     float action_cost[NumberActions];
     CreatFunc action_lookup[NumberActions];
     float initial_energy;
-    float initial_marker;
+    int initial_marker;
     Matrix* initial_brain;
     int max_age;
     int total_steps;
@@ -73,6 +74,7 @@ public:
     // State change
     Grid();
     Grid(int rws, int cls);
+    void Reset();
     ~Grid();
 
     // Setup
@@ -80,10 +82,6 @@ public:
     void SetupActions();
 
     void Resize(int rws, int cls);
-    void SaveState(std::ostream& os);
-    void LoadState(std::istream& is);
-    void SaveOccupant(std::ostream& os, Occupant* occ);
-    void LoadOccupant(std::istream& is);
 
     // Low-level position
     Pos Wrap(Pos pos) { return pos.Wrap(rows, cols); }
@@ -96,7 +94,8 @@ public:
     Creat& AddCreatAt(Pos pos, int orient=0);
     void AddCreats(int number, bool fairly);
     void RemoveAllCreats();
-    Creat* FindCreat(float marker);
+    Creat* LookupCreatByID(int id);
+    Creat* FindCreat(int marker);
     Occupant*& OccupantAt(Pos pos)
     { return occupants[pos.row * cols + pos.col]; }
     Creat* CreatAt(Pos pos)
@@ -105,14 +104,12 @@ public:
     // Scoring
     Matrix FindDominantGenome();
     float CompeteScore(Matrix& a, Matrix& b);
-    int CountCreatsByMarker(float markers);
+    int CountCreatsByMarker(int marker);
 
     void Step();
 
     // Convenience functions
     void Run(int steps, int report=0);
-    void RunHistory(const char* file, int steps, int every);
-    void RunLineage(const char* file, int steps, int every);
     void Report();
     Matrix Evolve(int steps);
 
