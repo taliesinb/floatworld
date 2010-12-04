@@ -38,7 +38,6 @@ void Occupant::Attach(Grid& g, Pos p)
 {
     grid = &g;
     grid->occupant_list.push_back(this);
-    cout << "Attaching " << reinterpret_cast<long int>(this) << " with id " << id << endl;
     Move(p);
 }
 
@@ -52,14 +51,6 @@ void Occupant::Remove()
 {
     RemoveFromLL();
     grid->occupant_list.remove(this);
-    cout << "Removing occupant " << id << "|" << endl;
-    cout << "Remaining occupants: [";
-    for_iterate(it, grid->occupant_list)
-    {
-        cout << (*it)->id << " ";
-    }
-    cout << "]" << endl;
-
     __Remove();
 }
 

@@ -25,7 +25,8 @@ std::istream& operator>>(std::istream& is, const char* str)
         is.get(ch);
         if (ch == 0)
         {
-            cout << "Early termination" << endl;
+            cout << "Early termination with null symbol" << endl;
+            cout << "Was expecting <" << str << ">" << endl;
             throw "error";
         }
         if (isspace(ch) && isspace(*s))
@@ -50,7 +51,7 @@ std::istream& operator>>(std::istream& is, const char* str)
         s++;
     } while (*s);
     done:
-//    cout << "matched <" << str << ">" << endl;
+    //cout << "matched <" << str << ">" << endl;
     return is;
 };
 
@@ -72,7 +73,8 @@ std::string get_word(std::istream& is)
 
 std::ostream& operator<<(std::ostream& os, Class& c)
 {
-    os << "{\t\"class\": \"" << c.Name() << "\"," << endl;
+    os << "{" << endl;
+    os << "\t\"class\": \"" << c.Name() << "\"," << endl;
     c.Write(os);
     os << "}" << endl;
     return os;

@@ -241,6 +241,82 @@ void Creat::Update()
     Step();
 }
 
+void Creat::CheckSanity(const char* str)
+{
+    for (int i = 0; i < Creat::neurons; i++)
+    {
+        float val = state(i);
+        if (val != val)
+        {
+            cout << "Neuron " << i << " of creat " << id << " is " << val << endl;
+            goto error;
+        }
+    }
+
+    for (int i = 0; i < Creat::neurons; i++)
+    {
+        for (int j = 0; j < Creat::neurons; j++)
+        {
+            float val = weights(i,j);
+            if (val != val)
+            {
+                cout << "ERROR: Weight " << i << ", " << j << " of creat " << id << " is " << val << endl;
+                goto error;
+            }
+        }
+    }
+
+    if (pos.row < 0 || pos.row >= grid->rows ||
+        pos.col < 0 || pos.col >= grid->cols)
+    {
+        cout << "ERROR: Position " << pos << " of creat " << id << " is invalid." << endl;
+        goto error;
+    }
+
+    if (!alive)
+    {
+        cout << "ERROR: Creat " << id << " is dead!" << endl;
+        goto error;
+    }
+
+    if (id == -1)
+    {
+        cout << "ERROR: Creat has invalid id: " << id << endl;
+        goto error;
+    }
+
+    if (grid->LookupOccupantByID(id) != this)
+    {
+        cout << "ERROR: Wrong occupant found with id: " << id << endl;
+        goto error;
+    }
+
+    {
+        Occupant* occ = grid->OccupantAt(pos);
+        while (occ)
+        {
+            if (occ == this) goto found;
+            occ = occ->next;
+        }
+        cout << "ERROR: Occupant not found at position: " << pos << endl;
+        goto error;
+    }
+
+    found:
+    return;
+
+    error:
+    cout << "CONTEXT: " << str << endl;
+    cout << "Creat printout:" << endl;
+    cout << "State2 contents:" << state2 << endl;
+    cout << "Creat::inputs = " << Creat::inputs << endl;
+    cout << "Creat::inputs + Creat::hidden = " << Creat::inputs + Creat::hidden << endl;
+    cout << "Creat::neurons = " << Creat::neurons << endl;
+
+    cout << *this << endl;
+    throw "invalid creat";
+}
+
 void Creat::Step()
 {
     assert(alive);
@@ -260,7 +336,6 @@ void Creat::Step()
     state(extinputs + 3) = RandFloat(-1.0, 1.0);
 
     // CALCULATE BRAIN STEP
-
     for  (int j = Creat::inputs; j < Creat::inputs + Creat::hidden; j++)
     {
         float v = 0;
@@ -272,7 +347,8 @@ void Creat::Step()
     for (int i = 0; i < hidden; i++)
     {
         float& h = state2(inputs + i);
-        h = atanh(h);
+        float h2 = h;
+        h = tanh(h);
     }
 
     for  (int j = Creat::inputs + Creat::hidden; j < Creat::neurons; j++)
@@ -284,6 +360,7 @@ void Creat::Step()
     }
 
     SwapContents(state, state2);
+    //CheckSanity("After update");
 
     // CALCULATE ACTION
     action = ActionNone;

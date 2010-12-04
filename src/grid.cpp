@@ -64,7 +64,6 @@ void read_grid_occupant_order(Grid* g, std::istream& s)
     for_iterate(it, order)
     {
         short id = *it;
-        std::cout << "Looking up id " << id << std::endl;
         Occupant* occ = g->LookupOccupantByID(id);
 
         assert(occ);
@@ -150,16 +149,12 @@ void Grid::SetSize(int rs, int cs)
         occupant_grid[i] = NULL;
 
     for_iterate(creat, graveyard)
-    {
-        cout << "Deleting creat " << (*creat)->id << endl;
         delete *creat;
-    }
+
     graveyard.clear();
     for_iterate(occ, occupant_list)
-    {
-        cout << "Deleting occupant " << (*occ)->id << " " << reinterpret_cast<long int>(*occ) << endl;
         delete *occ;
-    }
+
     occupant_list.clear();
 }
 
@@ -242,10 +237,8 @@ Creat& Grid::_AddCreat(Pos pos, int orient)
 
 void Grid::RemoveOccupants()
 {
-    cout << "RemoveOccupants" << endl;
     while (occupant_list.size())
     {
-        cout << "removing id " << occupant_list.back()->id << endl;
         occupant_list.back()->Remove();
     }
 }
@@ -254,11 +247,7 @@ Occupant* Grid::LookupOccupantByID(int search_id)
 {
     for_iterate(it, occupant_list)
     {
-        if ((*it)->id == search_id)
-        {
-            cout << "Found occupant " << *it;
-            return *it;
-        }
+        if ((*it)->id == search_id) return *it;
     }
     return NULL;
 }
@@ -496,7 +485,6 @@ int Grid::CountCreatsByMarker(int marker)
 
 void Grid::Reset()
 {
-    cout << "Reseting grid" << endl;
     RemoveOccupants();
 }
 

@@ -79,6 +79,7 @@ public:
     Pos Front(int offset=0);
     
     // UPDATE AND ACTION CODE
+    void CheckSanity(const char* str);
     void Update();
     void Step();
     void DoNothing();
