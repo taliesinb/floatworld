@@ -6,9 +6,10 @@ using namespace std;
 RegisterAbstractClass(Occupant, None)
 RegisterVar(Occupant, pos)
 RegisterVar(Occupant, signature)
+RegisterVar(Occupant, id)
 
-Occupant::Occupant(int sig)
-  : next(NULL), grid(NULL), pos(0,0), signature(sig)
+Occupant::Occupant()
+  : next(NULL), grid(NULL), pos(0,0), signature(0), id(-1)
 {
 }
 
@@ -17,25 +18,28 @@ void Occupant::Interact(Creat&)
 	
 }
 
+void Occupant::Reset()
+{
+
+}
+
 void Occupant::__Remove()
 {
 	
 }
 
-void Occupant::Place(Grid& g, Pos p)
+void Occupant::AssignID()
 {
-    grid = &g;
-    pos = p;
-    Place();
-    grid->occupant_list.push_back(this);
+    assert(grid);
+    id = grid->next_id++;
 }
 
-// add an occupant for the first time
-void Occupant::Place()
+void Occupant::Attach(Grid& g, Pos p)
 {
-    Occupant*& cell = grid->OccupantAt(pos);
-    next = cell;
-    cell = this;
+    grid = &g;
+    grid->occupant_list.push_back(this);
+    cout << "Attaching " << reinterpret_cast<long int>(this) << " with id " << id << endl;
+    Move(p);
 }
 
 void Occupant::Update()
@@ -48,6 +52,14 @@ void Occupant::Remove()
 {
     RemoveFromLL();
     grid->occupant_list.remove(this);
+    cout << "Removing occupant " << id << "|" << endl;
+    cout << "Remaining occupants: [";
+    for_iterate(it, grid->occupant_list)
+    {
+        cout << (*it)->id << " ";
+    }
+    cout << "]" << endl;
+
     __Remove();
 }
 
@@ -72,28 +84,25 @@ void Occupant::Move(Pos pos2)
 {
     RemoveFromLL();
     pos = pos2;
-    Place();
+    Occupant*& cell = grid->OccupantAt(pos);
+    next = cell;
+    cell = this;
 }
 
 void Occupant::MoveRandom()
 {
-    RemoveFromLL();
-    pos = grid->RandomCell();
-    Place();
+    Move(grid->RandomCell());
 }
 
-Creat* Occupant::Peer(int id)
-{
-    return (id < 0) ? NULL : grid->LookupCreatByID(id);
-}
-
-std::ostream& operator<<(std::ostream& s, Occupant* o)
+std::ostream& operator<<(std::ostream& s, Occupant*& o)
 {
     s << *o;
+    return s;
 }
 
-std::istream& operator<<(std::istream& i, Occupant* o)
+std::istream& operator>>(std::istream& s, Occupant*& o)
 {
-
+    o = dynamic_cast<Occupant*>(MetaClass::Create(s));
+    return s;
 }
 

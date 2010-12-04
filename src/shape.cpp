@@ -2,8 +2,7 @@
 #include "matrix.hpp"
 #include "grid.hpp"
 
-RegisterAbstractClass(Shape, None);
-RegisterVar(Shape, pos);
+RegisterAbstractClass(Shape, Occupant);
 RegisterVar(Shape, threshold);
 RegisterVar(Shape, energy);
 RegisterVar(Shape, ratio);
@@ -28,8 +27,7 @@ RegisterVar(Rectangle, angle);
 */
 
 Shape::Shape()
-  : Occupant(2),
-    threshold(15),
+  : threshold(15),
     energy(1.0),
     ratio(1.0),
     p_jump(0.01)

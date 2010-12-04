@@ -11,29 +11,29 @@ class Occupant : public Class
 {
   public:
 
-    Occupant(int sig);
+    Occupant();
     
     Occupant* next; // next occupant on this grid position
     Grid* grid;
     Pos pos;
-    int signature;
+    short signature;
+    short id;
 
     virtual void Interact(Creat& c);
     virtual void Update();
 
+    virtual void Reset();
     virtual void __Remove();
+    void AssignID();
 
-    void Place(Grid& grid, Pos pos);
-    void Place();
+    void Attach(Grid& grid, Pos pos);
     void Remove();
     void RemoveFromLL();
     void Move(Pos p);
     void MoveRandom();
-    
-    Creat* Peer(int id);
 };
 
-std::ostream& operator<<(std::ostream& s, Occupant* o);
-std::istream& operator<<(std::istream& i, Occupant* o);
+std::ostream& operator<<(std::ostream& s, Occupant*& o);
+std::istream& operator>>(std::istream& i, Occupant*& o);
 
 #endif

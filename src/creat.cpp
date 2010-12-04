@@ -11,16 +11,12 @@ RegisterVar(Creat, desirer_id);
 RegisterVar(Creat, weights);
 RegisterVar(Creat, state);
 RegisterVar(Creat, action);
-RegisterVar(Creat, id);
 RegisterVar(Creat, age);
 RegisterVar(Creat, orient);
 RegisterVar(Creat, possessed);
 RegisterVar(Creat, alive);
-RegisterVar(Creat, special);
 RegisterVar(Creat, energy);
 RegisterVar(Creat, marker);
-
-int Creat::global_id = 0;
 
 LineageNode::LineageNode(LineageNode* p)
     : pos(0,0), refs(1),  prev(p)
@@ -44,12 +40,12 @@ void Creat::Setup()
 }
 
 Creat::Creat()
-    : Occupant(1),
-      weights(neurons, neurons),
+    : weights(neurons, neurons),
       state(neurons, 1),
       state2(neurons, 1)
 {
     Reset();
+    signature = 1;
     weights.SetZero();
     state.SetZero();
     state2.SetZero();
@@ -57,17 +53,17 @@ Creat::Creat()
     pos.row = pos.col = 0;
 }
 
-Creat::Creat(const Creat &c) : Occupant(0)
+Creat::Creat(const Creat &c)
 { throw "creat being copied"; }
 
 void Creat::Reset()
 {
+    Occupant::Reset();
     state.SetZero();
     age = 0;
     action = ActionNone;
     possessed = false;
     alive = false;
-    id = grid ? grid->next_id++ : global_id++;
     marker = grid ? grid->initial_marker : 0;
     energy = grid ? grid->initial_energy : 0;
     lineage = NULL;
@@ -147,7 +143,6 @@ void Creat::MoveForward()
     if (Occupant* other = grid->OccupantAt(front))
     {
         other->Interact(*this);
-        special = true;
     } else 
     {
         Move(front);
@@ -310,7 +305,6 @@ void Creat::Step()
     // UPDATE AGE
     age++;
     grid->total_steps++;
-    special = false;
 
     // PERFORM ACTION
     if (energy > 0) (this->*(grid->action_lookup[action]))();
@@ -322,10 +316,10 @@ void Creat::__Remove()
 {
     alive = false;
     grid->num_creats--;
-    grid->deadpool.push_front(this);
+    grid->graveyard.push_front(this);
     if (lineage) lineage->Decrement();
-    if (desired_id >= 0) grid->LookupCreatByID(desired_id)->desirer_id = -1;
-    if (desirer_id >= 0) grid->LookupCreatByID(desirer_id)->desired_id = -1;
+    if (desired_id >= 0) Peer(desired_id)->desirer_id = -1;
+    if (desirer_id >= 0) Peer(desirer_id)->desired_id = -1;
 }
 
 void Creat::TurnLeft()
@@ -346,12 +340,12 @@ void Creat::CopyBrain(Creat& parent)
 
     marker = parent.marker;
 
-    if (desired_id >= 0) BlendBrain(*(grid->LookupCreatByID(desired_id)));
+    if (desired_id >= 0) BlendBrain(*Peer(desired_id));
 }
 
 void Creat::ChooseMate(Creat* other)
 {
-    if (desired_id >= 0) grid->LookupCreatByID(desired_id)->desirer_id = -1;
+    if (desired_id >= 0) Peer(desired_id)->desirer_id = -1;
     other->desirer_id = id;
     desired_id = other ? other->id : -1;
 }
@@ -364,7 +358,7 @@ Pos Creat::Front(int offset)
 
 Creat* Creat::Peer(int id)
 {
-    return (id < 0) ? NULL : grid->LookupCreatByID(id);
+    return (id < 0) ? NULL : dynamic_cast<Creat*>(grid->LookupOccupantByID(id));
 }
 
 float Creat::Complexity()

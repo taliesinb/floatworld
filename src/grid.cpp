@@ -1,7 +1,7 @@
 #include "grid.hpp"
 #include "creat.hpp"
 #include <fstream>
-#include  <assert.h>
+#include <assert.h>
 
 #include <QPainter>
 
@@ -10,51 +10,78 @@ RegisterVar(Grid, energy)
 RegisterVar(Grid, energy_decay_rate)
 RegisterVar(Grid, timestep)
 RegisterVar(Grid, births)
-RegisterVar(Grid, rows)
-RegisterVar(Grid, cols)
 RegisterVar(Grid, num_creats)
 RegisterVar(Grid, interaction_type)
 RegisterVar(Grid, enable_mutation)
 RegisterVar(Grid, enable_respawn)
 RegisterVar(Grid, path_energy)
 RegisterVar(Grid, record_lineages)
-//RegisterVar(Grid, action_cost)
 RegisterVar(Grid, initial_energy)
 RegisterVar(Grid, initial_marker)
+//RegisterVar(Grid, action_cost)
 //RegisterVar(Grid, initial_brain)
 RegisterVar(Grid, max_age)
 RegisterVar(Grid, total_steps)
+RegisterVar(Grid, next_id)
 RegisterVar(Grid, weight_mask)
-//RegisterVar(Grid, initial_brain)
 RegisterVar(Grid, mutation_color_drift)
 RegisterVar(Grid, mutation_prob)
 RegisterVar(Grid, mutation_sd)
 
+void write_grid_size(Grid* g, std::ostream& s)
+{
+    s << "[" << g->rows << ", " << g->cols << "]";
+}
+
+void read_grid_size(Grid* g, std::istream& s)
+{
+    int rows, cols;
+    s >> "[" >> rows >> ", " >> cols >> "]";
+    g->SetSize(rows, cols);
+}
+RegisterCustomVar(Grid, size, write_grid_size, read_grid_size)
+
+RegisterVar(Grid, occupant_list)
+
+void write_grid_occupant_order(Grid* g, std::ostream& s)
+{
+    std::list<int> order;
+    for (int i = 0; i < g->rows * g->cols; i++)
+    {
+        Occupant* occ = g->occupant_grid[i];
+        while (occ)
+        {
+            order.push_back(occ->id);
+            occ = occ->next;
+        }
+    }
+    s << order;
+}
+void read_grid_occupant_order(Grid* g, std::istream& s)
+{
+    std::list<int> order;
+    s >> order;
+    for_iterate(it, order)
+    {
+        short id = *it;
+        std::cout << "Looking up id " << id << std::endl;
+        Occupant* occ = g->LookupOccupantByID(id);
+
+        assert(occ);
+        occ->Attach(*g, occ->pos);
+        occ->id = id;
+    }
+}
+RegisterCustomVar(Grid, occupant_order, write_grid_occupant_order, read_grid_occupant_order)
 
 using namespace std;
 
 const char* interactionnames[] = {"None", "Wastage","Parasitism", "Predation", "Co-operation", "Gene Swap", "Gene Give", "Gene Receive", "Gene Symmetric", NULL};
 
-const int Grid::max_creats = 2000;
-
-Grid::Grid() :
-    energy(1,1), weight_mask(Creat::neurons, Creat::neurons)
+Grid::Grid() : weight_mask(Creat::neurons, Creat::neurons)
 {
     initial_brain = NULL;
     occupant_grid = NULL;
-}
-
-Grid::Grid(int rs, int cs)
-    : energy(rs,cs),
-      weight_mask(Creat::neurons, Creat::neurons)
-{
-    initial_brain = NULL;
-    occupant_grid = NULL;
-
-    cols = cs;
-    rows = rs;
-    occupant_grid = new Occupant*[rows * cols];
-    for (int i = 0; i < rows * cols; i++) occupant_grid[i] = NULL;
 
     energy_decay_rate = 0.0;
     enable_mutation = true;
@@ -73,21 +100,11 @@ Grid::Grid(int rs, int cs)
     initial_marker = 0.0;
     record_lineages = false;
 
-    freespot = 0;
     accuracy = 10;
     timestep = 0;
     num_creats = 0;
     births = 0;
     interaction_type = NoInteraction;
-    energy.SetZero();
-
-    for (int i = 0; i < max_creats; i++)
-    {
-        Creat* c = new Creat();
-        c->id = i;
-        c->grid = this;
-        deadpool.push_back(c);
-    }
 
     SetupMask(true);
     SetupActions();
@@ -118,17 +135,32 @@ void Grid::SetupMask(bool hid)
     weight_mask.SetSubMatrix(outl, inl, outr, inr, 1.0);
 }
 
-void Grid::Resize(int r, int c)
+void Grid::SetSize(int rs, int cs)
 {
-    RemoveOccupants();
+    rows = rs;
+    cols = cs;
 
-    rows = r, cols = c;
     energy.Resize(rows, cols);
-    delete[] occupant_grid;
-    occupant_grid = new Occupant*[rows * cols];
-    for (int i = 0; i < rows * cols; i++) occupant_grid[i] = NULL;
 
-    cout << "Resized to dimensions " << rows << ", " << cols << endl;
+    if (occupant_grid) delete occupant_grid;
+
+    occupant_grid = new Occupant*[rows * cols];
+
+    for (int i = 0; i < rows * cols; i++)
+        occupant_grid[i] = NULL;
+
+    for_iterate(creat, graveyard)
+    {
+        cout << "Deleting creat " << (*creat)->id << endl;
+        delete *creat;
+    }
+    graveyard.clear();
+    for_iterate(occ, occupant_list)
+    {
+        cout << "Deleting occupant " << (*occ)->id << " " << reinterpret_cast<long int>(*occ) << endl;
+        delete *occ;
+    }
+    occupant_list.clear();
 }
 
 void Grid::SetupActions()
@@ -191,17 +223,17 @@ Creat& Grid::_AddCreat(Pos pos, int orient)
     num_creats++;  
 
     Creat* fresh = NULL;
-    if (deadpool.size())
+    if (graveyard.size())
     {
-        fresh = deadpool.back();
-        deadpool.pop_back();
+        fresh = graveyard.back();
+        graveyard.pop_back();
     } else {
         fresh = new Creat;
-        fresh->grid = this;
     }
 
+    fresh->Attach(*this, pos);
+    fresh->AssignID();
     fresh->Reset();
-    fresh->Place(*this, pos);
     fresh->orient = orient;
     fresh->alive = true;
 
@@ -210,20 +242,22 @@ Creat& Grid::_AddCreat(Pos pos, int orient)
 
 void Grid::RemoveOccupants()
 {
+    cout << "RemoveOccupants" << endl;
     while (occupant_list.size())
     {
+        cout << "removing id " << occupant_list.back()->id << endl;
         occupant_list.back()->Remove();
-        occupant_list.pop_back();
     }
 }
   
-Creat* Grid::LookupCreatByID(int id)
+Occupant* Grid::LookupOccupantByID(int search_id)
 {
     for_iterate(it, occupant_list)
     {
-        if (Creat* creat = dynamic_cast<Creat*>(*it))
+        if ((*it)->id == search_id)
         {
-            if (creat->id == id) return creat;
+            cout << "Found occupant " << *it;
+            return *it;
         }
     }
     return NULL;
@@ -462,8 +496,10 @@ int Grid::CountCreatsByMarker(int marker)
 
 void Grid::Reset()
 {
+    cout << "Reseting grid" << endl;
     RemoveOccupants();
 }
+
 /*
 void Grid::LoadOccupant(istream& is)
 {

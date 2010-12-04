@@ -6,9 +6,10 @@ int sz = 120;
 
 GridWidget::GridWidget(QWidget* parent)
         : QWidget(parent),
-        grid(sz, sz),
+        grid(),
         pixmap(sz, sz, QImage::Format_RGB32)
 {
+    grid.SetSize(sz,sz);
     renders = 0;
     scale = 4;
     draw_type = draw_plain;

@@ -30,8 +30,7 @@ class Grid : public Class
 public:      
     
     std::list<Occupant*> occupant_list;
-    std::list<Creat*> deadpool;
-    int freespot;
+    std::list<Creat*> graveyard;
 
     Matrix energy;
     float energy_decay_rate;
@@ -40,7 +39,6 @@ public:
     int births;
     int rows, cols;
     int num_creats;
-    static const int max_creats;
     int interaction_type;
 
     bool enable_mutation;
@@ -82,7 +80,7 @@ public:
     void SetupMask(bool);
     void SetupActions();
 
-    void Resize(int rws, int cls);
+    void SetSize(int rws, int cls);
 
     // Low-level position
     Pos Wrap(Pos pos) { return pos.Wrap(rows, cols); }
@@ -95,7 +93,7 @@ public:
     Creat& AddCreatAt(Pos pos, int orient=0);
     void AddCreats(int number, bool fairly);
     void RemoveOccupants();
-    Creat* LookupCreatByID(int id);
+    Occupant* LookupOccupantByID(int id);
     Creat* FindCreat(int marker);
     inline Occupant*& OccupantAt(Pos pos)
     { return occupant_grid[pos.row * cols + pos.col]; }

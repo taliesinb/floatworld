@@ -57,12 +57,10 @@ public:
     Matrix state2;
 
     short action;
-    short id;
     short age;
     short orient;
     bool possessed;
     bool alive;
-    bool special;
     float energy;
     float marker;
 

@@ -56,16 +56,17 @@ MainWindow::MainWindow(QWidget *parent)
     for (int i = 0; i < 2; i++)
     {
         Circle* c = new Circle;
-        c->Place(grid, grid.RandomCell());
+        c->Attach(grid, grid.RandomCell());
+        c->AssignID();
         c->radius = 16;
         c->p_jump = 0.01;
         for (int k = 0; k < 10; k++) c->Update();
     }
-
+/*
     for (int i = 0; i < 2; i++)
     {
         Circle* c = new Circle;
-        c->Place(grid, grid.RandomCell());
+        c->Attach(grid, grid.RandomCell());
         c->radius = 23;
         c->energy = 0.25;
         c->p_jump = 0.005;
@@ -75,24 +76,25 @@ MainWindow::MainWindow(QWidget *parent)
     for (int i = 0; i < 2; i++)
     {
         Circle* c = new Circle;
-        c->Place(grid, grid.RandomCell());
+        c->Attach(grid, grid.RandomCell());
         c->radius = 8;
         c->energy = 2.0;
         c->p_jump = 0.01;
         for (int k = 0; k < 10; k++) c->Update();
     }
-
+*/
     grid.energy_decay_rate = 0.08;
     grid.enable_respawn = true;
     grid.mutation_prob = 0.1;
     grid.path_energy = 0;
 
-    grid.AddCreats(40, true);
+    grid.AddCreats(4, true);
 
-    for (int k = 0; k < 10; k++)
+    for (int k = 0; k < 2; k++)
     {
-    Occupant* block = new SkinnerBlock();
-    block->Place(grid, grid.RandomCell());
+        Occupant* block = new SkinnerBlock();
+        block->Attach(grid, grid.RandomCell());
+        block->AssignID();
     }
 
     connect(&timer1, SIGNAL(timeout()), this, SLOT(takeStep()));
@@ -138,7 +140,7 @@ void MainWindow::on_actionSlow_triggered()
 void MainWindow::on_actionSave_triggered()
 {
     QString fileName = QFileDialog::getSaveFileName(this,\
-    "Save World as", "", tr("Floatworlds (*.fw)"));
+    "Save World as", "/Users/tali/Desktop", tr("Floatworlds (*.fw)"));
 
     if (fileName.size() > 0)
     {
@@ -152,7 +154,7 @@ void MainWindow::on_actionSave_triggered()
 void MainWindow::on_actionLoad_triggered()
 {
     QString fileName = QFileDialog::getOpenFileName(this,\
-    "Load World", "", tr("Floatworlds (*.fw)"));
+    "Load World", "/Users/tali/Desktop", tr("Floatworlds (*.fw)"));
 
     if (fileName.size() > 0)
     {

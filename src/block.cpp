@@ -25,8 +25,7 @@ RegisterVar(CloneBlock, period);
 RegisterVar(CloneBlock, creat_id);
 
 Block::Block()
-  : Occupant(-1.5),
-    fill(false),
+  : fill(false),
     hue(0.5)
 {
 }
@@ -157,8 +156,8 @@ void CloneBlock::Interact(Creat& c)
 void CloneBlock::Update()
 {
   grid->energy(pos) = 0;
-  Creat* creat = Peer(creat_id);
-	if (grid->timestep % period == 0 && creat && creat->alive)
+  Creat* creat = dynamic_cast<Creat*>(grid->LookupOccupantByID(creat_id));
+  if (grid->timestep % period == 0 && creat && creat->alive)
   {
     Creat& child = grid->_AddCreat(grid->FairCell(), RandInt(3));
     child.CopyBrain(*creat);
