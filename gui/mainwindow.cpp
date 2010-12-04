@@ -140,7 +140,7 @@ void MainWindow::on_actionSlow_triggered()
 void MainWindow::on_actionSave_triggered()
 {
     QString fileName = QFileDialog::getSaveFileName(this,\
-    "Save World as", "/Users/tali/Desktop", tr("Floatworlds (*.fw)"));
+    "Save World as", QDir::homePath(), tr("Floatworlds (*.fw)"));
 
     if (fileName.size() > 0)
     {
@@ -154,7 +154,7 @@ void MainWindow::on_actionSave_triggered()
 void MainWindow::on_actionLoad_triggered()
 {
     QString fileName = QFileDialog::getOpenFileName(this,\
-    "Load World", "/Users/tali/Desktop", tr("Floatworlds (*.fw)"));
+    "Load World", QDir::homePath(), tr("Floatworlds (*.fw)"));
 
     if (fileName.size() > 0)
     {
