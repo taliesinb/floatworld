@@ -49,10 +49,6 @@ public:
     const float& GetW(int r, int c) const { return data[Mod(r,rows) * cols + Mod(c,cols)]; }
     float& GetW(int r, int c) { return data[Mod(r,rows) * cols + Mod(c,cols)]; }
       
-//    float& Get(Pos p) { return data[p.row * cols + p.col]; }
-//    const float& Get(Pos p) const { return data[p.row * cols + p.col]; }
-//    float& Get(int r, int c=0) { return data[r * cols + c]; }
-//    const float& Get(int r, int c=0) const { return data[r * cols + c]; }
     float& operator()(Pos p) { return data[p.row * cols + p.col]; }
     const float& operator()(Pos p) const { return data[p.row * cols + p.col]; }
     float& operator()(int r, int c=0) { return data[r * cols + c]; }

@@ -16,15 +16,3 @@ istream& operator>>(istream& is, Pos& p)
   return is;
 }
 
-ostream& operator<<(ostream& os, const FloatPos& p)
-{
-	os << p.row << " " << p.col;
-        return os;
-}
-
-istream& operator>>(istream& is, FloatPos& p)
-{
-	is >> p.row >> p.col;
-        return is;
-}
-
