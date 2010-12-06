@@ -28,7 +28,7 @@ class Pos
 
     Pos Transpose() { return Pos(col, row); }
 
-#define MAKE_OP(X)                                          \
+    #define MAKE_OP(X)                                          \
     Pos operator X(int f) { return Pos(row X f, col X f); } \
     void operator X##=(int f) { row X##= f; col X##= f; } \
     Pos operator X(Pos f) { return Pos(row X f.row, col X f.col); } \
