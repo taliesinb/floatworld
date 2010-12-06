@@ -93,7 +93,7 @@ std::ostream& operator<<(std::ostream& s, Occupant*& o)
 
 std::istream& operator>>(std::istream& s, Occupant*& o)
 {
-    o = dynamic_cast<Occupant*>(MetaClass::Create(s));
+    o = dynamic_cast<Occupant*>(Class::Create(s));
     return s;
 }
 

@@ -25,7 +25,7 @@ class Occupant;
 class QPainter;
 class QImage;
 
-class Grid : public Class
+class Grid : public Object
 {
 public:      
     

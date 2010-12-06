@@ -347,7 +347,6 @@ void Creat::Step()
     for (int i = 0; i < hidden; i++)
     {
         float& h = state2(inputs + i);
-        float h2 = h;
         h = tanh(h);
     }
 

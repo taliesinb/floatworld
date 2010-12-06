@@ -90,7 +90,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     grid.AddCreats(4, true);
 
-    for (int k = 0; k < 2; k++)
+    for (int k = 0; k < 15; k++)
     {
         Occupant* block = new SkinnerBlock();
         block->Attach(grid, grid.RandomCell());

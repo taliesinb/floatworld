@@ -7,7 +7,7 @@
 class Grid;
 class Creat;
 
-class Occupant : public Class
+class Occupant : public Object
 {
   public:
 

@@ -71,7 +71,7 @@ std::string get_word(std::istream& is)
     return str;
 }
 
-std::ostream& operator<<(std::ostream& os, Class& c)
+std::ostream& operator<<(std::ostream& os, Object& c)
 {
     os << "{" << endl;
     os << "\t\"class\": \"" << c.Name() << "\"," << endl;
@@ -80,7 +80,7 @@ std::ostream& operator<<(std::ostream& os, Class& c)
     return os;
 }
 
-std::istream& operator>>(std::istream& is, Class& c)
+std::istream& operator>>(std::istream& is, Object& c)
 {
     const char* name = c.Name();
     is >> "{\t\"class\": \"" >> name >> "\",";
@@ -88,26 +88,26 @@ std::istream& operator>>(std::istream& is, Class& c)
     return is;
 }
 
-int MetaClass::nmetaclasses = 0;
-MetaClass* MetaClass::metaclasses[128];
+int Class::nmetaclasses = 0;
+Class* Class::metaclasses[128];
 
-const char* Class::Name()
+const char* Object::Name()
 {
     const char* name = typeid(*this).name();
     while (*name >= '0' and *name <= '9') name++;
     return name;
 }
 
-void Class::Reset()
+void Object::Reset()
 {
 }
 
-MetaClass& Class::GetMetaClass()
+Class& Object::GetMetaClass()
 {
-    return *MetaClass::Lookup(Name());
+    return *Class::Lookup(Name());
 }
 
-void Class::Write(ostream& os)
+void Object::Write(ostream& os)
 {
     stringstream ostr;
     string line;
@@ -120,12 +120,12 @@ void Class::Write(ostream& os)
     }
 }
 
-void Class::Read(istream& is)
+void Object::Read(istream& is)
 {
     GetMetaClass().Read(this, is);
 }
 
-MetaClass::MetaClass(const char* _name, const char* _pname, ClassMaker func)
+Class::Class(const char* _name, const char* _pname, ObjectMaker func)
     : name(_name),
       pname(_pname),
       maker(func),
@@ -135,7 +135,7 @@ MetaClass::MetaClass(const char* _name, const char* _pname, ClassMaker func)
     nmetaclasses++;
 }
 
-MetaClass* MetaClass::Lookup(const char* name)
+Class* Class::Lookup(const char* name)
 {
     for (int i = 0; i < nmetaclasses; i++)
     {
@@ -145,31 +145,31 @@ MetaClass* MetaClass::Lookup(const char* name)
 }
 
 
-Class* MetaClass::MakeNew(const char* name)
+Object* Class::MakeNew(const char* name)
 {
-    MetaClass* metaclass = Lookup(name);
+    Class* metaclass = Lookup(name);
     assert(metaclass);
 
     return (*metaclass->maker)();
 }
 
-Class* MetaClass::Create(std::istream& is)
+Object* Class::Create(std::istream& is)
 {
 //    cout << "Trying to read class" << endl;
     is >> "{\t\"class\": \"";
     string name = get_word(is);
     is >> "\"" >> whitespace >> "," >> whitespace;
 //    cout << "Read the following classname: " << name << endl;
-    Class* serial = MakeNew(name.c_str());
+    Object* serial = MakeNew(name.c_str());
     serial->Read(is);
     is >> whitespace >> "}";
     return serial;
 }
 
-void MetaClass::Read(Class* c, istream& is)
+void Class::Read(Object* c, istream& is)
 {
 //    cout << "Starting to read class: " << name << endl;
-    MetaClass* parent = Lookup(pname);
+    Class* parent = Lookup(pname);
     if (parent)
     {
         parent->Read(c, is);
@@ -188,9 +188,9 @@ void MetaClass::Read(Class* c, istream& is)
 //    cout << "Done reading class: " << name << endl;
 }
 
-void MetaClass::Write(Class* c, ostream& os)
+void Class::Write(Object* c, ostream& os)
 {
-    MetaClass* parent = Lookup(pname);
+    Class* parent = Lookup(pname);
     if (parent)
     {
         parent->Write(c, os);
@@ -204,7 +204,7 @@ void MetaClass::Write(Class* c, ostream& os)
     }
 }
 
-Registrator::Registrator(MetaClass& metaclass, const char* name, ClassReader read, ClassWriter write)
+Registrator::Registrator(Class& metaclass, const char* name, ObjectReader read, ObjectWriter write)
 {
     metaclass.writers[metaclass.nvars] = write;
     metaclass.readers[metaclass.nvars] = read;
