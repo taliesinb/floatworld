@@ -4,6 +4,7 @@
 #include <assert.h>
 
 #include <QPainter>
+#include <QVBoxLayout>
 
 RegisterClass(Grid, None)
 RegisterVar(Grid, energy)

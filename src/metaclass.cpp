@@ -3,10 +3,38 @@
 #include <string.h>
 #include <sstream>
 
+#include <QObject>
+#include <QWidget>
+
 #include "metaclass.hpp"
 #include "misc.hpp"
 
 using namespace std;
+
+class HookObject : QFormLayout
+{
+    Q_OBJECT
+
+public:
+
+    Class& mclass;
+    Object* object;
+    std::list<QWidget*> widgets;
+
+    HookObject(Class& mc, Object* obj);
+
+public slots:
+    void child_changed();
+
+public:
+    void ConstructChildren();
+    void UpdateChildren();
+};
+
+HookObject::HookObject(Class& mc, Object* obj)
+    : mclass(mc), object(obj)
+{
+}
 
 std::istream& operator>>(std::istream& is, const char* str)
 {
@@ -91,6 +119,11 @@ std::istream& operator>>(std::istream& is, Object& c)
 int Class::nmetaclasses = 0;
 Class* Class::metaclasses[128];
 
+Object::Object()
+{
+    qt_hook = NULL;
+}
+
 const char* Object::Name()
 {
     const char* name = typeid(*this).name();
@@ -102,7 +135,28 @@ void Object::Reset()
 {
 }
 
-Class& Object::GetMetaClass()
+void Object::SetupQtHook()
+{
+    assert (qt_hook == NULL);
+    qt_hook = new HookObject(GetClass(), this);
+    qt_hook->ConstructChildren();
+}
+
+void Object::UpdateQtHook()
+{
+    if (qt_hook)
+    {
+        qt_hook->UpdateChildren();
+    }
+}
+
+void Object::DeleteQtHook()
+{
+    if (qt_hook) delete qt_hook;
+    qt_hook = NULL;
+}
+
+Class& Object::GetClass()
 {
     return *Class::Lookup(Name());
 }
@@ -112,7 +166,7 @@ void Object::Write(ostream& os)
     stringstream ostr;
     string line;
 
-    GetMetaClass().Write(this, ostr);
+    GetClass().Write(this, ostr);
 
     while(std::getline(ostr, line))
     {
@@ -122,14 +176,15 @@ void Object::Write(ostream& os)
 
 void Object::Read(istream& is)
 {
-    GetMetaClass().Read(this, is);
+    GetClass().Read(this, is);
 }
 
 Class::Class(const char* _name, const char* _pname, ObjectMaker func)
     : name(_name),
       pname(_pname),
       maker(func),
-      nvars(0)
+      nvars(0),
+      nqvars(0)
 {
     metaclasses[nmetaclasses] = this;
     nmetaclasses++;
@@ -143,7 +198,6 @@ Class* Class::Lookup(const char* name)
     }
     return NULL;
 }
-
 
 Object* Class::MakeNew(const char* name)
 {
@@ -204,6 +258,48 @@ void Class::Write(Object* c, ostream& os)
     }
 }
 
+void HookObject::child_changed()
+{
+    int i = 0;
+    for_iterate(w, widgets)
+    {
+        cout << "reading out widget " << i << endl;
+        stringstream s;
+        (*(mclass.qwriters[i]))(*w++, s);
+        (*(mclass.readers[mclass.qvarindex[i]]))(object, s);
+        i++;
+    }
+}
+
+void HookObject::UpdateChildren()
+{
+    int i = 0;
+    for_iterate(w, widgets)
+    {
+        cout << "writing in widget " << i << endl;
+        stringstream s;
+        (*(mclass.writers[mclass.qvarindex[i]]))(object, s);
+
+        QWidget* widget = *w++;
+        widget->blockSignals(true);
+        (*mclass.qreaders[i])(widget, s);
+        widget->blockSignals(false);
+        i++;
+    }
+}
+
+void HookObject::ConstructChildren()
+{
+    for(int i = 0; i < mclass.nqvars; i++)
+    {
+        QWidget* widget = (*mclass.qfactories[i])();
+        QObject::connect(widget, SIGNAL(changed()),
+                         this, SLOT(child_was_changed()));
+        addRow(mclass.qlabels[i], widget);
+        widgets.push_back(widget);
+    }
+}
+
 Registrator::Registrator(Class& metaclass, const char* name, ObjectReader read, ObjectWriter write)
 {
     metaclass.writers[metaclass.nvars] = write;
@@ -212,4 +308,20 @@ Registrator::Registrator(Class& metaclass, const char* name, ObjectReader read, 
     metaclass.nvars++;
 }
 
+Registrator::Registrator(Class& metaclass, const char* name, const char* label, QReader read, QWriter write, QFactory factory)
+{
+    int n = metaclass.nqvars++;
+    metaclass.qwriters[n] = write;
+    metaclass.qreaders[n] = read;
+    metaclass.qlabels[n] = label;
+    metaclass.qfactories[n] = factory;
+    int i = 0;
+    while (strcmp(name, metaclass.varname[i])) {
+        if (i < metaclass.nvars) i++; else
+            throw "couldn't find var";
+    }
+    metaclass.qvarindex[n] = i;
+}
+
+#include "metaclass.moc"
 

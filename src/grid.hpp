@@ -73,13 +73,12 @@ public:
     // State change
     Grid();
     Grid(int rws, int cls);
-    void Reset();
+    virtual void Reset();
     ~Grid();
 
     // Setup
     void SetupMask(bool);
     void SetupActions();
-
     void SetSize(int rws, int cls);
 
     // Low-level position
