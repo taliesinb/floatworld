@@ -2,12 +2,32 @@
 #define QTHOOKS_HPP
 
 #include <iostream>
+#include <list>
 
-class QWidget;
+#include <QFormLayout>
+
 class QSpinBox;
+class Class;
+class Object;
 
-QWidget* QSpinBoxFactory();
-void QSpinBoxReader(QSpinBox* box, std::istream& is);
-void QSpinBoxWriter(QSpinBox* box, std::ostream& os);
+class HookObject : public QFormLayout
+{
+    Q_OBJECT
+
+public:
+
+    Class& mclass;
+    Object* object;
+    std::list<QWidget*> widgets;
+
+    HookObject(Class& mc, Object* obj);
+
+public slots:
+    void child_changed();
+
+public:
+    void ConstructChildren();
+    void UpdateChildren();
+};
 
 #endif // QTHOOKS_HPP

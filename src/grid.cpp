@@ -4,7 +4,6 @@
 #include <assert.h>
 
 #include <QPainter>
-#include <QVBoxLayout>
 
 RegisterClass(Grid, None)
 RegisterVar(Grid, energy)
@@ -28,6 +27,9 @@ RegisterVar(Grid, weight_mask)
 RegisterVar(Grid, mutation_color_drift)
 RegisterVar(Grid, mutation_prob)
 RegisterVar(Grid, mutation_sd)
+
+RegisterQtHook(Grid, max_age, "Maximum age", QSpinBox);
+
 
 void write_grid_size(Grid* g, std::ostream& s)
 {

@@ -1,6 +1,8 @@
 #include "mainwindow.hpp"
+
 #include <fstream>
 #include <QFileDialog>
+#include "qthooks.hpp"
 
 using namespace std;
 
@@ -104,6 +106,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     gridWidget->rerender();
     gridWidget->repaint();
+
+    grid.SetupQtHook();
+    groupBox->setLayout(grid.qt_hook);
 }
 
 void MainWindow::on_actionPlay_triggered()

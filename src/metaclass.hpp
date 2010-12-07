@@ -3,8 +3,6 @@
 
 #include <iostream>
 #include <list>
-#include "../gui/qthooks.hpp"
-#include <QFormLayout>
 
 static const char* whitespace = "\t";
 
@@ -16,10 +14,9 @@ class HookObject;
 
 class Object
 {
-private:
+public:
     HookObject* qt_hook;
 
-public:
     Object();
     Class& GetClass();
     void Write(std::ostream& os);
@@ -77,7 +74,7 @@ typedef void (*ObjectWriter)(Object*, std::ostream&);
 typedef void (*ObjectReader)(Object*, std::istream&);
 typedef void (*QWriter)(QWidget*, std::ostream&);
 typedef void (*QReader)(QWidget*, std::istream&);
-typedef QWidget* (*QFactory)();
+typedef QWidget* (*QFactory)(HookObject*);
 
 class Class
 {
@@ -119,6 +116,19 @@ class Registrator
     Registrator(Class& metaclass, const char* name, const char* label, QReader read, QWriter write, QFactory factory);
 };   
 
+class QWidget;
+class QSpinBox;
+
+QWidget* QSpinBoxFactory(HookObject*);
+void QSpinBoxReader(QSpinBox* box, std::istream& is);
+void QSpinBoxWriter(QSpinBox* box, std::ostream& os);
+
+#define RegisterQtHook(CLASS, NAME, LABEL, WIDGET)\
+    Registrator CLASS##Name##QRegistrator(CLASS##MetaClass, \
+    #NAME, LABEL, reinterpret_cast<QReader>(&WIDGET##Reader), \
+    reinterpret_cast<QWriter>(&WIDGET##Writer),\
+    &WIDGET##Factory)
+
 #define RegisterClass(CLASS, PARENT)                           \
     Object* CLASS##Factory() { return new CLASS; }              \
     Class CLASS##MetaClass(#CLASS, #PARENT,                \
@@ -134,11 +144,6 @@ class Registrator
     { is >> (dynamic_cast<CLASS*>(obj))->NAME; }                    \
     Registrator CLASS##NAME##Registrator(CLASS##MetaClass,      \
     #NAME, &CLASS##Reader##NAME, &CLASS##Writer##NAME);
-
-#define RegisterQtHook(CLASS, NAME, LABEL, WIDGET)\
-    Registrator CLASS##Name##QRegistrator(CLASS##MetaClass, \
-    #LABEL, #NAME, &WIDGET##Reader, &WIDGET##Writer,\
-    &WIDGET##Factory)
 
 #define RegisterCustomVar(CLASS, FIELD, SAVE, LOAD)         \
     void CLASS##SaveHelper##FIELD(Object* obj, std::ostream& os)    \
