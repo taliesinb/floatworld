@@ -1,8 +1,11 @@
 #include "widgets.hpp"
 
 #include <QPainter>
+#include <QMouseEvent>
 
-int sz = 120;
+using namespace std;
+
+int sz = 80;
 
 GridWidget::GridWidget(QWidget* parent)
         : QWidget(parent),
@@ -11,7 +14,7 @@ GridWidget::GridWidget(QWidget* parent)
 {
     grid.SetSize(sz,sz);
     renders = 0;
-    scale = 4;
+    scale = 6;
     draw_type = draw_plain;
     setAttribute(Qt::WA_PaintOnScreen);
     setAttribute(Qt::WA_OpaquePaintEvent);
@@ -38,11 +41,15 @@ void GridWidget::rerender()
         for (int j = 0; j < grid.cols; j++)
         {
             int val = *line2++ * 5;
-            if (Block* block = dynamic_cast<Block*>(grid.OccupantAt(Pos(i,j))))
+            color.setRgb(val,val,val);
+
+            Occupant* occ = grid.OccupantAt(Pos(i,j));
+
+            if (dynamic_cast<Block*>(occ))
             {
-                *line1++ = qRgb(0, 200, 0);
+                color.setRgb(0, 200, 0);
             } else
-            if (Creat* creat = dynamic_cast<Creat*>(grid.OccupantAt(Pos(i,j))))
+            if (Creat* creat = dynamic_cast<Creat*>(occ))
             {
                 float intensity = 255;
                 if (draw_type == draw_age)
@@ -54,15 +61,24 @@ void GridWidget::rerender()
                     else if (stage < 1.0) color.setRgb(250,250,250);
                 } else {
                     if (draw_type == draw_energy) intensity = creat->energy * 6;
-                    if (draw_type == draw_color)  color.setHsv((int(creat->marker * 20) + (100 * 255)) % 255, 220, 220);
+                    if (draw_type == draw_color)  color.setHsv(int(255 * 255 + creat->marker * 255) % 255, 220, 220);
                     else color.setRgb(intensity > 255 ? 255 : intensity, 0, 0);
                 }
-
-                *line1++ = color.rgb();
-            } else
-                *line1++ = qRgb(val,val,val);
+            }
+            if (occ && occ->qt_hook) color = color.lighter(150);
+            *line1++ = color.rgb();
         }
     }
     renders++;
 }
 
+void GridWidget::mousePressEvent(QMouseEvent *event)
+{
+    int x = event->x() / scale;
+    int y = event->y() / scale;
+    Pos pos(y,x);
+    if (pos.Inside(grid.rows, grid.cols))
+    {
+        ClickedCell(pos);
+    }
+}

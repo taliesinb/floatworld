@@ -22,6 +22,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     setupUi(this);
 
+    grid = &gridWidget->grid;
+
     action_group->addAction(actionAge);
     action_group->addAction(actionEnergy);
     action_group->addAction(actionPlain);
@@ -29,16 +31,13 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect( action_group, SIGNAL( selected( QAction* ) ), this, SLOT( viewtype_set( QAction* ) ) );
 
-    // shortcut
-    Grid& grid = gridWidget->grid;
-
     // setup creatures
     Creat::Setup();
 
-    grid.interaction_type = Wastage;
+    grid->interaction_type = Wastage;
 
     // setup adam:
-    grid.initial_brain = &adam;
+    grid->initial_brain = &adam;
     adam.SetZero();
     enum {
         energyF = 0, energyL, energyR, creatF, creatL, creatR,
@@ -53,14 +52,14 @@ MainWindow::MainWindow(QWidget *parent)
     adam(move,cons) = 1.1;
     adam(left,random) = 1.05;
 
-    grid.max_age = 120;
+    grid->max_age = 120;
 
-    for (int i = 0; i < 2; i++)
+    for (int i = 0; i < 3; i++)
     {
         Circle* c = new Circle;
-        c->Attach(grid, grid.RandomCell());
+        c->Attach(*grid, grid->RandomCell());
         c->AssignID();
-        c->radius = 16;
+        c->radius = 12;
         c->p_jump = 0.01;
         for (int k = 0; k < 10; k++) c->Update();
     }
@@ -68,7 +67,7 @@ MainWindow::MainWindow(QWidget *parent)
     for (int i = 0; i < 2; i++)
     {
         Circle* c = new Circle;
-        c->Attach(grid, grid.RandomCell());
+        c->Attach(grid, grid->RandomCell());
         c->radius = 23;
         c->energy = 0.25;
         c->p_jump = 0.005;
@@ -78,26 +77,29 @@ MainWindow::MainWindow(QWidget *parent)
     for (int i = 0; i < 2; i++)
     {
         Circle* c = new Circle;
-        c->Attach(grid, grid.RandomCell());
+        c->Attach(grid, grid->RandomCell());
         c->radius = 8;
         c->energy = 2.0;
         c->p_jump = 0.01;
         for (int k = 0; k < 10; k++) c->Update();
     }
 */
-    grid.energy_decay_rate = 0.08;
-    grid.enable_respawn = true;
-    grid.mutation_prob = 0.1;
-    grid.path_energy = 0;
+    grid->energy_decay_rate = 0.08;
+    grid->enable_respawn = true;
+    grid->mutation_prob = 0.1;
+    grid->path_energy = 0;
 
-    grid.AddCreats(4, true);
+    grid->AddCreats(30, true);
 
-    for (int k = 0; k < 15; k++)
+    for (int k = 0; k < 12; k++)
     {
         Occupant* block = new SkinnerBlock();
-        block->Attach(grid, grid.RandomCell());
+        block->Attach(*grid, grid->RandomCell());
         block->AssignID();
     }
+
+    connect(gridWidget, SIGNAL(ClickedCell(Pos)), this,
+            SLOT(cell_clicked(Pos)));
 
     connect(&timer1, SIGNAL(timeout()), this, SLOT(takeStep()));
     timer1.start(5);
@@ -107,8 +109,28 @@ MainWindow::MainWindow(QWidget *parent)
     gridWidget->rerender();
     gridWidget->repaint();
 
-    grid.SetupQtHook();
-    groupBox->setLayout(grid.qt_hook);
+    grid->SetupQtHook();
+    gridBox->setLayout(grid->qt_hook);
+}
+
+void MainWindow::cell_clicked(Pos pos)
+{
+    cout << "Clicked at pos " << pos << endl;
+    Occupant* occ = grid->OccupantAt(pos);
+    if (occ)
+    {
+        cout << "Setting to occ with id " << occ->id << endl;
+
+        if (occupantBox->layout())
+            delete occupantBox->layout();
+
+        occupantBox->setLayout(occ->SetupQtHook());
+
+    } else {
+        grid->energy(pos) += 5;
+    }
+    gridWidget->rerender();
+    gridWidget->repaint();
 }
 
 void MainWindow::on_actionPlay_triggered()
@@ -127,7 +149,7 @@ void MainWindow::on_actionStop_triggered()
 
 void MainWindow::on_actionStep_triggered()
 {
-    gridWidget->grid.Step();
+    grid->Step();
     gridWidget->rerender();
     gridWidget->repaint();
 }
@@ -180,7 +202,6 @@ void MainWindow::reportFPS()
 void MainWindow::takeStep()
 {
     if (!speed) return;
-    Grid& grid = gridWidget->grid;
     if (speed < 1)
     {
         float thresh = floor(stepper);
@@ -188,9 +209,9 @@ void MainWindow::takeStep()
         if (stepper > thresh + 0.9999)
         {
             stepper = 0;
-            grid.Step();
+            grid->Step();
         }
-    } else grid.Run(int(round(speed)), 500);
+    } else grid->Run(int(round(speed)), 500);
 
     gridWidget->rerender();
     gridWidget->update();

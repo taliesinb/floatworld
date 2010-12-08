@@ -17,5 +17,5 @@ void SetRandomSeed(int seed)
 
 int RandInt(int n)
 {
-  return abs((rand() * rand() + rand() + rand())) % (n + 1);
+  return rand() % (n + 1);
 }

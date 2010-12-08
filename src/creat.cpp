@@ -18,6 +18,11 @@ RegisterVar(Creat, alive);
 RegisterVar(Creat, energy);
 RegisterVar(Creat, marker);
 
+RegisterQtHook(Creat, energy, "Energy", QDoubleSpinBox);
+RegisterQtHook(Creat, age, "Age", QSpinBox);
+RegisterQtHook(Creat, orient, "Orientation", QSpinBox);
+RegisterQtHook(Creat, action, "Action", QSpinBox);
+
 LineageNode::LineageNode(LineageNode* p)
     : pos(0,0), refs(1),  prev(p)
 {
@@ -224,7 +229,8 @@ void Creat::Interaction(Creat& other)
 
 void Creat::MutateBrain()
 {
-    while (RandBool(grid->mutation_prob))
+    int count = 0;
+    while (RandBool(grid->mutation_prob) && count++ < 10)
     {
         Pos w = SelectRandomWeight();
         weights(w) += RandGauss(0, grid->mutation_sd);
@@ -233,7 +239,7 @@ void Creat::MutateBrain()
     }
 
     if (grid->mutation_color_drift)
-        marker += RandFloat(-0.015, 0.015);
+        marker += RandSign() * 0.02;
 }
 
 void Creat::Update()
@@ -386,6 +392,7 @@ void Creat::Step()
     if (energy > 0) (this->*(grid->action_lookup[action]))();
 
     if (energy < 0 || age > grid->max_age) Remove();
+    else UpdateQtHook();
 }
 
 void Creat::__Remove()

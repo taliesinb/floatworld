@@ -23,7 +23,7 @@ public:
     void Read(std::istream& is);
 
     virtual void Reset();
-    void SetupQtHook();
+    HookObject* SetupQtHook();
     void UpdateQtHook();
     void DeleteQtHook();
     const char* Name();
@@ -118,13 +118,28 @@ class Registrator
 
 class QWidget;
 class QSpinBox;
+class QDoubleSpinBox;
+class QCheckBox;
+
+QWidget* QCheckBoxFactory(HookObject*);
+void QCheckBoxReader(QCheckBox* box, std::istream& is);
+void QCheckBoxWriter(QCheckBox* box, std::ostream& os);
 
 QWidget* QSpinBoxFactory(HookObject*);
 void QSpinBoxReader(QSpinBox* box, std::istream& is);
 void QSpinBoxWriter(QSpinBox* box, std::ostream& os);
 
+QWidget* QDoubleSpinBoxFactory(HookObject*);
+void QDoubleSpinBoxReader(QDoubleSpinBox* box, std::istream& is);
+void QDoubleSpinBoxWriter(QDoubleSpinBox* box, std::ostream& os);
+
+QWidget* ProbabilityBoxFactory(HookObject*);
+void ProbabilityBoxReader(QDoubleSpinBox* box, std::istream& is);
+void ProbabilityBoxWriter(QDoubleSpinBox* box, std::ostream& os);
+
+
 #define RegisterQtHook(CLASS, NAME, LABEL, WIDGET)\
-    Registrator CLASS##Name##QRegistrator(CLASS##MetaClass, \
+    Registrator CLASS##NAME##QRegistrator(CLASS##MetaClass, \
     #NAME, LABEL, reinterpret_cast<QReader>(&WIDGET##Reader), \
     reinterpret_cast<QWriter>(&WIDGET##Writer),\
     &WIDGET##Factory)

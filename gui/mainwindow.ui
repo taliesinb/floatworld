@@ -24,10 +24,40 @@
     <property name="sizeConstraint">
      <enum>QLayout::SetMinimumSize</enum>
     </property>
-    <item row="1" column="0">
+    <item row="2" column="0">
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <widget class="QGroupBox" name="groupBox">
+       <widget class="GridWidget" name="gridWidget" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <zorder>verticalLayoutWidget</zorder>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item row="2" column="1">
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QGroupBox" name="occupantBox">
+        <property name="maximumSize">
+         <size>
+          <width>200</width>
+          <height>400</height>
+         </size>
+        </property>
+        <property name="title">
+         <string>Occupant</string>
+        </property>
+        <zorder>gridBox</zorder>
+        <zorder>gridBox</zorder>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="gridBox">
         <property name="maximumSize">
          <size>
           <width>200</width>
@@ -36,16 +66,6 @@
         </property>
         <property name="title">
          <string>Grid</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="GridWidget" name="gridWidget" native="true">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
         </property>
        </widget>
       </item>
@@ -151,7 +171,7 @@
     <string>Step</string>
    </property>
    <property name="visible">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionGrid">

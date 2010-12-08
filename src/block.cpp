@@ -16,6 +16,8 @@ RegisterVar(SkinnerBlock, touch_count);
 RegisterVar(SkinnerBlock, o_touch_count);
 RegisterVar(SkinnerBlock, phase);
 
+RegisterQtHook(SkinnerBlock, touch_count, "Count", QSpinBox);
+
 RegisterClass(PhasedSkinnerBlock, SkinnerBlock);
 RegisterVar(PhasedSkinnerBlock, period);
 RegisterVar(PhasedSkinnerBlock, phase);
@@ -28,6 +30,7 @@ Block::Block()
   : fill(false),
     hue(0.5)
 {
+    signature = -2;
 }
 
 
@@ -92,7 +95,7 @@ void SkinnerBlock::Interact(Creat&)
     touch_count = 0;
     Circle spot;
     spot.pos = pos;
-    spot.radius = 4;
+    spot.radius = 5;
     spot.energy = 50;
     spot.Draw(grid->energy);
   }

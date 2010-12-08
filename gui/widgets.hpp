@@ -18,6 +18,7 @@ public:
     Grid grid;
     QImage pixmap;
     GridWidget(QWidget* parent);
+    Occupant* occ;
 
     enum {
         draw_plain,
@@ -30,8 +31,14 @@ public:
 
     void rerender();
 
+    void mousePressEvent(QMouseEvent* event);
+
+signals:
+
+    void ClickedCell(Pos pos);
 
 protected:
+
     void paintEvent(QPaintEvent *event);
 };
 

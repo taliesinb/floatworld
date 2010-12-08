@@ -72,7 +72,6 @@ public:
 
     // State change
     Grid();
-    Grid(int rws, int cls);
     virtual void Reset();
     ~Grid();
 
