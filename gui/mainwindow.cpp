@@ -47,6 +47,7 @@ MainWindow::MainWindow(QWidget *parent)
         c->Attach(*grid, grid->RandomCell());
         c->AssignID();
         c->radius = 12;
+        c->threshold = 5;
         c->p_jump = 0.01;
         for (int k = 0; k < 10; k++) c->Update();
     }
@@ -93,7 +94,7 @@ MainWindow::MainWindow(QWidget *parent)
 //    connect(&timer2, SIGNAL(timeout()), this, SLOT(reportFPS()));
 //    timer2.start(5000);
 
-    gridWidget->rerender();
+    gridWidget->Rerender();
     gridWidget->repaint();
 
     grid->SetupQtHook();
@@ -110,6 +111,11 @@ void MainWindow::cell_clicked(Pos pos)
 
         if (occupantBox->layout())
         {
+            QLayoutItem *child;
+            while ((child = occupantBox->layout()->takeAt(0)) != 0) {
+                    child->widget()->deleteLater();
+                    delete child;
+            }
             HookManager* hm = dynamic_cast<HookManager*>(occupantBox->layout());
             hm->object->DeleteQtHook();
         }
@@ -119,7 +125,7 @@ void MainWindow::cell_clicked(Pos pos)
     } else {
         grid->energy(pos) += 5;
     }
-    gridWidget->rerender();
+    gridWidget->Rerender();
     gridWidget->repaint();
 }
 
@@ -140,7 +146,7 @@ void MainWindow::on_actionStop_triggered()
 void MainWindow::on_actionStep_triggered()
 {
     grid->Step();
-    gridWidget->rerender();
+    gridWidget->Rerender();
     gridWidget->repaint();
 }
 
@@ -185,8 +191,8 @@ void MainWindow::on_actionLoad_triggered()
 
 void MainWindow::reportFPS()
 {
-    cout << gridWidget->renders << endl;
-    gridWidget->renders = 0;
+    cout << gridWidget->render_count << endl;
+    gridWidget->render_count = 0;
 }
 
 void MainWindow::takeStep()
@@ -203,6 +209,6 @@ void MainWindow::takeStep()
         }
     } else grid->Run(int(round(speed)), 500);
 
-    gridWidget->rerender();
+    gridWidget->Rerender();
     gridWidget->update();
 }

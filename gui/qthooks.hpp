@@ -1,6 +1,8 @@
 #ifndef QTHOOKS_HPP
 #define QTHOOKS_HPP
 
+#include "widgets.hpp"
+
 #include <iostream>
 #include <list>
 
@@ -9,21 +11,11 @@
 #include <QCheckBox>
 #include <QDoubleSpinBox>
 #include <QComboBox>
+#include <QLabel>
 
 class Class;
 class Object;
-
-class Hook
-{
-public:
-    void* ptr;
-    const char* changesignal;
-
-    Hook(const char* sig);
-    void SetPointer(void* ptr);
-
-    virtual void Synchronize(bool inbound);
-};
+class Matrix;
 
 class IntWidget : public QSpinBox, public Hook
 {
@@ -52,6 +44,17 @@ class EnumWidget : public QComboBox, public Hook
 {
 public:
     EnumWidget(const char* labels);
+    virtual void Synchronize(bool inbound);
+};
+
+class MatrixWidget : public MatrixLabel, public Hook
+{
+    Matrix* matrix;
+
+public:
+    MatrixWidget(int pixel);
+    virtual void OnSetPointer();
+    virtual void Rerender();
     virtual void Synchronize(bool inbound);
 };
 

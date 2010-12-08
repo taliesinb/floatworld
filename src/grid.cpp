@@ -30,14 +30,14 @@ RegisterVar(Grid, mutation_sd)
 RegisterVar(Grid, draw_type)
 RegisterVar(Grid, draw_creats_only)
 
-RegisterQtHook(Grid, draw_type, "Display", EnumWidget("Action\nAge\nEnergy\nPlumage"));
-RegisterQtHook(Grid, draw_creats_only, "Creats only", BoolWidget());
-RegisterQtHook(Grid, max_age, "Maximum age", IntWidget(0,1000));
-RegisterQtHook(Grid, mutation_prob, "Mutation probability", FloatWidget(0, 1, 0.05));
-RegisterQtHook(Grid, initial_energy, "Initial energy", FloatWidget(0,20,0.5));
-RegisterQtHook(Grid, enable_respawn, "Respawning", BoolWidget);
-RegisterQtHook(Grid, enable_mutation, "Mutation", BoolWidget);
-RegisterQtHook(Grid, mutation_color_drift, "Plumage Drift", BoolWidget);
+RegisterQtHook(Grid, draw_type, "Display", EnumHook("Action\nAge\nEnergy\nPlumage"));
+RegisterQtHook(Grid, draw_creats_only, "Creats only", BoolHook());
+RegisterQtHook(Grid, max_age, "Maximum age", IntegerHook(0,1000));
+RegisterQtHook(Grid, mutation_prob, "Mutation probability", FloatHook(0, 1, 0.05));
+RegisterQtHook(Grid, initial_energy, "Initial energy", FloatHook(0,20,0.5));
+RegisterQtHook(Grid, enable_respawn, "Respawning", BoolHook());
+RegisterQtHook(Grid, enable_mutation, "Mutation", BoolHook());
+RegisterQtHook(Grid, mutation_color_drift, "Plumage Drift", BoolHook());
 
 void write_grid_size(Grid* g, std::ostream& s)
 {
@@ -154,6 +154,7 @@ void Grid::SetSize(int rs, int cs)
     cols = cs;
 
     energy.Resize(rows, cols);
+    energy.SetZero();
 
     if (occupant_grid) delete occupant_grid;
 

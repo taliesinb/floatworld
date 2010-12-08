@@ -6,33 +6,41 @@
 #include <QImage>
 
 #include "../src/grid.hpp"
-#include "../src/block.hpp"
 
-class GridWidget : public QWidget
+class MatrixLabel : public QWidget
 {
     Q_OBJECT
 
 public:
-    int renders;
-    float scale;
-    Grid grid;
-    QImage pixmap;
-    GridWidget(QWidget* parent);
-    Occupant* occ;
+    QImage* pixel_data;
+    float pixel_scale;
+    int render_count; /* for peformance debugging */
 
-    // TODO: destructor
+    MatrixLabel(QWidget* parent);
 
-    void rerender();
+    virtual void Rerender();
+    void AllocateImage(int rows, int cols);
+
+protected:
 
     void mousePressEvent(QMouseEvent* event);
+    void paintEvent(QPaintEvent *event);
 
 signals:
 
     void ClickedCell(Pos pos);
 
-protected:
+};
 
-    void paintEvent(QPaintEvent *event);
+class GridWidget : public MatrixLabel
+{
+    Q_OBJECT
+
+public:
+    Grid grid;
+    GridWidget(QWidget* parent);
+
+    void Rerender();
 };
 
 

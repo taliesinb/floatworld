@@ -44,7 +44,7 @@
        <widget class="QGroupBox" name="occupantBox">
         <property name="maximumSize">
          <size>
-          <width>200</width>
+          <width>300</width>
           <height>400</height>
          </size>
         </property>
@@ -57,7 +57,7 @@
        <widget class="QGroupBox" name="gridBox">
         <property name="maximumSize">
          <size>
-          <width>200</width>
+          <width>300</width>
           <height>400</height>
          </size>
         </property>

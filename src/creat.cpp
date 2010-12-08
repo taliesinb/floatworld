@@ -1,5 +1,6 @@
 #include "creat.hpp"
 #include "grid.hpp"
+#include "qthookdefs.hpp"
 
 #include <fstream>
 
@@ -18,9 +19,11 @@ RegisterVar(Creat, alive);
 RegisterVar(Creat, energy);
 RegisterVar(Creat, marker);
 
-RegisterQtHook(Creat, energy, "Energy", FloatWidget(0,100,1));
-RegisterQtHook(Creat, age, "Age", IntWidget(0,1000));
-RegisterQtHook(Creat, action, "Action", EnumWidget("None\nForward\nLeft\nRight\nReproduce"));
+RegisterQtHook(Creat, energy, "Energy", FloatHook(0,100,1));
+RegisterQtHook(Creat, age, "Age", IntegerHook(0,1000));
+RegisterQtHook(Creat, action, "Action", EnumHook("None\nForward\nLeft\nRight\nReproduce"));
+RegisterQtHook(Creat, state, "Neurons", MatrixHook(8));
+RegisterQtHook(Creat, weights, "Weights", MatrixHook(8));
 
 /*
 RegisterQtHook(Creat, orient, "Orientation", QSpinBox);
