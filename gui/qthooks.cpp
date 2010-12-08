@@ -24,6 +24,10 @@ HookManager::HookManager(Class &mc, Object *obj)
 
 }
 
+HookManager::~HookManager()
+{
+}
+
 IntWidget::IntWidget(int min, int max) : Hook(SIGNAL(valueChanged(int)))
 {
     setRange(min, max);

@@ -66,6 +66,7 @@ public:
     std::list<QWidget*> widgets;
 
     HookManager(Class& mc, Object* obj);
+    virtual ~HookManager();
 
 public slots:
     void child_changed();

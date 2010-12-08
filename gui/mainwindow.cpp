@@ -109,7 +109,10 @@ void MainWindow::cell_clicked(Pos pos)
         cout << "Setting to occ with id " << occ->id << endl;
 
         if (occupantBox->layout())
-            delete occupantBox->layout();
+        {
+            HookManager* hm = dynamic_cast<HookManager*>(occupantBox->layout());
+            hm->object->DeleteQtHook();
+        }
 
         occupantBox->setLayout(occ->SetupQtHook());
 
