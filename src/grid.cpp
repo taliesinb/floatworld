@@ -28,13 +28,17 @@ RegisterVar(Grid, mutation_color_drift)
 RegisterVar(Grid, mutation_prob)
 RegisterVar(Grid, mutation_sd)
 
+RegisterQtHook(Grid, max_age, "Maximum age", IntWidget(0,1000));
+RegisterQtHook(Grid, enable_respawn, "Respawning", BoolWidget);
+
+/*
 RegisterQtHook(Grid, mutation_color_drift, "Plumage Drift", QCheckBox);
 RegisterQtHook(Grid, enable_mutation, "Mutation", QCheckBox);
 RegisterQtHook(Grid, enable_respawn, "Respawning", QCheckBox);
 RegisterQtHook(Grid, max_age, "Maximum age", QSpinBox);
 RegisterQtHook(Grid, mutation_prob, "Mutation probability", ProbabilityBox);
-RegisterQtHook(Grid, initial_energy, "Initial energy", QDoubleSpinBox);
-
+RegisterQtHook(Grid, initial_energy, "Initial energy", FloatWidget(0,20,0.5));
+*/
 void write_grid_size(Grid* g, std::ostream& s)
 {
     s << "[" << g->rows << ", " << g->cols << "]";

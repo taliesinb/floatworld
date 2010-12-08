@@ -18,11 +18,12 @@ RegisterVar(Creat, alive);
 RegisterVar(Creat, energy);
 RegisterVar(Creat, marker);
 
+/*
 RegisterQtHook(Creat, energy, "Energy", QDoubleSpinBox);
 RegisterQtHook(Creat, age, "Age", QSpinBox);
 RegisterQtHook(Creat, orient, "Orientation", QSpinBox);
 RegisterQtHook(Creat, action, "Action", QSpinBox);
-
+*/
 LineageNode::LineageNode(LineageNode* p)
     : pos(0,0), refs(1),  prev(p)
 {

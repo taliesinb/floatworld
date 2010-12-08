@@ -10,12 +10,12 @@ std::istream& operator>>(std::istream& is, const char* str);
 
 class Class;
 class Object;
-class HookObject;
+class HookManager;
 
 class Object
 {
 public:
-    HookObject* qt_hook;
+    HookManager* qt_hook;
 
     Object();
     Class& GetClass();
@@ -23,7 +23,7 @@ public:
     void Read(std::istream& is);
 
     virtual void Reset();
-    HookObject* SetupQtHook();
+    HookManager* SetupQtHook();
     void UpdateQtHook();
     void DeleteQtHook();
     const char* Name();
@@ -72,9 +72,7 @@ class QWidget;
 typedef Object* (*ObjectMaker)();
 typedef void (*ObjectWriter)(Object*, std::ostream&);
 typedef void (*ObjectReader)(Object*, std::istream&);
-typedef void (*QWriter)(QWidget*, std::ostream&);
-typedef void (*QReader)(QWidget*, std::istream&);
-typedef QWidget* (*QFactory)(HookObject*);
+typedef QWidget* (*HookFactory)(Object*);
 
 class Class
 {
@@ -96,11 +94,8 @@ public:
     const char* varname[32];
 
     int nqvars;
-    QWriter qwriters[32];
-    QReader qreaders[32];
-    QFactory qfactories[32];
-    int qvarindex[32];
-    const char* qlabels[32];
+    HookFactory factories[32];
+    const char* labels[32];
 
     Class(const char* _name, const char* _pname, ObjectMaker func);
     void Read(Object* occ, std::istream& is);
@@ -113,36 +108,56 @@ class Registrator
 {
   public:
     Registrator(Class& metaclass, const char* name, ObjectReader read, ObjectWriter write);
-    Registrator(Class& metaclass, const char* name, const char* label, QReader read, QWriter write, QFactory factory);
+    Registrator(Class& metaclass, const char* label, HookFactory factory);
 };   
 
-class QWidget;
-class QSpinBox;
-class QDoubleSpinBox;
-class QCheckBox;
+/*
 
-QWidget* QCheckBoxFactory(HookObject*);
-void QCheckBoxReader(QCheckBox* box, std::istream& is);
-void QCheckBoxWriter(QCheckBox* box, std::ostream& os);
+ we need a factory function to pass a reference to the actual
+ class member. this factory function will take create a new
+ widget with the right variables and then connect to a void
+ pointer.
 
-QWidget* QSpinBoxFactory(HookObject*);
-void QSpinBoxReader(QSpinBox* box, std::istream& is);
-void QSpinBoxWriter(QSpinBox* box, std::ostream& os);
+ registerqtchook(class, name, label, hookwidget)
+ hook* factory(object* obj) =
+ {
+    hook* = new hookwidget;
+    hook->SetPointer(static_cast<void*>(dynamic_cast<class*>(obj)->name)
+    return hook;
+ }
 
-QWidget* QDoubleSpinBoxFactory(HookObject*);
-void QDoubleSpinBoxReader(QDoubleSpinBox* box, std::istream& is);
-void QDoubleSpinBoxWriter(QDoubleSpinBox* box, std::ostream& os);
+ RegisterQtHook actually takes a new widget as a
+ 'prototype'. It will copy it and then hook it to
+ the corresponding value. But we want the corresponding
+ classes to only be parameterized on type. So they need
+ to take a pointer to the value they are hooked to.
+ They also need to have refresh() method.
 
-QWidget* ProbabilityBoxFactory(HookObject*);
-void ProbabilityBoxReader(QDoubleSpinBox* box, std::istream& is);
-void ProbabilityBoxWriter(QDoubleSpinBox* box, std::ostream& os);
+ What will registerqthook look like?
+
+ registerqthook(class, name, label, hookwidget*)
+
+ hookwidget will have a refresh method and an setpointer
+ method. setpointer will have to be void*. It will do a
+ reinterpretcast to the appropriate type.
+
+ hookwidget will also know how to clone itself. but it'll
+ have to clone itself from an ordinary pointer. so we need
+ another cast to cast it to its own type.
 
 
-#define RegisterQtHook(CLASS, NAME, LABEL, WIDGET)\
-    Registrator CLASS##NAME##QRegistrator(CLASS##MetaClass, \
-    #NAME, LABEL, reinterpret_cast<QReader>(&WIDGET##Reader), \
-    reinterpret_cast<QWriter>(&WIDGET##Writer),\
-    &WIDGET##Factory)
+*/
+
+#include "../gui/qthooks.hpp"
+
+#define RegisterQtHook(CLASS, NAME, LABEL, PROTOTYPE)       \
+    QWidget* CLASS##NAME##Factory(Object* obj) {            \
+    Hook* h = new PROTOTYPE;                                \
+    h->SetPointer(static_cast<void*>(&dynamic_cast<CLASS*>(obj)->NAME)); \
+    return dynamic_cast<QWidget*>(h); }                                                \
+    Registrator CLASS##NAME##HookRegistrator(CLASS##MetaClass, \
+    LABEL, &CLASS##NAME##Factory);
+
 
 #define RegisterClass(CLASS, PARENT)                           \
     Object* CLASS##Factory() { return new CLASS; }              \

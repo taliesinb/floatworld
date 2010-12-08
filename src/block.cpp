@@ -16,7 +16,7 @@ RegisterVar(SkinnerBlock, touch_count);
 RegisterVar(SkinnerBlock, o_touch_count);
 RegisterVar(SkinnerBlock, phase);
 
-RegisterQtHook(SkinnerBlock, touch_count, "Count", QSpinBox);
+//RegisterQtHook(SkinnerBlock, touch_count, "Count", QSpinBox);
 
 RegisterClass(PhasedSkinnerBlock, SkinnerBlock);
 RegisterVar(PhasedSkinnerBlock, period);

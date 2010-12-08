@@ -111,10 +111,10 @@ void Object::Reset()
 {
 }
 
-HookObject* Object::SetupQtHook()
+HookManager* Object::SetupQtHook()
 {
     assert (qt_hook == NULL);
-    qt_hook = new HookObject(GetClass(), this);
+    qt_hook = new HookManager(GetClass(), this);
     qt_hook->ConstructChildren();
     return qt_hook;
 }
@@ -243,20 +243,10 @@ Registrator::Registrator(Class& metaclass, const char* name, ObjectReader read, 
     metaclass.nvars++;
 }
 
-Registrator::Registrator(Class& metaclass, const char* name, const char* label, QReader read, QWriter write, QFactory factory)
+Registrator::Registrator(Class& metaclass, const char* label, HookFactory factory)
 {
     int n = metaclass.nqvars++;
-    metaclass.qwriters[n] = write;
-    metaclass.qreaders[n] = read;
-    metaclass.qlabels[n] = label;
-    metaclass.qfactories[n] = factory;
-    int i = 0;
-//    cout << "looking for: " << name << endl;
-    while (strcmp(name, metaclass.varname[i])) {
-//        cout << "checking against " << metaclass.varname[i] << endl;
-        if (i < metaclass.nvars) i++; else
-            throw "couldn't find var";
-    }
-    metaclass.qvarindex[n] = i;
+    metaclass.labels[n] = label;
+    metaclass.factories[n] = factory;
 }
 

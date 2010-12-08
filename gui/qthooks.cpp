@@ -2,145 +2,88 @@
 #include "../src/metaclass.hpp"
 #include "../src/misc.hpp"
 
-#include <QSpinBox>
-#include <QCheckBox>
-#include <sstream>
-
 using namespace std;
 
-HookObject::HookObject(Class &mc, Object *obj)
+Hook::Hook(const char *sig) : changesignal(sig)
+{
+}
+
+void Hook::SetPointer(void *p)
+{
+    ptr = p;
+}
+
+void Hook::Synchronize(bool)
+{
+
+}
+
+HookManager::HookManager(Class &mc, Object *obj)
     : mclass(mc), object(obj)
 {
 
 }
 
-void HookObject::child_changed()
+IntWidget::IntWidget(int min, int max) : Hook(SIGNAL(valueChanged(int)))
 {
-    int i = 0;
-    for_iterate(w, widgets)
+    setRange(min, max);
+}
+
+void IntWidget::Synchronize(bool inbound)
+{
+    if (inbound) setValue(*reinterpret_cast<int*>(ptr));
+    else *reinterpret_cast<int*>(ptr) = value();
+}
+
+FloatWidget::FloatWidget(float min, float max, float div) : Hook(SIGNAL(valueChanged(double)))
+{
+    setRange(min, max);
+    setSingleStep(div);
+}
+
+void FloatWidget::Synchronize(bool inbound)
+{
+    if (inbound) setValue(*reinterpret_cast<float*>(ptr));
+    else *reinterpret_cast<float*>(ptr) = value();
+}
+
+void HookManager::child_changed()
+{
+    for_iterate(it, widgets)
     {
-//        cout << "reading out widget " << i << endl;
-        stringstream s;
-        (*(mclass.qwriters[i]))(*w, s);
-        (*(mclass.readers[mclass.qvarindex[i]]))(object, s);
-        i++;
+         dynamic_cast<Hook*>(*it)->Synchronize(false);
     }
 }
 
-void HookObject::UpdateChildren()
+void HookManager::UpdateChildren()
 {
-    int i = 0;
-    for_iterate(w, widgets)
+    for_iterate(it, widgets)
     {
-//        cout << "writing in widget " << i << endl;
-        stringstream s;
-        (*(mclass.writers[mclass.qvarindex[i]]))(object, s);
-
-        QWidget* widget = *w;
-        widget->blockSignals(true);
-        (*mclass.qreaders[i])(widget, s);
-        widget->blockSignals(false);
-        i++;
+        QWidget* w = *it;
+        w->blockSignals(true);
+        dynamic_cast<Hook*>(w)->Synchronize(true);
+        w->blockSignals(false);
     }
 }
 
-void HookObject::ConstructChildren()
+void HookManager::ConstructChildren()
 {
-    for(int i = 0; i < mclass.nqvars; i++)
+    for (int i = 0; i < mclass.nqvars; i++)
     {
-        QWidget* widget = (*mclass.qfactories[i])(this);
-        addRow(mclass.qlabels[i], widget);
+        QWidget* widget = (*mclass.factories[i])(object);
+        QObject::connect(widget, dynamic_cast<Hook*>(widget)->changesignal, this, SLOT(child_changed()));
+        addRow(mclass.labels[i], widget);
         widgets.push_back(widget);
     }
     UpdateChildren();
 }
 
-
-QWidget* QSpinBoxFactory(HookObject* h)
+BoolWidget::BoolWidget() : Hook(SIGNAL(toggled(bool)))
 {
-    QSpinBox* box = new QSpinBox;
-    box->setRange(-10000,10000);
-    QObject::connect(box, SIGNAL(valueChanged(int)),
-                     h, SLOT(child_changed()));
-    return box;
 }
 
-void QSpinBoxWriter(QSpinBox* box, std::ostream& s)
+void BoolWidget::Synchronize(bool inbound)
 {
-    s << box->value();
+    if (inbound) setChecked(*static_cast<bool*>(ptr));
+    else *static_cast<bool*>(ptr) = isChecked();
 }
-
-
-void QSpinBoxReader(QSpinBox* box, std::istream& s)
-{
-    int val;
-    s >> val;
-    box->setValue(val);
-}
-
-QWidget* QDoubleSpinBoxFactory(HookObject* h)
-{
-    QDoubleSpinBox* box = new QDoubleSpinBox;
-    QObject::connect(box, SIGNAL(valueChanged(double)),
-                     h, SLOT(child_changed()));
-    return box;
-}
-
-void QDoubleSpinBoxWriter(QDoubleSpinBox* box, std::ostream& s)
-{
-    s << box->value();
-}
-
-
-void QDoubleSpinBoxReader(QDoubleSpinBox* box, std::istream& s)
-{
-    double val;
-    s >> val;
-    box->setValue(val);
-}
-
-QWidget* ProbabilityBoxFactory(HookObject* h)
-{
-    QDoubleSpinBox* box = new QDoubleSpinBox;
-    box->setRange(0.0, 1.0);
-    box->setSingleStep(0.001);
-    box->setDecimals(3);
-    QObject::connect(box, SIGNAL(valueChanged(double)),
-                     h, SLOT(child_changed()));
-    return box;
-}
-
-void ProbabilityBoxWriter(QDoubleSpinBox* box, std::ostream& s)
-{
-    s << box->value();
-}
-
-
-void ProbabilityBoxReader(QDoubleSpinBox* box, std::istream& s)
-{
-    double val;
-    s >> val;
-    box->setValue(val);
-}
-
-QWidget* QCheckBoxFactory(HookObject* h)
-{
-    QCheckBox* box = new QCheckBox;
-    QObject::connect(box, SIGNAL(stateChanged(int)),
-                     h, SLOT(child_changed()));
-    return box;
-
-}
-
-void QCheckBoxReader(QCheckBox* box, std::istream& is)
-{
-    bool b;
-    is >> b;
-    box->setChecked(b);
-}
-
-void QCheckBoxWriter(QCheckBox* box, std::ostream& os)
-{
-    os << box->isChecked();
-}
-
