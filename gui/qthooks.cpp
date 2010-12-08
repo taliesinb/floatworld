@@ -27,6 +27,9 @@ HookManager::HookManager(Class &mc, Object *obj)
 IntWidget::IntWidget(int min, int max) : Hook(SIGNAL(valueChanged(int)))
 {
     setRange(min, max);
+    QFont font;
+    font.setPointSize(10);
+    setFont(font);
 }
 
 void IntWidget::Synchronize(bool inbound)
@@ -39,6 +42,9 @@ FloatWidget::FloatWidget(float min, float max, float div) : Hook(SIGNAL(valueCha
 {
     setRange(min, max);
     setSingleStep(div);
+    QFont font;
+    font.setPointSize(10);
+    setFont(font);
 }
 
 void FloatWidget::Synchronize(bool inbound)

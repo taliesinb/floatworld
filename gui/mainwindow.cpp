@@ -6,14 +6,6 @@
 
 using namespace std;
 
-void MainWindow::viewtype_set(QAction* action)
-{
-    if (action == actionAge) gridWidget->draw_type = GridWidget::draw_age;
-    if (action == actionEnergy) gridWidget->draw_type = GridWidget::draw_energy;
-    if (action == actionPlain) gridWidget->draw_type = GridWidget::draw_plain;
-    if (action == actionPlumage) gridWidget->draw_type = GridWidget::draw_color;
-}
-
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
     adam(Creat::neurons, Creat::neurons),
@@ -23,11 +15,6 @@ MainWindow::MainWindow(QWidget *parent)
     setupUi(this);
 
     grid = &gridWidget->grid;
-
-    action_group->addAction(actionAge);
-    action_group->addAction(actionEnergy);
-    action_group->addAction(actionPlain);
-    action_group->addAction(actionPlumage);
 
     connect( action_group, SIGNAL( selected( QAction* ) ), this, SLOT( viewtype_set( QAction* ) ) );
 

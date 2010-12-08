@@ -32,7 +32,6 @@ public:
     MainWindow(QWidget *parent = 0);
 
 private slots:
-    void viewtype_set(QAction* action);
     void on_actionSlow_triggered();
     void on_actionPlay_triggered();
     void on_actionStop_triggered();

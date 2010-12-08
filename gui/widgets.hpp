@@ -20,13 +20,6 @@ public:
     GridWidget(QWidget* parent);
     Occupant* occ;
 
-    enum {
-        draw_plain,
-        draw_age,
-        draw_energy,
-        draw_color
-    } draw_type;
-
     // TODO: destructor
 
     void rerender();

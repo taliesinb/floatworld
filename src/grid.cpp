@@ -27,19 +27,18 @@ RegisterVar(Grid, weight_mask)
 RegisterVar(Grid, mutation_color_drift)
 RegisterVar(Grid, mutation_prob)
 RegisterVar(Grid, mutation_sd)
+RegisterVar(Grid, draw_type)
+RegisterVar(Grid, draw_creats_only)
 
+RegisterQtHook(Grid, draw_type, "Display", EnumWidget("Action\nAge\nEnergy\nPlumage"));
+RegisterQtHook(Grid, draw_creats_only, "Creats only", BoolWidget());
 RegisterQtHook(Grid, max_age, "Maximum age", IntWidget(0,1000));
+RegisterQtHook(Grid, mutation_prob, "Mutation probability", FloatWidget(0, 1, 0.05));
+RegisterQtHook(Grid, initial_energy, "Initial energy", FloatWidget(0,20,0.5));
 RegisterQtHook(Grid, enable_respawn, "Respawning", BoolWidget);
 RegisterQtHook(Grid, enable_mutation, "Mutation", BoolWidget);
+RegisterQtHook(Grid, mutation_color_drift, "Plumage Drift", BoolWidget);
 
-/*
-RegisterQtHook(Grid, mutation_color_drift, "Plumage Drift", QCheckBox);
-RegisterQtHook(Grid, enable_mutation, "Mutation", QCheckBox);
-RegisterQtHook(Grid, enable_respawn, "Respawning", QCheckBox);
-RegisterQtHook(Grid, max_age, "Maximum age", QSpinBox);
-RegisterQtHook(Grid, mutation_prob, "Mutation probability", ProbabilityBox);
-RegisterQtHook(Grid, initial_energy, "Initial energy", FloatWidget(0,20,0.5));
-*/
 void write_grid_size(Grid* g, std::ostream& s)
 {
     s << "[" << g->rows << ", " << g->cols << "]";
@@ -106,6 +105,9 @@ Grid::Grid() : weight_mask(Creat::neurons, Creat::neurons)
     max_age = 100;
     total_steps = 0;
     next_id = 0;
+
+    draw_type = DrawAction;
+    draw_creats_only = false;
 
     initial_energy = 2;
     initial_marker = 0.0;

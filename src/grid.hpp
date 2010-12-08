@@ -21,6 +21,13 @@ enum InteractionMode
     GeneSymmetric,
 };
 
+enum {
+    DrawAction,
+    DrawAge,
+    DrawEnergy,
+    DrawColor
+};
+
 class Occupant;
 class QPainter;
 class QImage;
@@ -40,6 +47,9 @@ public:
     int rows, cols;
     int num_creats;
     int interaction_type;
+
+    int draw_type;
+    bool draw_creats_only;
 
     bool enable_mutation;
     bool enable_respawn;

@@ -34,7 +34,6 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <zorder>verticalLayoutWidget</zorder>
        </widget>
       </item>
      </layout>
@@ -52,8 +51,6 @@
         <property name="title">
          <string>Occupant</string>
         </property>
-        <zorder>gridBox</zorder>
-        <zorder>gridBox</zorder>
        </widget>
       </item>
       <item>
@@ -91,17 +88,7 @@
     <addaction name="actionLoad"/>
     <addaction name="actionClose"/>
    </widget>
-   <widget class="QMenu" name="menuView">
-    <property name="title">
-     <string>View</string>
-    </property>
-    <addaction name="actionAge"/>
-    <addaction name="actionEnergy"/>
-    <addaction name="actionPlumage"/>
-    <addaction name="actionPlain"/>
-   </widget>
    <addaction name="menuFile"/>
-   <addaction name="menuView"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <property name="movable">
@@ -217,44 +204,6 @@
   <action name="actionColor_by">
    <property name="text">
     <string>Color by</string>
-   </property>
-  </action>
-  <action name="actionAge">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Age</string>
-   </property>
-  </action>
-  <action name="actionEnergy">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Energy</string>
-   </property>
-  </action>
-  <action name="actionPlumage">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>Plumage</string>
-   </property>
-  </action>
-  <action name="actionPlain">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Plain</string>
    </property>
   </action>
  </widget>

@@ -15,7 +15,6 @@ GridWidget::GridWidget(QWidget* parent)
     grid.SetSize(sz,sz);
     renders = 0;
     scale = 6;
-    draw_type = draw_plain;
     setAttribute(Qt::WA_PaintOnScreen);
     setAttribute(Qt::WA_OpaquePaintEvent);
     //setAttribute(Qt::WA_NoSystemBackground);
@@ -33,6 +32,7 @@ void GridWidget::paintEvent(QPaintEvent*)
 
 void GridWidget::rerender()
 {
+    int draw_type = grid.draw_type;
     QColor color(255, 0, 0);
     for (int i = 0; i < grid.rows; i++)
     {
@@ -40,32 +40,51 @@ void GridWidget::rerender()
         float* line2 = grid.energy[i];
         for (int j = 0; j < grid.cols; j++)
         {
-            int val = *line2++ * 5;
-            color.setRgb(val,val,val);
+            int val = *line2++ * 10;
+
+            if (val > 0) val = 10 * log(1 + val);
+            if (val > 255) val = 255;
+            if (val > 0) color.setRgb(val, val, val);
+            else color.setRgb(10 - val, 0, 0);
 
             Occupant* occ = grid.OccupantAt(Pos(i,j));
 
-            if (dynamic_cast<Block*>(occ))
+            Creat* creat = dynamic_cast<Creat*>(occ);
+            if (creat)
             {
-                color.setRgb(0, 200, 0);
-            } else
-            if (Creat* creat = dynamic_cast<Creat*>(occ))
-            {
-                float intensity = 255;
-                if (draw_type == draw_age)
+                switch (draw_type)
                 {
+                case DrawAge: {
                     float stage = float(creat->age) / grid.max_age;
                     if (stage < 0.3) color.setRgb(0,128,0);
                     else if (stage < 0.6) color.setRgb(128,128,0);
                     else if (stage < 0.95) color.setRgb(128,0,0);
                     else if (stage < 1.0) color.setRgb(250,250,250);
-                } else {
-                    if (draw_type == draw_energy) intensity = creat->energy * 6;
-                    if (draw_type == draw_color)  color.setHsv(int(255 * 255 + creat->marker * 255) % 255, 220, 220);
-                    else color.setRgb(intensity > 255 ? 255 : intensity, 0, 0);
+                } break;
+                case DrawEnergy:
+                    val = creat->energy * 6;
+                    if (val > 255) val = 255;
+                    color.setRgb(val, val, val);
+                    break;
+                case DrawColor:
+                    color.setHsv(int(255 * 255 + creat->marker * 255) % 255, 220, 220);
+                    break;
+                case DrawAction:
+                    switch (creat->action)
+                    {
+                    case ActionNone: color.setRgb(150, 50, 50); break;
+                    case ActionForward: color.setRgb(80, 80, 80); break;
+                    case ActionLeft: color.setRgb(180, 120, 50); break;
+                    case ActionRight: color.setRgb(120, 50, 180); break;
+                    case ActionReproduce: color.setRgb(0, 255, 0); break;
+                    }
                 }
+            } else if (dynamic_cast<Block*>(occ))
+            {
+                color.setRgb(0, 200, 0);
             }
-            if (occ && occ->qt_hook) color = color.lighter(150);
+            if (!creat && grid.draw_creats_only) color.setRgb(0,0,0);
+            if (occ && occ->qt_hook) color = color.lighter(200);
             *line1++ = color.rgb();
         }
     }

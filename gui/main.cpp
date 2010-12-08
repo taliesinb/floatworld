@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
 
     MainWindow win;
     win.show();
-    srand(101);
+    srand(100);
 
     return a.exec();
 }

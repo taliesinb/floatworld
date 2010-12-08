@@ -130,7 +130,7 @@ Pos Creat::SelectRandomWeight()
 
 void Creat::Reproduce()
 {
-    Pos front = (Front() + Pos(RandInt(-3,3), RandInt(-3,3))).Wrap(grid->rows, grid->cols);
+    Pos front = Front();
 
     if (grid->OccupantAt(front)) return;
   
@@ -232,6 +232,8 @@ void Creat::Interaction(Creat& other)
 
 void Creat::MutateBrain()
 {
+    if (!grid->enable_mutation) return;
+
     int count = 0;
     while (RandBool(grid->mutation_prob) && count++ < 10)
     {
