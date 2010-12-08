@@ -30,6 +30,7 @@ RegisterVar(Grid, mutation_sd)
 
 RegisterQtHook(Grid, max_age, "Maximum age", IntWidget(0,1000));
 RegisterQtHook(Grid, enable_respawn, "Respawning", BoolWidget);
+RegisterQtHook(Grid, enable_mutation, "Mutation", BoolWidget);
 
 /*
 RegisterQtHook(Grid, mutation_color_drift, "Plumage Drift", QCheckBox);

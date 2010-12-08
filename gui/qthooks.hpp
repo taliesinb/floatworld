@@ -8,6 +8,7 @@
 #include <QSpinBox>
 #include <QCheckBox>
 #include <QDoubleSpinBox>
+#include <QComboBox>
 
 class Class;
 class Object;
@@ -44,6 +45,13 @@ class BoolWidget : public QCheckBox, public Hook
 {
 public:
     BoolWidget();
+    virtual void Synchronize(bool inbound);
+};
+
+class EnumWidget : public QComboBox, public Hook
+{
+public:
+    EnumWidget(const char* labels);
     virtual void Synchronize(bool inbound);
 };
 

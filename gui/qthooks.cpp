@@ -87,3 +87,18 @@ void BoolWidget::Synchronize(bool inbound)
     if (inbound) setChecked(*static_cast<bool*>(ptr));
     else *static_cast<bool*>(ptr) = isChecked();
 }
+
+EnumWidget::EnumWidget(const char *labels) : Hook(SIGNAL(activated(int)))
+{
+    QString str(labels);
+    insertItems(0, str.split("\n"));
+    QFont font;
+    font.setPointSize(10);
+    setFont(font);
+}
+
+void EnumWidget::Synchronize(bool inbound)
+{
+    if (inbound) setCurrentIndex(*static_cast<int*>(ptr));
+    else *static_cast<int*>(ptr) = currentIndex();
+}

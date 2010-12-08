@@ -18,9 +18,11 @@ RegisterVar(Creat, alive);
 RegisterVar(Creat, energy);
 RegisterVar(Creat, marker);
 
+RegisterQtHook(Creat, energy, "Energy", FloatWidget(0,100,1));
+RegisterQtHook(Creat, age, "Age", IntWidget(0,1000));
+RegisterQtHook(Creat, action, "Action", EnumWidget("None\nForward\nLeft\nRight\nReproduce"));
+
 /*
-RegisterQtHook(Creat, energy, "Energy", QDoubleSpinBox);
-RegisterQtHook(Creat, age, "Age", QSpinBox);
 RegisterQtHook(Creat, orient, "Orientation", QSpinBox);
 RegisterQtHook(Creat, action, "Action", QSpinBox);
 */

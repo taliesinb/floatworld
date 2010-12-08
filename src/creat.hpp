@@ -56,9 +56,9 @@ public:
     Matrix state;
     Matrix state2;
 
-    short action;
-    short age;
-    short orient;
+    int action;
+    int age;
+    int orient;
     bool possessed;
     bool alive;
     float energy;
