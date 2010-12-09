@@ -6,25 +6,26 @@
 
 using namespace std;
 
-int sz = 80;
+int sz = 150;
 int border = 3;
 
 MatrixLabel::MatrixLabel(QWidget* parent)
     : QWidget(parent),
     pixel_scale(5),
     pixel_data(NULL),
-    render_count(0)
+    render_count(0),
+    grid(false)
 {
     setAttribute(Qt::WA_PaintOnScreen);
     setAttribute(Qt::WA_OpaquePaintEvent);
 }
 
-void MatrixLabel::AllocateImage(int rows, int cols)
+void MatrixLabel::AllocateImage(int width, int height)
 {
     if (pixel_data) delete pixel_data;
-    pixel_data = new QImage(cols, rows, QImage::Format_RGB32);
+    pixel_data = new QImage(width, height, QImage::Format_RGB32);
     pixel_data->fill(0);
-    setFixedSize(cols * pixel_scale + 2 * border, rows * pixel_scale + 2 * border);
+    setFixedSize(width * pixel_scale + 2 * border, height * pixel_scale + 2 * border);
     Rerender();
 }
 
@@ -41,6 +42,18 @@ void MatrixLabel::paintEvent(QPaintEvent*)
     painter.fillRect(QRect(0, 0, w2 + 2 * border, h2 + 2 * border), Qt::gray);
     painter.drawImage(QRect(border, border, w2, h2),
                       *pixel_data, QRect(0, 0, w, h));
+    if (grid) {
+        for (int i = 0; i <= w; i++)
+        {
+            int x = border + i * pixel_scale;
+            painter.drawLine(x, border, x, border + h * pixel_scale);
+        }
+        for (int i = 0; i <= h; i++)
+        {
+            int y = border + i * pixel_scale;
+            painter.drawLine(border, y, border + w * pixel_scale, y);
+        }
+    }
 }
 
 void MatrixLabel::mousePressEvent(QMouseEvent *event)
@@ -56,7 +69,7 @@ void MatrixLabel::mousePressEvent(QMouseEvent *event)
 GridWidget::GridWidget(QWidget* parent)
         : MatrixLabel(parent)
 {
-    pixel_scale = 8;
+    pixel_scale = 4;
     grid.SetSize(sz,sz);
     AllocateImage(sz,sz);
 }

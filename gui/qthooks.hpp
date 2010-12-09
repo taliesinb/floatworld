@@ -50,9 +50,11 @@ public:
 class MatrixWidget : public MatrixLabel, public Hook
 {
     Matrix* matrix;
+    bool flipped;
+    int rows, cols;
 
 public:
-    MatrixWidget(int pixel);
+    MatrixWidget(int pixel, bool flip);
     virtual void OnSetPointer();
     virtual void Rerender();
     virtual void Synchronize(bool inbound);

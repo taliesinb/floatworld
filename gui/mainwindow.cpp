@@ -8,7 +8,7 @@ using namespace std;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
-    adam(Creat::neurons, Creat::neurons),
+    adam(Creat::hidden + Creat::outputs, Creat::neurons),
     speed(0), stepper(0), speed_multiplier(4),
     action_group(new QActionGroup(this))
 {
@@ -34,15 +34,14 @@ MainWindow::MainWindow(QWidget *parent)
         right,
         breed,
     };
-
-    adam(breed,energy) = 1.0;
-    adam(move,cons) = 1.1;
-    adam(left,random) = 1.05;
+    int offset = Creat::inputs;
+    adam(breed - offset, energy) = 1.0;
+    adam(move - offset, cons) = 1.1;
+    adam(left - offset, random) = 1.05;
 
     grid->max_age = 120;
 
-
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 4; i++)
     {
         Circle* c = new Circle;
         c->Attach(*grid, grid->RandomCell());
@@ -87,7 +86,7 @@ MainWindow::MainWindow(QWidget *parent)
         block->AssignID();
     }
 
-    for (int k = 0; k < 12; k++)
+    for (int k = 0; k < 100; k++)
     {
         Occupant* block = new MoveableBlock();
         block->Attach(*grid, grid->RandomCell());

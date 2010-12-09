@@ -22,8 +22,8 @@ RegisterVar(Creat, marker);
 RegisterQtHook(Creat, energy, "Energy", FloatHook(0,100,1));
 RegisterQtHook(Creat, age, "Age", IntegerHook(0,1000));
 RegisterQtHook(Creat, action, "Action", EnumHook("None\nForward\nLeft\nRight\nReproduce"));
-RegisterQtHook(Creat, state, "Neurons", MatrixHook(8));
-RegisterQtHook(Creat, weights, "Weights", MatrixHook(8));
+RegisterQtHook(Creat, state, "Neurons", MatrixHook(8, true));
+RegisterQtHook(Creat, weights, "Weights", MatrixHook(8, false));
 
 /*
 RegisterQtHook(Creat, orient, "Orientation", QSpinBox);
@@ -51,7 +51,7 @@ void Creat::Setup()
 }
 
 Creat::Creat()
-    : weights(neurons, neurons),
+    : weights(hidden + outputs, neurons),
       state(neurons, 1),
       state2(neurons, 1)
 {
@@ -124,10 +124,8 @@ list<LineageNode> Creat::ReconstructLineage()
 Pos Creat::SelectRandomWeight()
 {
     int j, k;
-    do { 
-        j = RandInt(Creat::neurons-1);
-        k = RandInt(Creat::neurons-1);
-    } while (grid->weight_mask(j,k) == 0.0);
+    j = RandInt(Creat::hidden + Creat::outputs - 1);
+    k = RandInt(Creat::neurons-1);
     return Pos(j,k);
 }
 
@@ -255,6 +253,7 @@ void Creat::Update()
     Step();
 }
 
+// TODO: Update for new weight matrix
 void Creat::CheckSanity(const char* str)
 {
     for (int i = 0; i < Creat::neurons; i++)
@@ -350,12 +349,14 @@ void Creat::Step()
     state(extinputs + 3) = RandFloat(-1.0, 1.0);
 
     // CALCULATE BRAIN STEP
-    for  (int j = Creat::inputs; j < Creat::inputs + Creat::hidden; j++)
+    // only clumns 0 through input+hidden are used
+    // only rows from inputs from 0 through neu
+    for  (int j = 0; j < Creat::hidden; j++)
     {
         float v = 0;
         for (int k = 0; k < Creat::inputs + Creat::hidden; k++)
             v += weights.data[j * Creat::neurons + k] * state.data[k];
-        state2.data[j] = v;
+        state2.data[Creat::inputs + j] = v;
     }
 
     for (int i = 0; i < hidden; i++)
@@ -364,12 +365,12 @@ void Creat::Step()
         h = tanh(h);
     }
 
-    for  (int j = Creat::inputs + Creat::hidden; j < Creat::neurons; j++)
+    for  (int j = Creat::hidden; j < Creat::hidden + Creat::outputs; j++)
     {
         float v = 0;
         for (int k = 0; k < Creat::inputs + Creat::hidden; k++)
             v += weights.data[j * Creat::neurons + k] * state.data[k];
-        state2.data[j] = v;
+        state2.data[Creat::inputs + j] = v;
     }
 
     SwapContents(state, state2);
@@ -500,7 +501,7 @@ void ShuffleBrains(Matrix& a, Matrix& b)
 
 void Creat::BlendBrain(Creat& other)
 {
-    for (int i = 0; i < neurons; i++)
+    for (int i = 0; i < hidden + outputs; i++)
         for (int j = 0; j < neurons; j++)
             if (RandBit()) weights(i,j) = other.weights(i,j);
 }

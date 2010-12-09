@@ -23,7 +23,6 @@ RegisterVar(Grid, initial_marker)
 RegisterVar(Grid, max_age)
 RegisterVar(Grid, total_steps)
 RegisterVar(Grid, next_id)
-RegisterVar(Grid, weight_mask)
 RegisterVar(Grid, mutation_color_drift)
 RegisterVar(Grid, mutation_prob)
 RegisterVar(Grid, mutation_sd)
@@ -89,7 +88,7 @@ using namespace std;
 
 const char* interactionnames[] = {"None", "Wastage","Parasitism", "Predation", "Co-operation", "Gene Swap", "Gene Give", "Gene Receive", "Gene Symmetric", NULL};
 
-Grid::Grid() : weight_mask(Creat::neurons, Creat::neurons)
+Grid::Grid()
 {
     initial_brain = NULL;
     occupant_grid = NULL;
@@ -121,7 +120,6 @@ Grid::Grid() : weight_mask(Creat::neurons, Creat::neurons)
     births = 0;
     interaction_type = NoInteraction;
 
-    SetupMask(true);
     SetupActions();
 }
 
@@ -129,25 +127,6 @@ Grid::~Grid()
 {
     // for (unsigned int i = 0; i < watchers.size(); i++)
     //    watchers[i]->grid = NULL;
-}
-
-void Grid::SetupMask(bool hid)
-{
-    int inl =  0;
-    int inr =  Creat::inputs - 1;
-    int hidl = Creat::inputs;
-    int hidr = Creat::inputs + Creat::hidden - 1;
-    int outl = hidr + 1;
-    int outr = hidr + Creat::outputs;
-
-    weight_mask.SetZero();
-    if (hid)
-    {
-        weight_mask.SetSubMatrix(hidl, inl, hidr, inr, 1.0);
-        weight_mask.SetSubMatrix(outl, hidl, outr, hidr, 1.0);
-        weight_mask.SetSubMatrix(hidl, hidl, hidr, hidr, 1.0);
-    }
-    weight_mask.SetSubMatrix(outl, inl, outr, inr, 1.0);
 }
 
 void Grid::SetSize(int rs, int cs)

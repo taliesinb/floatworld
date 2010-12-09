@@ -67,8 +67,6 @@ public:
     int total_steps;
     int next_id;
 
-    Matrix weight_mask;
-
     int accuracy;
 
     bool mutation_color_drift;
@@ -87,7 +85,6 @@ public:
     ~Grid();
 
     // Setup
-    void SetupMask(bool);
     void SetupActions();
     void SetSize(int rws, int cls);
 

@@ -46,7 +46,7 @@ Hook* EnumHook(const char* str)
     return new EnumWidget(str);
 }
 
-Hook* MatrixHook(int size)
+Hook* MatrixHook(int size, bool flip)
 {
-    return new MatrixWidget(size);
+    return new MatrixWidget(size, flip);
 }

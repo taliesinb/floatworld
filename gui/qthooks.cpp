@@ -70,16 +70,22 @@ void EnumWidget::Synchronize(bool inbound)
     else *static_cast<int*>(ptr) = currentIndex();
 }
 
-MatrixWidget::MatrixWidget(int size) : Hook(SIGNAL(ClickedCell(Pos))), MatrixLabel(NULL)
+MatrixWidget::MatrixWidget(int size, bool flip) : Hook(SIGNAL(ClickedCell(Pos))), MatrixLabel(NULL)
 {
+    flipped = flip;
     matrix = NULL;
     pixel_scale = size;
+    rows = cols = 0;
+    grid = true;
 }
 
 void MatrixWidget::OnSetPointer()
 {
     matrix = static_cast<Matrix*>(ptr);
-    AllocateImage(matrix->cols, matrix->rows);
+    rows = matrix->rows;
+    cols = matrix->cols;
+    if (flipped) swap(rows, cols);
+    AllocateImage(cols, rows);
 }
 
 void MatrixWidget::Synchronize(bool inbound)
@@ -90,13 +96,12 @@ void MatrixWidget::Synchronize(bool inbound)
 void MatrixWidget::Rerender()
 {
     QColor color(0, 0, 0);
-
-    for (int i = 0; i < matrix->cols; i++)
+    for (int i = 0; i < rows; i++)
     {
         QRgb* line1 = reinterpret_cast<QRgb*>(pixel_data->scanLine(i));
-        for (int j = 0; j < matrix->rows; j++)
+        for (int j = 0; j < cols; j++)
         {
-            float val = (*matrix)(i, j);
+            float val = flipped ? (*matrix)(j, i) : (*matrix)(i, j);
             int sgn = val > 0 ? 1 : -1;
             val = 150 * log(1 + fabs(val));
             if (val > 255) val = 255;

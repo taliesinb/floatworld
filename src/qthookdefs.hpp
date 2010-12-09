@@ -21,6 +21,6 @@ Hook* IntegerHook(int min, int max);
 Hook* FloatHook(float min, float max, float step);
 Hook* BoolHook();
 Hook* EnumHook(const char* str);
-Hook* MatrixHook(int size);
+Hook* MatrixHook(int size, bool flip);
 
 #endif // QTHOOKDEFS_HPP

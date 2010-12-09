@@ -14,6 +14,7 @@ class MatrixLabel : public QWidget
 public:
     QImage* pixel_data;
     float pixel_scale;
+    bool grid;
     int render_count; /* for peformance debugging */
 
     MatrixLabel(QWidget* parent);
