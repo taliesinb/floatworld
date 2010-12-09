@@ -147,9 +147,10 @@ void Creat::Reproduce()
     grid->births++;
 }
 
-void Creat::MoveForward()
+void Creat::MoveInDir(int o)
 { 
-    Pos front = Front();
+    Pos front = (pos + Pos(o)).Wrap(grid->rows, grid->cols);
+    orient = o;
 
     if (Occupant* other = grid->OccupantAt(front))
     {
@@ -346,12 +347,14 @@ void Creat::Step()
     assert(alive);
   
     // SETUP EXTERNAL INPUTS
-    state(0) = grid->EnergyKernel(pos, orient) / 20.0;
-    state(1) = grid->EnergyKernel(pos, orient - 1) / 20.0;
-    state(2) = grid->EnergyKernel(pos, orient + 1) / 20.0;
-    state(3) = grid->CreatKernel(pos, orient);
-    state(4) = grid->CreatKernel(pos, orient - 1);
-    state(5) = grid->CreatKernel(pos, orient + 1);
+    state(0) = grid->EnergyKernel(pos, 0) / 20.0;
+    state(1) = grid->EnergyKernel(pos, 1) / 20.0;
+    state(2) = grid->EnergyKernel(pos, 2) / 20.0;
+    state(3) = grid->EnergyKernel(pos, 3) / 20.0;
+    state(4) = grid->CreatKernel(pos, 0);
+    state(5) = grid->CreatKernel(pos, 1);
+    state(6) = grid->CreatKernel(pos, 2);
+    state(7) = grid->CreatKernel(pos, 3);
 
     // SETUP INTERNAL INPUTS
     state(extinputs + 0) = 1.0;
@@ -427,14 +430,24 @@ void Creat::__Remove()
     if (desirer_id >= 0) Peer(desirer_id)->desired_id = -1;
 }
 
-void Creat::TurnLeft()
+void Creat::MoveN()
 {
-    orient = Mod(orient - 1, 4);
+    MoveInDir(0);
 }
 
-void Creat::TurnRight()
+void Creat::MoveE()
 {
-    orient = Mod(orient + 1, 4);
+    MoveInDir(1);
+}
+
+void Creat::MoveS()
+{
+    MoveInDir(2);
+}
+
+void Creat::MoveW()
+{
+    MoveInDir(3);
 }
 
 void Creat::CopyBrain(Creat& parent)

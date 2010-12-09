@@ -15,4 +15,5 @@ QMAKE_LFLAGS+=-pg
 
 OTHER_FILES += \
     README.markdown \
-    PLANS
+    PLANS \
+    TODO

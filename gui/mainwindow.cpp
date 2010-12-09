@@ -27,21 +27,23 @@ MainWindow::MainWindow(QWidget *parent)
     grid->initial_brain = &adam;
     adam.SetZero();
     enum {
-        energyF = 0, energyL, energyR, creatF, creatL, creatR,
+        energyN = 0, energyE, energyS, energyW,
+        creatN, creatE, creatS, creatW,
         cons, energy, age, random,
-        move = Creat::inputs + Creat::hidden,
-        left,
-        right,
-        breed,
+        moveN = Creat::inputs + Creat::hidden,
+        moveE,
+        moveS,
+        moveW,
+        breed
     };
     int offset = Creat::inputs;
     adam(breed - offset, energy) = 1.0;
-    adam(move - offset, cons) = 1.1;
-    adam(left - offset, random) = 1.05;
+    adam(moveN - offset, cons) = 1.1;
+    adam(moveE - offset, random) = 1.2;
 
     grid->max_age = 120;
 
-    for (int i = 0; i < 12; i++)
+    for (int i = 0; i < 8; i++)
     {
         Circle* c = new Circle;
         c->Attach(*grid, grid->RandomCell());
@@ -66,7 +68,7 @@ MainWindow::MainWindow(QWidget *parent)
         block->AssignID();
     }
 
-    for (int k = 0; k < 100; k++)
+    for (int k = 0; k < 120; k++)
     {
         Occupant* block = new MoveableBlock();
         block->Attach(*grid, grid->RandomCell());

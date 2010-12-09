@@ -123,16 +123,18 @@ void GridWidget::Rerender()
                 {
                     switch (creat->action)
                     {
-                    case ActionNone: color.setRgb(150, 50, 50); break;
-                    case ActionForward: color.setRgb(80, 80, 80); break;
-                    case ActionLeft: color.setRgb(180, 120, 50); break;
-                    case ActionRight: color.setRgb(120, 50, 180); break;
+                    case ActionNone: color.setRgb(100, 100, 100); break;
+                    case ActionMoveN: color.setHsv(64, 200, 200); break;
+                    case ActionMoveE: color.setHsv(128, 200, 200); break;
+                    case ActionMoveS: color.setHsv(192, 200, 200); break;
+                    case ActionMoveW: color.setHsv(256, 200, 200); break;
+
                     case ActionReproduce: color.setRgb(0, 255, 0); break;
                     }
                 }}
             } else if (dynamic_cast<Block*>(occ))
             {
-                color.setRgb(0, 200, 0);
+                color.setRgb(230, 230, 230);
             }
 
             if (!creat && grid.draw_creats_only) color.setRgb(0,0,0);

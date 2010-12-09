@@ -160,15 +160,17 @@ void Grid::SetSize(int rs, int cs)
 void Grid::SetupActions()
 {
     action_lookup[ActionNone] = &Creat::DoNothing;
-    action_lookup[ActionForward] = &Creat::MoveForward;
-    action_lookup[ActionLeft] = &Creat::TurnLeft;
-    action_lookup[ActionRight] = &Creat::TurnRight;
+    action_lookup[ActionMoveN] = &Creat::MoveN;
+    action_lookup[ActionMoveE] = &Creat::MoveE;
+    action_lookup[ActionMoveS] = &Creat::MoveS;
+    action_lookup[ActionMoveW] = &Creat::MoveW;
     action_lookup[ActionReproduce] = &Creat::Reproduce;
 
     action_cost[ActionNone] = 0;
-    action_cost[ActionLeft] = 0;
-    action_cost[ActionForward] = 1.0;
-    action_cost[ActionRight] = 0;
+    action_cost[ActionMoveN] = 1.0;
+    action_cost[ActionMoveE] = 1.0;
+    action_cost[ActionMoveS] = 1.0;
+    action_cost[ActionMoveW] = 1.0;
     action_cost[ActionReproduce] = 60.0;
 }
 

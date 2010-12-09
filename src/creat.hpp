@@ -10,9 +10,10 @@
 enum CreatAction
 {
     ActionNone = 0,
-    ActionForward,
-    ActionLeft,
-    ActionRight,
+    ActionMoveN,
+    ActionMoveE,
+    ActionMoveS,
+    ActionMoveW,
     ActionReproduce,
     NumberActions, // dummy for bookkeeping purposes
 };
@@ -38,11 +39,11 @@ public:
 class Creat : public Occupant
 {
 public:
-    static const int extinputs = 6;
+    static const int extinputs = 8;
     static const int intinputs = 4;
     static const int inputs = extinputs + intinputs;
     static const int hidden = 4;
-    static const int outputs = 4;
+    static const int outputs = 5;
     static const int neurons = inputs + hidden + outputs;
 
     static int global_id;
@@ -84,9 +85,11 @@ public:
     void Update();
     void Step();
     void DoNothing();
-    void MoveForward();
-    void TurnLeft();
-    void TurnRight();
+    void MoveInDir(int o);
+    void MoveN();
+    void MoveE();
+    void MoveS();
+    void MoveW();
     void Reproduce();
     void MutateBrain();
     void CopyBrain(Creat& parent);
