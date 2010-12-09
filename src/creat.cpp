@@ -72,6 +72,8 @@ void Creat::Reset()
     Occupant::Reset();
     state.SetZero();
     age = 0;
+    fingerprint = 0;
+    for (int k = 0; k < 64; k++) { fingerprint <<= 1; fingerprint |= RandBit(); }
     action = ActionNone;
     possessed = false;
     alive = false;
@@ -236,16 +238,25 @@ void Creat::MutateBrain()
     if (!grid->enable_mutation) return;
 
     int count = 0;
+    bool mutated = false;
     while (RandBool(grid->mutation_prob) && count++ < 10)
     {
+        mutated = true;
+
         Pos w = SelectRandomWeight();
         weights(w) += RandGauss(0, grid->mutation_sd);
 
         if (grid->record_lineages) AddToLineage(w);
     }
 
-    if (grid->mutation_color_drift)
-        marker += RandSign() * 0.02;
+    if (mutated)
+    {
+        if (grid->mutation_color_drift)
+            marker += RandSign() * 0.02;
+
+        fingerprint <<= 1;
+        fingerprint |= RandBit();
+    }
 }
 
 void Creat::Update()
@@ -348,32 +359,34 @@ void Creat::Step()
     state(extinputs + 2) = (float(age) - (grid->max_age / 2)) / grid->max_age;
     state(extinputs + 3) = RandFloat(-1.0, 1.0);
 
-    // CALCULATE BRAIN STEP
-    // only clumns 0 through input+hidden are used
-    // only rows from inputs from 0 through neu
-    for  (int j = 0; j < Creat::hidden; j++)
+    for (int iter = 0; iter < grid->neural_net_iterations; iter++)
     {
-        float v = 0;
-        for (int k = 0; k < Creat::inputs + Creat::hidden; k++)
-            v += weights.data[j * Creat::neurons + k] * state.data[k];
-        state2.data[Creat::inputs + j] = v;
-    }
+        // CALCULATE BRAIN STEP
+        // only clumns 0 through input+hidden are used
+        // only rows from inputs from 0 through neu
+        for  (int j = 0; j < Creat::hidden; j++)
+        {
+            float v = 0;
+            for (int k = 0; k < Creat::inputs + Creat::hidden; k++)
+                v += weights.data[j * Creat::neurons + k] * state.data[k];
+            state2.data[Creat::inputs + j] = v;
+        }
 
-    for (int i = 0; i < hidden; i++)
-    {
-        float& h = state2(inputs + i);
-        h = tanh(h);
-    }
+        for (int i = 0; i < hidden; i++)
+        {
+            float& h = state2(inputs + i);
+            h = tanh(h);
+        }
 
-    for  (int j = Creat::hidden; j < Creat::hidden + Creat::outputs; j++)
-    {
-        float v = 0;
-        for (int k = 0; k < Creat::inputs + Creat::hidden; k++)
-            v += weights.data[j * Creat::neurons + k] * state.data[k];
-        state2.data[Creat::inputs + j] = v;
+        for  (int j = Creat::hidden; j < Creat::hidden + Creat::outputs; j++)
+        {
+            float v = 0;
+            for (int k = 0; k < Creat::inputs + Creat::hidden; k++)
+                v += weights.data[j * Creat::neurons + k] * state.data[k];
+            state2.data[Creat::inputs + j] = v;
+        }
+        SwapContents(state, state2);
     }
-
-    SwapContents(state, state2);
     //CheckSanity("After update");
 
     // CALCULATE ACTION
@@ -431,6 +444,7 @@ void Creat::CopyBrain(Creat& parent)
     //  state = parent.state;
 
     marker = parent.marker;
+    fingerprint = parent.fingerprint;
 
     if (desired_id >= 0) BlendBrain(*Peer(desired_id));
 }

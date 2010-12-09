@@ -23,6 +23,7 @@ RegisterVar(Grid, initial_marker)
 RegisterVar(Grid, max_age)
 RegisterVar(Grid, total_steps)
 RegisterVar(Grid, next_id)
+RegisterVar(Grid, neural_net_iterations)
 RegisterVar(Grid, mutation_color_drift)
 RegisterVar(Grid, mutation_prob)
 RegisterVar(Grid, mutation_sd)
@@ -33,11 +34,12 @@ RegisterQtHook(Grid, draw_type, "Display", EnumHook("Action\nAge\nEnergy\nPlumag
 RegisterQtHook(Grid, draw_creats_only, "Creats only", BoolHook());
 RegisterQtHook(Grid, max_age, "Maximum age", IntegerHook(0,1000));
 RegisterQtHook(Grid, mutation_prob, "Mutation probability", FloatHook(0, 1, 0.05));
-RegisterQtHook(Grid, initial_energy, "Initial energy", FloatHook(0,50,0.5));
+RegisterQtHook(Grid, initial_energy, "Initial energy", IntegerHook(-50,50));
 RegisterQtHook(Grid, enable_respawn, "Respawning", BoolHook());
 RegisterQtHook(Grid, initial_mutations, "Respawn diversity", IntegerHook(0,20));
 RegisterQtHook(Grid, enable_mutation, "Mutation", BoolHook());
-RegisterQtHook(Grid, mutation_color_drift, "Plumage Drift", BoolHook());
+RegisterQtHook(Grid, mutation_color_drift, "Plumage drift", BoolHook());
+RegisterQtHook(Grid, neural_net_iterations, "NN iterations", IntegerHook(1,10));
 
 void write_grid_size(Grid* g, std::ostream& s)
 {
@@ -111,8 +113,9 @@ Grid::Grid()
 
     initial_energy = 2;
     initial_marker = 0.0;
-    initial_mutations = 0;
+    initial_mutations = 10;
     record_lineages = false;
+    neural_net_iterations = 5;
 
     accuracy = 10;
     timestep = 0;
@@ -407,10 +410,87 @@ void Grid::Report()
         }
     }
 
+    //ColorClusters();
+
     avg_complexity /= num_creats ? num_creats : 1;
     cout << "Time, Pop, Complexity = " << timestep << " " << num_creats << " " << avg_complexity << endl;
 
     flush(cout);
+}
+
+#include <ext/hash_map>
+namespace std { using namespace __gnu_cxx; }
+
+// THIS DOESN'T WORK YET. NEED TO USE LONGEST COMMON SUBSTRING
+// AS A DISTANCE METRIC AND THEN DO K-MEANS, AND THEN EMBED INTO R/Z
+void Grid::ColorClusters()
+{
+    /* Assume that things within 4 mutations are 'the same species'
+
+       Chop off fingerprints until 90% fall into 4 groups.
+    */
+
+    std::vector<unsigned long int> fingerprints;
+    for_iterate(it, occupant_list)
+    {
+        Creat* creat= dynamic_cast<Creat*>(*it);
+        if (creat) fingerprints.push_back(creat->fingerprint);
+    }
+
+    int chop;
+    std::hash_map<unsigned long int, int> counts;
+    for (chop = 0; chop < 64; chop++)
+    {
+        counts.clear();
+        for_iterate(it, fingerprints)
+        {
+            unsigned long int f = *it;
+            f >>= chop;
+            counts[f] = counts[f] + 1;
+        }
+
+        std::vector<int> freqs;
+        for_iterate(it2, counts)
+        {
+            //cout << "fingerprint " << (*it2).first << " has count " << (*it2).second << endl;
+            freqs.push_back((*it2).second);
+        }
+
+        sort(freqs.rbegin(), freqs.rend());
+
+        int i = 0, total1 = 0, total2 = 0, min = 10000;
+        for_iterate(it3, freqs)
+        {
+            int c = *it3;
+            if (i++ < 4) total1 += c;
+            if (c < min) min = c;
+            total2 += c;
+        }
+
+        if (float(min) > 64 - chop) goto done;
+    }
+
+    done:
+    cout << "Using chop vaulue of " << chop << endl;
+
+    int num = counts.size() + 1;
+    float col = 0;
+    for_iterate(it4, counts)
+    {
+        unsigned long int f = (*it4).first;
+        cout << (*it4).first << " has count " << (*it4).second << endl;
+        for_iterate(occ, occupant_list)
+        {
+            Creat* cr = dynamic_cast<Creat*>(*occ);
+            if (cr && (cr->fingerprint >> chop) == f)
+            {
+                cr->marker = col;
+            }
+        }
+        col += 1.0 / num;
+    }
+
+    cout << "done" << endl;
 }
 
 void Grid::Step()

@@ -59,7 +59,7 @@ public:
 
     float action_cost[NumberActions];
     CreatFunc action_lookup[NumberActions];
-    float initial_energy;
+    int initial_energy;
     int initial_marker;
     int initial_mutations;
     Matrix* initial_brain;
@@ -68,6 +68,7 @@ public:
     int next_id;
 
     int accuracy;
+    int neural_net_iterations;
 
     bool mutation_color_drift;
     float mutation_prob;
@@ -110,6 +111,8 @@ public:
     Matrix FindDominantGenome();
     float CompeteScore(Matrix& a, Matrix& b);
     int CountCreatsByMarker(int marker);
+
+    void ColorClusters();
 
     void Step();
 

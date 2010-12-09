@@ -41,37 +41,17 @@ MainWindow::MainWindow(QWidget *parent)
 
     grid->max_age = 120;
 
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < 12; i++)
     {
         Circle* c = new Circle;
         c->Attach(*grid, grid->RandomCell());
         c->AssignID();
         c->radius = 12;
-        c->threshold = 5;
+        c->threshold = 7;
         c->p_jump = 0.01;
-        for (int k = 0; k < 10; k++) c->Update();
-    }
-/*
-    for (int i = 0; i < 2; i++)
-    {
-        Circle* c = new Circle;
-        c->Attach(grid, grid->RandomCell());
-        c->radius = 23;
-        c->energy = 0.25;
-        c->p_jump = 0.005;
         for (int k = 0; k < 10; k++) c->Update();
     }
 
-    for (int i = 0; i < 2; i++)
-    {
-        Circle* c = new Circle;
-        c->Attach(grid, grid->RandomCell());
-        c->radius = 8;
-        c->energy = 2.0;
-        c->p_jump = 0.01;
-        for (int k = 0; k < 10; k++) c->Update();
-    }
-*/
     grid->energy_decay_rate = 0.08;
     grid->enable_respawn = true;
     grid->mutation_prob = 0.1;

@@ -56,6 +56,7 @@ public:
     Matrix state;
     Matrix state2;
 
+    unsigned long int fingerprint;
     int action;
     int age;
     int orient;
