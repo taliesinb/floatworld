@@ -34,8 +34,9 @@ RegisterQtHook(Grid, draw_type, "Display", EnumHook("Action\nAge\nEnergy\nPlumag
 RegisterQtHook(Grid, draw_creats_only, "Creats only", BoolHook());
 RegisterQtHook(Grid, max_age, "Maximum age", IntegerHook(0,1000));
 RegisterQtHook(Grid, mutation_prob, "Mutation probability", FloatHook(0, 1, 0.05));
-RegisterQtHook(Grid, initial_energy, "Initial energy", FloatHook(0,20,0.5));
+RegisterQtHook(Grid, initial_energy, "Initial energy", FloatHook(0,50,0.5));
 RegisterQtHook(Grid, enable_respawn, "Respawning", BoolHook());
+RegisterQtHook(Grid, initial_mutations, "Respawn diversity", IntegerHook(0,20));
 RegisterQtHook(Grid, enable_mutation, "Mutation", BoolHook());
 RegisterQtHook(Grid, mutation_color_drift, "Plumage Drift", BoolHook());
 
@@ -111,6 +112,7 @@ Grid::Grid() : weight_mask(Creat::neurons, Creat::neurons)
 
     initial_energy = 2;
     initial_marker = 0.0;
+    initial_mutations = 0;
     record_lineages = false;
 
     accuracy = 10;
@@ -215,8 +217,14 @@ Pos Grid::FairCell()
 
 void Grid::AddCreats(int number, bool fairly)
 {
+    float mp = mutation_prob;
+    mutation_prob = 0.5;
     for (int i = 0; i < number; i++)
-        AddCreatAt(fairly ? FairCell() : EmptyCell(), RandInt(3));
+    {
+        Creat& c = AddCreatAt(fairly ? FairCell() : EmptyCell(), RandInt(3));
+        for (int i = 0; i < initial_mutations; i++) c.MutateBrain();
+    }
+    mutation_prob = mp;
 }
 
 Creat& Grid::AddCreatAt(Pos pos, int orient)

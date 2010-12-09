@@ -61,6 +61,7 @@ public:
     CreatFunc action_lookup[NumberActions];
     float initial_energy;
     int initial_marker;
+    int initial_mutations;
     Matrix* initial_brain;
     int max_age;
     int total_steps;
