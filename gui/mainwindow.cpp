@@ -41,6 +41,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     grid->max_age = 120;
 
+
     for (int i = 0; i < 3; i++)
     {
         Circle* c = new Circle;
@@ -79,9 +80,16 @@ MainWindow::MainWindow(QWidget *parent)
 
     grid->AddCreats(30, true);
 
-    for (int k = 0; k < 12; k++)
+    for (int k = 0; k < 0; k++)
     {
         Occupant* block = new SkinnerBlock();
+        block->Attach(*grid, grid->RandomCell());
+        block->AssignID();
+    }
+
+    for (int k = 0; k < 12; k++)
+    {
+        Occupant* block = new MoveableBlock();
         block->Attach(*grid, grid->RandomCell());
         block->AssignID();
     }
@@ -111,11 +119,6 @@ void MainWindow::cell_clicked(Pos pos)
 
         if (occupantBox->layout())
         {
-            QLayoutItem *child;
-            while ((child = occupantBox->layout()->takeAt(0)) != 0) {
-                    child->widget()->deleteLater();
-                    delete child;
-            }
             HookManager* hm = dynamic_cast<HookManager*>(occupantBox->layout());
             hm->object->DeleteQtHook();
         }

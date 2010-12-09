@@ -128,8 +128,15 @@ void Object::UpdateQtHook()
 }
 
 void Object::DeleteQtHook()
-{
-    if (qt_hook) delete qt_hook;
+{    
+    if (qt_hook) {
+        QLayoutItem *child;
+        while ((child = qt_hook->takeAt(0)) != 0) {
+                child->widget()->deleteLater();
+                delete child;
+        }
+        delete qt_hook;
+    }
     qt_hook = NULL;
 }
 

@@ -56,6 +56,7 @@ void MatrixLabel::mousePressEvent(QMouseEvent *event)
 GridWidget::GridWidget(QWidget* parent)
         : MatrixLabel(parent)
 {
+    pixel_scale = 8;
     grid.SetSize(sz,sz);
     AllocateImage(sz,sz);
 }
