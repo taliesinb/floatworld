@@ -188,30 +188,21 @@ void MainWindow::on_actionNextOccupant_triggered()
 
 void MainWindow::SelectNextOccupant(bool forward)
 {
-    if (selected_occupant) {
-        Pos p = selected_occupant->pos;
-        int sz = grid->rows * grid->cols;
-        int start = p.row * grid->cols + p.col;
-        int index = start + (forward ? 1 : -1);
-        do {
-            Occupant* occ = grid->occupant_grid[index];
-            if (occ)
-            {
-                SelectOccupant(occ);
-                return;
-            }
-            index += (forward ? 1 : -1);
-            index += sz;
-            index %= sz;
-        } while (index != start);
-
-    } else {
-
-        if (grid->occupant_list.size())
+    Pos p = gridWidget->highlighted.Wrap(grid->rows, grid->cols);
+    int sz = grid->rows * grid->cols;
+    int start = p.row * grid->cols + p.col;
+    int index = start + (forward ? 1 : -1);
+    do {
+        Occupant* occ = grid->occupant_grid[index];
+        if (occ)
         {
-            SelectOccupant(grid->occupant_list.front());
+            SelectOccupant(occ);
+            return;
         }
-    }
+        index += (forward ? 1 : -1);
+        index += sz;
+        index %= sz;
+    } while (index != start);
 }
 
 void MainWindow::on_actionFast_triggered()

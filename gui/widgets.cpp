@@ -154,11 +154,10 @@ void GridWidget::Rerender()
                     case ActionReproduce: color.setRgb(0, 255, 0); break;
                     }
                 }}
-            } else if (dynamic_cast<Block*>(occ))
+            } else if (Block* block = dynamic_cast<Block*>(occ))
             {
-                color.setRgb(230, 230, 230);
+                color.setHsv(255 * block->draw_hue, 110, 255);
             }
-
             if (!creat && grid.draw_creats_only) color.setRgb(0,0,0);
             *line1++ = color.rgb();
         }

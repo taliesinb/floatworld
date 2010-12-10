@@ -30,16 +30,17 @@ RegisterVar(Grid, mutation_sd)
 RegisterVar(Grid, draw_type)
 RegisterVar(Grid, draw_creats_only)
 
-RegisterQtHook(Grid, draw_type, "Display", EnumHook("Action\nAge\nEnergy\nPlumage"));
+RegisterQtHook(Grid, draw_type, "Display method", EnumHook("Action\nAge\nEnergy\nPlumage"));
 RegisterQtHook(Grid, draw_creats_only, "Creats only", BoolHook());
 RegisterQtHook(Grid, max_age, "Maximum age", IntegerHook(0,1000));
 RegisterQtHook(Grid, mutation_prob, "Mutation probability", FloatHook(0, 1, 0.05));
 RegisterQtHook(Grid, initial_energy, "Initial energy", IntegerHook(-50,50));
-RegisterQtHook(Grid, enable_respawn, "Respawning", BoolHook());
+RegisterQtHook(Grid, enable_respawn, "Enable respawning", BoolHook());
 RegisterQtHook(Grid, initial_mutations, "Respawn diversity", IntegerHook(0,20));
-RegisterQtHook(Grid, enable_mutation, "Mutation", BoolHook());
+RegisterQtHook(Grid, enable_mutation, "Enable mutation", BoolHook());
 RegisterQtHook(Grid, mutation_color_drift, "Plumage drift", BoolHook());
-RegisterQtHook(Grid, neural_net_iterations, "NN iterations", IntegerHook(1,10));
+RegisterQtHook(Grid, neural_net_iterations, "Neural iterations", IntegerHook(1,10));
+RegisterQtHook(Grid, energy_decay_rate, "Energy decay rate", FloatHook(0,0.5,0.01));
 
 void write_grid_size(Grid* g, std::ostream& s)
 {
