@@ -18,6 +18,7 @@ MatrixLabel::MatrixLabel(QWidget* parent)
 {
     setAttribute(Qt::WA_PaintOnScreen);
     setAttribute(Qt::WA_OpaquePaintEvent);
+    setFocusPolicy(Qt::StrongFocus);
 }
 
 void MatrixLabel::AllocateImage(int width, int height)

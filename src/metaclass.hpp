@@ -153,9 +153,9 @@ class Registrator
 
 #define RegisterQtHook(CLASS, NAME, LABEL, PROTOTYPE)       \
     QWidget* CLASS##NAME##Factory(Object* obj) {            \
-    Hook* h = PROTOTYPE;                                \
-    h->SetPointer(static_cast<void*>(&dynamic_cast<CLASS*>(obj)->NAME)); \
-    return h->AsWidget(); }                                                \
+    Hook* h = PROTOTYPE;                                    \
+    h->SetPointer(reinterpret_cast<void*>(&dynamic_cast<CLASS*>(obj)->NAME)); \
+    return h->AsWidget(); }                                 \
     Registrator CLASS##NAME##HookRegistrator(CLASS##MetaClass, \
     LABEL, &CLASS##NAME##Factory);
 

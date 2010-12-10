@@ -35,7 +35,7 @@ class Circle : public Shape
 {
   public:
 
-    float radius;
+    int radius;
 
     Circle();
     

@@ -66,11 +66,11 @@ class HookManager : public QFormLayout
 
 public:
 
-    Class& mclass;
+    Class* mclass;
     Object* object;
     std::list<QWidget*> widgets;
 
-    HookManager(Class& mc, Object* obj);
+    HookManager(Class* mc, Object* obj);
     virtual ~HookManager();
 
 public slots:

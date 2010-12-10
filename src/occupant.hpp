@@ -16,8 +16,8 @@ class Occupant : public Object
     Occupant* next; // next occupant on this grid position
     Grid* grid;
     Pos pos;
-    short signature;
-    short id;
+    float signature;
+    int id;
 
     virtual void Interact(Creat& c);
     virtual void Update();

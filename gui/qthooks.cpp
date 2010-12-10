@@ -6,20 +6,9 @@
 
 using namespace std;
 
-HookManager::HookManager(Class &mc, Object *obj)
-    : mclass(mc), object(obj)
+IntWidget::IntWidget(int _min, int _max) : Hook(SIGNAL(valueChanged(int)))
 {
-
-}
-
-HookManager::~HookManager()
-{
-    being_removed();
-}
-
-IntWidget::IntWidget(int min, int max) : Hook(SIGNAL(valueChanged(int)))
-{
-    setRange(min, max);
+    setRange(_min, _max);
     QFont font;
     font.setPointSize(10);
     setFont(font);
@@ -115,6 +104,17 @@ void MatrixWidget::Rerender()
     }
 }
 
+HookManager::HookManager(Class *mc, Object *obj)
+    : mclass(mc), object(obj)
+{
+
+}
+
+HookManager::~HookManager()
+{
+    being_removed();
+}
+
 void HookManager::child_changed()
 {
     for_iterate(it, widgets)
@@ -126,25 +126,33 @@ void HookManager::child_changed()
 
 void HookManager::UpdateChildren()
 {
+    int i =0;
     for_iterate(it, widgets)
     {
         QWidget* w = *it;
         w->blockSignals(true);
         dynamic_cast<Hook*>(w)->Synchronize(true);
         w->blockSignals(false);
+//        cout << "Updating widget " << i++ << "of " << mclass->name << endl;
     }
 }
 
 void HookManager::ConstructChildren()
 {
-    for (int i = 0; i < mclass.nqvars; i++)
+    if (Class* parent = Class::Lookup(mclass->pname))
     {
-        QWidget* widget = (*mclass.factories[i])(object);
+        Class* temp = mclass;
+        mclass = parent;
+        ConstructChildren();
+        mclass = temp;
+    }
+    for (int i = 0; i < mclass->nqvars; i++)
+    {
+        QWidget* widget = (*mclass->factories[i])(object);
         QObject::connect(widget, dynamic_cast<Hook*>(widget)->changesignal, this, SLOT(child_changed()));
-        addRow(mclass.labels[i], widget);
+        addRow(mclass->labels[i], widget);
         widgets.push_back(widget);
     }
-    UpdateChildren();
 }
 
 

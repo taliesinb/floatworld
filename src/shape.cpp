@@ -8,8 +8,14 @@ RegisterVar(Shape, energy);
 RegisterVar(Shape, ratio);
 RegisterVar(Shape, p_jump);
 
+RegisterQtHook(Shape, threshold, "Energy maximum", FloatHook(-50,50,0.25));
+RegisterQtHook(Shape, energy, "Energy increment", FloatHook(-5,5,0.1));
+RegisterQtHook(Shape, ratio,  "Fill ratio", FloatHook(0,1,0.1));
+RegisterQtHook(Shape, p_jump, "Jump probability", FloatHook(0, 1, 0.001));
+
 RegisterClass(Circle, Shape);
 RegisterVar(Circle, radius);
+RegisterQtHook(Circle, radius, "Radius", IntegerHook(0, 100));
 
 /*
 RegisterClass(GaussianCircle, Circle);
@@ -44,44 +50,44 @@ void Shape::Draw(Matrix& m)
 
 void Shape::Update()
 {
-  Draw(grid->energy);
-  if (RandBool(p_jump))
-    MoveRandom();
+    Draw(grid->energy);
+    if (RandBool(p_jump))
+        MoveRandom();
 }
 
 Circle::Circle()
-  : radius(10)
 {
+    radius = 10;
 }
 
 float Circle::Area()
 {
-  return 2 * 3.141519 * radius;
+    return 3.141519 * radius * radius;
 }
 
 void Circle::DrawFull(Matrix& m)
 {
-  float r2 = radius * radius;
-  for (int i = -radius; i <= radius; i++)
-    for (int j = -radius; j <= radius; j++)
-      if (abs(i) + abs(j) < radius || (i * i) + (j * j) < r2)
-        Inject(m, i, j, energy);
+    float r2 = radius * radius;
+    for (int i = -radius; i <= radius; i++)
+        for (int j = -radius; j <= radius; j++)
+            if (abs(i) + abs(j) < radius || (i * i) + (j * j) < r2)
+                Inject(m, i, j, energy);
 }
    
 
 void Circle::DrawStochastic(Matrix& m, int n)
 {
-  float r2 = radius * radius;
-  float de = energy / ratio;
-  for (int t = 0; t < n; t++)
-  {
-    int r, c;
-    do {
-      r = RandInt(-radius, radius);
-      c = RandInt(-radius, radius);
-    } while (r * r + c * c > r2);
-    Inject(m, r, c, de);
-  }
+    float r2 = radius * radius;
+    float de = energy / ratio;
+    for (int t = 0; t < n; t++)
+    {
+        int r, c;
+        do {
+            r = RandInt(-radius, radius);
+            c = RandInt(-radius, radius);
+        } while (r * r + c * c > r2);
+        Inject(m, r, c, de);
+    }
 }
 
 /*

@@ -114,8 +114,9 @@ void Object::Reset()
 HookManager* Object::SetupQtHook()
 {
     assert (qt_hook == NULL);
-    qt_hook = new HookManager(GetClass(), this);
+    qt_hook = new HookManager(&GetClass(), this);
     qt_hook->ConstructChildren();
+    qt_hook->UpdateChildren();
     return qt_hook;
 }
 

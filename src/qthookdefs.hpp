@@ -10,6 +10,7 @@ public:
     const char* changesignal;
 
     Hook(const char* sig);
+    virtual ~Hook();
     void SetPointer(void* ptr);
     QWidget* AsWidget();
 

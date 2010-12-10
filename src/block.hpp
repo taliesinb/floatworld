@@ -12,37 +12,34 @@ public:
 
     Block();
 
-    bool fill;
-    float hue;
+    bool draw_filled;
+    float draw_hue;
 
-    void __Remove();
     void Update();
 };
 
-class MoveableBlock : public Block
+class RewardBlock : public Block
+{
+public:
+    RewardBlock();
+
+    int reward;
+};
+
+class MoveableBlock : public RewardBlock
 {
 public:
 
     void Interact(Creat& c);
 };
 
-class EnergyBlock : public Block
+class SkinnerBlock : public RewardBlock
 {
 public:
-    EnergyBlock();
-    EnergyBlock(float _de);
-
-    float de;
-
-    void Update();
-};
-
-class SkinnerBlock : public Block
-{
-public:
+    int threshold;
     int touch_count;
-    int o_touch_count;
-    int phase;
+    int _touch_count;
+    int radius;
 
     SkinnerBlock();
 
@@ -53,25 +50,10 @@ public:
 class PhasedSkinnerBlock : public SkinnerBlock
 {
 public:
-
     int period;
     bool phase;
 
     PhasedSkinnerBlock();
-
-    bool Phase();
-    void Interact(Creat& c);
-    void Update();
-};
-
-class CloneBlock : public Block
-{
-public:
-
-    int period;
-    int creat_id;
-
-    CloneBlock();
 
     void Interact(Creat& c);
     void Update();

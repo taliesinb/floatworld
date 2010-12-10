@@ -92,14 +92,30 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::cell_clicked(Pos pos)
 {
-    cout << "Clicked at pos " << pos << endl;
     Occupant* occ = grid->OccupantAt(pos);
 
     if (occ)
+    {
         SelectOccupant(occ);
-    else
-        grid->energy(pos) += 5;
-
+    } else
+    {
+        float min_d = 10000;
+        Occupant* occ = NULL;
+        for_iterate(it, grid->occupant_list)
+        {
+            Occupant* o = *it;
+            float d = (o->pos - pos).Mag();
+            if (d < min_d)
+            {
+                min_d = d;
+                occ = o;
+            }
+        }
+        if (min_d < 3)
+            SelectOccupant(occ);
+        else
+            grid->energy(pos) += 5;
+    }
     redraw();
 }
 

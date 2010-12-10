@@ -5,6 +5,11 @@ Hook::Hook(const char *sig) : changesignal(sig)
 {
 }
 
+Hook::~Hook()
+{
+
+}
+
 void Hook::SetPointer(void *p)
 {
     ptr = p;
