@@ -320,9 +320,6 @@ void SwapContents(Matrix& m1, Matrix& m2)
 
 ostream& operator<<(ostream& os, const Matrix& m)
 {
-    os.precision(2);
-    os.width(6);
-    os.setf(ios::right | ios::fixed);
     os << "[";
     for (int i = 0; i < m.rows; i++)
     {

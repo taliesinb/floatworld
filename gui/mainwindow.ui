@@ -88,7 +88,16 @@
     <addaction name="actionLoad"/>
     <addaction name="actionClose"/>
    </widget>
+   <widget class="QMenu" name="menuOccupant">
+    <property name="title">
+     <string>Occupant</string>
+    </property>
+    <addaction name="actionNextOccupant"/>
+    <addaction name="actionPrevOccupant"/>
+    <addaction name="actionIndividualStep"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuOccupant"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <property name="movable">
@@ -108,6 +117,7 @@
    <addaction name="actionSlow"/>
    <addaction name="actionFast"/>
    <addaction name="actionStep"/>
+   <addaction name="actionIndividualStep"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionPlay">
@@ -157,6 +167,9 @@
    <property name="text">
     <string>Step</string>
    </property>
+   <property name="shortcut">
+    <string>Return</string>
+   </property>
    <property name="visible">
     <bool>true</bool>
    </property>
@@ -196,14 +209,41 @@
     <string>Slow</string>
    </property>
   </action>
-  <action name="actionColor_By">
+  <action name="actionIndividualStep">
+   <property name="icon">
+    <iconset resource="floatworld.qrc">
+     <normaloff>:/icons/edit-redo.png</normaloff>:/icons/edit-redo.png</iconset>
+   </property>
    <property name="text">
-    <string>Color By</string>
+    <string>Step</string>
+   </property>
+   <property name="toolTip">
+    <string>Individual Step</string>
+   </property>
+   <property name="shortcut">
+    <string>Space</string>
+   </property>
+   <property name="visible">
+    <bool>true</bool>
    </property>
   </action>
-  <action name="actionColor_by">
+  <action name="actionNextOccupant">
    <property name="text">
-    <string>Color by</string>
+    <string>Next occupant</string>
+   </property>
+   <property name="shortcut">
+    <string>&gt;</string>
+   </property>
+  </action>
+  <action name="actionPrevOccupant">
+   <property name="text">
+    <string>Prev occupant</string>
+   </property>
+   <property name="toolTip">
+    <string>Previous occupant</string>
+   </property>
+   <property name="shortcut">
+    <string>&lt;</string>
    </property>
   </action>
  </widget>

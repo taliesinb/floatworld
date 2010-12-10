@@ -10,13 +10,12 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
     adam(Creat::hidden + Creat::outputs, Creat::neurons),
     speed(0), stepper(0), speed_multiplier(4),
+    selected_occupant(NULL),
     action_group(new QActionGroup(this))
 {
     setupUi(this);
 
     grid = &gridWidget->grid;
-
-    connect( action_group, SIGNAL( selected( QAction* ) ), this, SLOT( viewtype_set( QAction* ) ) );
 
     // setup creatures
     Creat::Setup();
@@ -86,29 +85,49 @@ MainWindow::MainWindow(QWidget *parent)
 
     grid->SetupQtHook();
     gridBox->setLayout(grid->qt_hook);
+
+    connect(grid->qt_hook, SIGNAL(value_changed()),
+            this, SLOT(redraw()));
 }
 
 void MainWindow::cell_clicked(Pos pos)
 {
     cout << "Clicked at pos " << pos << endl;
     Occupant* occ = grid->OccupantAt(pos);
+
     if (occ)
-    {
-        cout << "Setting to occ with id " << occ->id << endl;
-
-        if (occupantBox->layout())
-        {
-            HookManager* hm = dynamic_cast<HookManager*>(occupantBox->layout());
-            hm->object->DeleteQtHook();
-        }
-
-        occupantBox->setLayout(occ->SetupQtHook());
-
-    } else {
+        SelectOccupant(occ);
+    else
         grid->energy(pos) += 5;
+
+    redraw();
+}
+
+void MainWindow::unselect_occupant()
+{
+    selected_occupant = NULL;
+}
+
+void MainWindow::SelectOccupant(Occupant *occ)
+{
+    if (selected_occupant && occ != selected_occupant)
+        selected_occupant->DeleteQtHook();
+
+    if (occ && occ != selected_occupant)
+    {
+        // TODO: make sure s_o hasn't been freed,
+        // which might happen if user deletes an
+        // occupant
+
+        selected_occupant = occ;
+
+        HookManager* hm = occ->SetupQtHook();
+        occupantBox->setLayout(hm);
+        connect(hm, SIGNAL(value_changed()), this,
+                SLOT(redraw()));
+        connect(hm, SIGNAL(being_removed()), this,
+                SLOT(unselect_occupant()));
     }
-    gridWidget->Rerender();
-    gridWidget->repaint();
 }
 
 void MainWindow::on_actionPlay_triggered()
@@ -128,8 +147,55 @@ void MainWindow::on_actionStop_triggered()
 void MainWindow::on_actionStep_triggered()
 {
     grid->Step();
-    gridWidget->Rerender();
-    gridWidget->repaint();
+    redraw();
+}
+
+void MainWindow::on_actionIndividualStep_triggered()
+{
+    if (selected_occupant) {
+        selected_occupant ->Update();
+        redraw();
+    }
+}
+
+void MainWindow::on_actionPrevOccupant_triggered()
+{
+    SelectNextOccupant(false);
+    redraw();
+}
+
+void MainWindow::on_actionNextOccupant_triggered()
+{
+    SelectNextOccupant(true);
+    redraw();
+}
+
+void MainWindow::SelectNextOccupant(bool forward)
+{
+    if (selected_occupant) {
+        Pos p = selected_occupant->pos;
+        int sz = grid->rows * grid->cols;
+        int start = p.row * grid->cols + p.col;
+        int index = start + (forward ? 1 : -1);
+        do {
+            Occupant* occ = grid->occupant_grid[index];
+            if (occ)
+            {
+                SelectOccupant(occ);
+                return;
+            }
+            index += (forward ? 1 : -1);
+            index += sz;
+            index %= sz;
+        } while (index != start);
+
+    } else {
+
+        if (grid->occupant_list.size())
+        {
+            SelectOccupant(grid->occupant_list.front());
+        }
+    }
 }
 
 void MainWindow::on_actionFast_triggered()
@@ -168,8 +234,9 @@ void MainWindow::on_actionLoad_triggered()
         f >> gridWidget->grid;
         f.close();
     }
+    grid->UpdateQtHook();
+    redraw();
 }
-
 
 void MainWindow::reportFPS()
 {
@@ -190,7 +257,13 @@ void MainWindow::takeStep()
             grid->Step();
         }
     } else grid->Run(int(round(speed)), 500);
+    redraw();
+}
 
+void MainWindow::redraw()
+{
+    if (selected_occupant)
+        gridWidget->highlighted = selected_occupant->pos;
     gridWidget->Rerender();
-    gridWidget->update();
+    gridWidget->repaint();
 }

@@ -15,6 +15,7 @@ public:
     QImage* pixel_data;
     float pixel_scale;
     bool grid;
+    Pos highlighted;
     int render_count; /* for peformance debugging */
 
     MatrixLabel(QWidget* parent);

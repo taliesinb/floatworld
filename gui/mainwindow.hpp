@@ -27,22 +27,33 @@ public:
     float stepper;
     float speed_multiplier;
     QActionGroup* action_group;
+    Occupant* selected_occupant;
     Grid* grid;
 
     MainWindow(QWidget *parent = 0);
 
+    void SelectOccupant(Occupant* occ);
+
+    void SelectNextOccupant(bool forward);
+
 private slots:
+    void redraw();
+
     void on_actionSlow_triggered();
     void on_actionPlay_triggered();
     void on_actionStop_triggered();
     void on_actionFast_triggered();
     void on_actionStep_triggered();
+    void on_actionIndividualStep_triggered();
+    void on_actionNextOccupant_triggered();
+    void on_actionPrevOccupant_triggered();
 
     void on_actionSave_triggered();
     void on_actionLoad_triggered();
 
 public slots:
     void cell_clicked(Pos pos);
+    void unselect_occupant();
     void takeStep();
     void reportFPS();
 };

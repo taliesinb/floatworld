@@ -14,6 +14,7 @@ HookManager::HookManager(Class &mc, Object *obj)
 
 HookManager::~HookManager()
 {
+    being_removed();
 }
 
 IntWidget::IntWidget(int min, int max) : Hook(SIGNAL(valueChanged(int)))
@@ -108,7 +109,7 @@ void MatrixWidget::Rerender()
             int hue = 64 + 64 * sgn;
             int sat = min(100 + int(val), 255);
             int var = min(100 + int(val), 255);
-            color.setHsv(64 + 64 * sgn, val, 255);
+            color.setHsv((256 + (64 + 48 * sgn)) % 256, val, 255 - (val / 5));
             *line1++ = color.rgb();
         }
     }
@@ -120,6 +121,7 @@ void HookManager::child_changed()
     {
          dynamic_cast<Hook*>(*it)->Synchronize(false);
     }
+    value_changed();
 }
 
 void HookManager::UpdateChildren()

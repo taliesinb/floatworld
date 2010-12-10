@@ -26,6 +26,7 @@ public:
     HookManager* SetupQtHook();
     void UpdateQtHook();
     void DeleteQtHook();
+    void SignalQtHook();
     const char* Name();
 };
 

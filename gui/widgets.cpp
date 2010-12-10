@@ -14,7 +14,7 @@ MatrixLabel::MatrixLabel(QWidget* parent)
     pixel_scale(5),
     pixel_data(NULL),
     render_count(0),
-    grid(false)
+    grid(false), highlighted(-1,-1)
 {
     setAttribute(Qt::WA_PaintOnScreen);
     setAttribute(Qt::WA_OpaquePaintEvent);
@@ -25,7 +25,7 @@ void MatrixLabel::AllocateImage(int width, int height)
     if (pixel_data) delete pixel_data;
     pixel_data = new QImage(width, height, QImage::Format_RGB32);
     pixel_data->fill(0);
-    setFixedSize(width * pixel_scale + 2 * border, height * pixel_scale + 2 * border);
+    setFixedSize(width * pixel_scale + 2 * border+1, height * pixel_scale + 2 * border+1);
     Rerender();
 }
 
@@ -39,10 +39,15 @@ void MatrixLabel::paintEvent(QPaintEvent*)
     QPainter painter(this);
     int w = pixel_data->width(), h = pixel_data->height();
     int w2 = w * pixel_scale, h2 = h * pixel_scale;
-    painter.fillRect(QRect(0, 0, w2 + 2 * border, h2 + 2 * border), Qt::gray);
+    painter.setPen(Qt::black);
+    painter.drawRect(QRect(0, 0, w2 + 2 * border, h2 + 2 * border));
+    painter.setPen(Qt::white);
+    painter.drawRect(QRect(1,1,w2 + 2 * border-2, h2 + 2 * border-2));
+    painter.fillRect(QRect(2,2,w2 + 2 * border-3, h2 + 2 * border-3), Qt::white);
     painter.drawImage(QRect(border, border, w2, h2),
                       *pixel_data, QRect(0, 0, w, h));
     if (grid) {
+        painter.setPen(Qt::gray);
         for (int i = 0; i <= w; i++)
         {
             int x = border + i * pixel_scale;
@@ -53,6 +58,17 @@ void MatrixLabel::paintEvent(QPaintEvent*)
             int y = border + i * pixel_scale;
             painter.drawLine(border, y, border + w * pixel_scale, y);
         }
+    }
+    if (highlighted.Inside(h, w))
+    {
+        QPen pen;
+        pen.setWidth(2);
+        pen.setColor(QColor(255,255,255,100));
+        painter.setPen(pen);
+        painter.drawRect(QRect(border + pixel_scale * highlighted.col - 2,
+                           border + pixel_scale * highlighted.row - 2,
+                           pixel_scale + 4, pixel_scale + 4));
+
     }
 }
 
@@ -78,6 +94,13 @@ void GridWidget::Rerender()
 {
     int draw_type = grid.draw_type;
     QColor color(0, 0, 0);
+
+    if (grid.rows != pixel_data->height() ||
+        grid.cols != pixel_data->width())
+    {
+        AllocateImage(grid.rows, grid.cols);
+        return;
+    }
 
     for (int i = 0; i < grid.rows; i++)
     {
@@ -132,11 +155,10 @@ void GridWidget::Rerender()
                 }}
             } else if (dynamic_cast<Block*>(occ))
             {
-                color.setRgb(0, 200, 0);
+                color.setRgb(230, 230, 230);
             }
 
             if (!creat && grid.draw_creats_only) color.setRgb(0,0,0);
-            if (occ && occ->qt_hook) color = color.lighter(200);
             *line1++ = color.rgb();
         }
     }

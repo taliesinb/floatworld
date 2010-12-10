@@ -51,6 +51,7 @@ void Occupant::Remove()
 {
     RemoveFromLL();
     grid->occupant_list.remove(this);
+    DeleteQtHook();
     __Remove();
 }
 

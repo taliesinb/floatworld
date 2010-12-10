@@ -76,6 +76,10 @@ public:
 public slots:
     void child_changed();
 
+signals:
+    void value_changed();
+    void being_removed();
+
 public:
     void ConstructChildren();
     void UpdateChildren();
