@@ -6,6 +6,8 @@
 #include <iostream>
 #include <list>
 
+#include "../src/qthookdefs.hpp"
+
 #include <QFormLayout>
 #include <QSpinBox>
 #include <QCheckBox>

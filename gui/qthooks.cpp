@@ -60,13 +60,14 @@ void EnumWidget::Synchronize(bool inbound)
     else *static_cast<int*>(ptr) = currentIndex();
 }
 
-MatrixWidget::MatrixWidget(int size, bool flip) : Hook(SIGNAL(ClickedCell(Pos))), MatrixLabel(NULL)
+MatrixWidget::MatrixWidget(int size, bool flip)
+    : MatrixLabel(), Hook(SIGNAL(ClickedCell(Pos)))
 {
     flipped = flip;
     matrix = NULL;
     pixel_scale = size;
     rows = cols = 0;
-    grid = true;
+    draw_grid = true;
 }
 
 void MatrixWidget::OnSetPointer()
@@ -95,10 +96,10 @@ void MatrixWidget::Rerender()
             int sgn = val > 0 ? 1 : -1;
             val = 150 * log(1 + fabs(val));
             if (val > 255) val = 255;
-            int hue = 64 + 64 * sgn;
-            int sat = min(100 + int(val), 255);
-            int var = min(100 + int(val), 255);
-            color.setHsv((256 + (64 + 48 * sgn)) % 256, val, 255 - (val / 5));
+            int hue = 256 + (64 + 64 * sgn) % 256;
+            int sat = val;
+            int var = 255 - (val / 5);
+            color.setHsv(hue, sat, var);
             *line1++ = color.rgb();
         }
     }
@@ -126,14 +127,12 @@ void HookManager::child_changed()
 
 void HookManager::UpdateChildren()
 {
-    int i =0;
     for_iterate(it, widgets)
     {
         QWidget* w = *it;
         w->blockSignals(true);
         dynamic_cast<Hook*>(w)->Synchronize(true);
         w->blockSignals(false);
-//        cout << "Updating widget " << i++ << "of " << mclass->name << endl;
     }
 }
 

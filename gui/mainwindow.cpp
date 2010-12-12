@@ -9,13 +9,11 @@ using namespace std;
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
     adam(Creat::hidden + Creat::outputs, Creat::neurons),
-    speed(0), stepper(0), speed_multiplier(4),
-    selected_occupant(NULL),
-    action_group(new QActionGroup(this))
+    speed(0), stepper(0), speed_multiplier(4)
 {
     setupUi(this);
 
-    grid = &gridWidget->grid;
+    grid = gridWidget->grid;
 
     // setup creatures
     Creat::Setup();
@@ -72,79 +70,21 @@ MainWindow::MainWindow(QWidget *parent)
         block->AssignID();
     }
 
-    connect(gridWidget, SIGNAL(ClickedCell(Pos)), this,
-            SLOT(cell_clicked(Pos)));
+    connect(&timer, SIGNAL(timeout()), this, SLOT(takeStep()));
+    timer.start(5);
 
-    connect(&timer1, SIGNAL(timeout()), this, SLOT(takeStep()));
-    timer1.start(5);
-//    connect(&timer2, SIGNAL(timeout()), this, SLOT(reportFPS()));
-//    timer2.start(5000);
-
-    gridWidget->Rerender();
-    gridWidget->repaint();
+    gridWidget->Draw();
 
     grid->SetupQtHook();
     gridBox->setLayout(grid->qt_hook);
 
-    connect(grid->qt_hook, SIGNAL(value_changed()),
-            this, SLOT(redraw()));
+    connect(grid->qt_hook, SIGNAL(value_changed()), gridWidget, SLOT(Draw()));
+    connect(gridWidget, SIGNAL(OccupantSelected(Occupant*)), this, SLOT(DisplayInspector(Occupant*)));
+
+    gridWidget->setMaximumSize(gridWidget->sizeHint()); // 30 30 is bad, it oscillates!
+    resize(5000,5000); // force a resize to the maximum size
 }
 
-void MainWindow::cell_clicked(Pos pos)
-{
-    Occupant* occ = grid->OccupantAt(pos);
-
-    if (occ)
-    {
-        SelectOccupant(occ);
-    } else
-    {
-        float min_d = 10000;
-        Occupant* occ = NULL;
-        for_iterate(it, grid->occupant_list)
-        {
-            Occupant* o = *it;
-            float d = (o->pos - pos).Mag();
-            if (d < min_d)
-            {
-                min_d = d;
-                occ = o;
-            }
-        }
-        if (min_d < 3)
-            SelectOccupant(occ);
-        else
-            grid->energy(pos) += 5;
-    }
-    redraw();
-}
-
-void MainWindow::unselect_occupant()
-{
-    selected_occupant = NULL;
-}
-
-void MainWindow::SelectOccupant(Occupant *occ)
-{
-    if (selected_occupant && occ != selected_occupant)
-        selected_occupant->DeleteQtHook();
-
-    if (occ && occ != selected_occupant)
-    {
-        // TODO: make sure s_o hasn't been freed,
-        // which might happen if user deletes an
-        // occupant
-
-        selected_occupant = occ;
-
-        HookManager* hm = occ->SetupQtHook();
-        occupantBox->setLayout(hm);
-        connect(hm, SIGNAL(value_changed()), this,
-                SLOT(redraw()));
-        connect(hm, SIGNAL(being_removed()), this,
-                SLOT(unselect_occupant()));
-    }
-}
 
 void MainWindow::on_actionPlay_triggered()
 {
@@ -162,47 +102,22 @@ void MainWindow::on_actionStop_triggered()
 
 void MainWindow::on_actionStep_triggered()
 {
-    grid->Step();
-    redraw();
+    gridWidget->Step();
 }
 
 void MainWindow::on_actionIndividualStep_triggered()
 {
-    if (selected_occupant) {
-        selected_occupant ->Update();
-        redraw();
-    }
+    gridWidget->UpdateOccupant();
 }
 
 void MainWindow::on_actionPrevOccupant_triggered()
 {
-    SelectNextOccupant(false);
-    redraw();
+    gridWidget->SelectNextOccupant(false);
 }
 
 void MainWindow::on_actionNextOccupant_triggered()
 {
-    SelectNextOccupant(true);
-    redraw();
-}
-
-void MainWindow::SelectNextOccupant(bool forward)
-{
-    Pos p = gridWidget->highlighted.Wrap(grid->rows, grid->cols);
-    int sz = grid->rows * grid->cols;
-    int start = p.row * grid->cols + p.col;
-    int index = start + (forward ? 1 : -1);
-    do {
-        Occupant* occ = grid->occupant_grid[index];
-        if (occ)
-        {
-            SelectOccupant(occ);
-            return;
-        }
-        index += (forward ? 1 : -1);
-        index += sz;
-        index %= sz;
-    } while (index != start);
+    gridWidget->SelectNextOccupant(true);
 }
 
 void MainWindow::on_actionFast_triggered()
@@ -238,17 +153,11 @@ void MainWindow::on_actionLoad_triggered()
     {
         ifstream f;
         f.open(fileName.toUtf8());
-        f >> gridWidget->grid;
+        f >> *(gridWidget->grid);
         f.close();
     }
     grid->UpdateQtHook();
-    redraw();
-}
-
-void MainWindow::reportFPS()
-{
-    cout << gridWidget->render_count << endl;
-    gridWidget->render_count = 0;
+    gridWidget->Draw();
 }
 
 void MainWindow::takeStep()
@@ -263,14 +172,13 @@ void MainWindow::takeStep()
             stepper = 0;
             grid->Step();
         }
-    } else grid->Run(int(round(speed)), 500);
-    redraw();
+    } else grid->Run(int(round(speed)), 100);
+    gridWidget->Draw();
 }
 
-void MainWindow::redraw()
+void MainWindow::DisplayInspector(Occupant *occ)
 {
-    if (selected_occupant)
-        gridWidget->highlighted = selected_occupant->pos;
-    gridWidget->Rerender();
-    gridWidget->repaint();
+    if (occ->qt_hook)
+        occupantBox->setLayout(occ->qt_hook);
+    gridWidget->Draw();
 }

@@ -21,23 +21,14 @@ class MainWindow : public QMainWindow, public Ui::MainWindow
 
 public:
     Matrix adam;
-    QTimer timer1;
-    QTimer timer2;
+    QTimer timer;
     float speed;
     float stepper;
     float speed_multiplier;
-    QActionGroup* action_group;
-    Occupant* selected_occupant;
     Grid* grid;
-
     MainWindow(QWidget *parent = 0);
 
-    void SelectOccupant(Occupant* occ);
-
-    void SelectNextOccupant(bool forward);
-
 private slots:
-    void redraw();
 
     void on_actionSlow_triggered();
     void on_actionPlay_triggered();
@@ -51,11 +42,9 @@ private slots:
     void on_actionSave_triggered();
     void on_actionLoad_triggered();
 
-public slots:
-    void cell_clicked(Pos pos);
-    void unselect_occupant();
     void takeStep();
-    void reportFPS();
+
+    void DisplayInspector(Occupant* occ);
 };
 
 #endif // MAINWINDOW_HPP

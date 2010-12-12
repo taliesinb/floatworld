@@ -30,8 +30,8 @@ RegisterVar(Grid, mutation_sd)
 RegisterVar(Grid, draw_type)
 RegisterVar(Grid, draw_creats_only)
 
-RegisterQtHook(Grid, draw_type, "Display method", EnumHook("Action\nAge\nEnergy\nPlumage"));
-RegisterQtHook(Grid, draw_creats_only, "Creats only", BoolHook());
+//RegisterQtHook(Grid, draw_type, "Display method", EnumHook("Action\nAge\nEnergy\nPlumage"));
+//RegisterQtHook(Grid, draw_creats_only, "Creats only", BoolHook());
 RegisterQtHook(Grid, max_age, "Maximum age", IntegerHook(0,1000));
 RegisterQtHook(Grid, mutation_prob, "Mutation probability", FloatHook(0, 1, 0.05));
 RegisterQtHook(Grid, initial_energy, "Initial energy", IntegerHook(-50,50));

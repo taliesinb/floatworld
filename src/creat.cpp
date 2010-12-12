@@ -22,8 +22,8 @@ RegisterVar(Creat, marker);
 RegisterQtHook(Creat, energy, "Energy", FloatHook(0,100,1));
 RegisterQtHook(Creat, age, "Age", IntegerHook(0,1000));
 RegisterQtHook(Creat, action, "Action", EnumHook("None\nForward\nLeft\nRight\nReproduce"));
-RegisterQtHook(Creat, state, "Neurons", MatrixHook(8, true));
-RegisterQtHook(Creat, weights, "Weights", MatrixHook(8, false));
+RegisterQtHook(Creat, state, "Neurons", MatrixHook(7, true));
+RegisterQtHook(Creat, weights, "Weights", MatrixHook(7, false));
 
 /*
 RegisterQtHook(Creat, orient, "Orientation", QSpinBox);

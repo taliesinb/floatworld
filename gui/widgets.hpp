@@ -2,10 +2,10 @@
 #define WIDGETS_HPP
 
 #include <QtGui/QWidget>
-#include <QPixmap>
-#include <QImage>
 
-#include "../src/grid.hpp"
+#include "src/pos.hpp"
+
+class QImage;
 
 class MatrixLabel : public QWidget
 {
@@ -14,14 +14,16 @@ class MatrixLabel : public QWidget
 public:
     QImage* pixel_data;
     float pixel_scale;
-    bool grid;
+    bool draw_grid;
     Pos highlighted;
-    int render_count; /* for peformance debugging */
 
     MatrixLabel(QWidget* parent);
+    MatrixLabel();
 
     virtual void Rerender();
     void AllocateImage(int rows, int cols);
+    virtual QSize sizeHint() const;
+    virtual QSize minimumSizeHint() const;
 
 protected:
 
@@ -34,15 +36,37 @@ signals:
 
 };
 
-class GridWidget : public MatrixLabel
+class Grid;
+class Occupant;
+class QScrollArea;
+
+class GridWidget : public QWidget
 {
     Q_OBJECT
 
+private:
+    QScrollArea* scroll_area;
+    MatrixLabel* matrix_label;
+
 public:
-    Grid grid;
+    Grid* grid;
     GridWidget(QWidget* parent);
 
+    Occupant* selected_occupant;
+    void SelectOccupant(Occupant* occ);
+    void SelectNextOccupant(bool forward);
+    QSize sizeHint() const;
+
+public slots:
+    void Step();
+    void Draw();
     void Rerender();
+    void SelectAtPos(Pos pos);
+    void UnselectOccupant();
+    void UpdateOccupant();
+
+signals:
+    void OccupantSelected(Occupant*);
 };
 
 
