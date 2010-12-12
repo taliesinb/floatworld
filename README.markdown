@@ -20,11 +20,11 @@ Objects can be introduced into the environment to interact with the creatures.
 
 I use Qt Creator as my IDE (it's pretty good, and integrates cleanly with various Qt tools). 
 
-Download and install the Qt SDK for your platform from [their website](http://qt.nokia.com/downloads/downloads)
+Download and install the Qt SDK for your platform from [their website](http://qt.nokia.com/downloads/downloads).
 
-I've only built floatworld on Snow Leopard, so I can't yet speak about building it on other platforms. The build process is painless: first ask Qt to produce a makefile using the `qmake` library, then actually build the sources using `make`. In more detail:
+I've only built *floatworld* on Snow Leopard, so I can't yet speak about building it on other platforms. The build process is painless: first ask Qt to produce a makefile using the `qmake` library, then actually build the sources using `make`. In more detail:
 
-To build an appropriate Makefile using `quake`, run the following command from the project directory. 
+To build an appropriate Makefile using `qmake`, run the following command from the project directory. 
 
     qmake floatworld.pro -r -spec macx-g++
 
