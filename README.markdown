@@ -1,10 +1,8 @@
 #README
 
-#### WARNING
+WARNING: *THIS PROJECT IS NOT YET READY FOR PUBLIC CONSUMPTION. CHECK IT OUT AT YOUR OWN RISK, AS IT IS CHANGING VERY FAST*
 
-*THIS PROJECT IS NOT YET READY FOR PUBLIC CONSUMPTION. CHECK IT OUT AT YOUR OWN RISK, AS IT IS CHANGING VERY FAST*
-
-#### About floatworld
+## About *floatworld*	
 
 *floatworld* is an artificial life environment in which virtual creatures ('Creats') compete for space and energy.
 
@@ -18,7 +16,7 @@ Unlike [genetic algorithms](http://en.wikipedia.org/wiki/Genetic_algorithm), the
 
 Objects can be introduced into the environment to interact with the creatures. 
 
-#### Building floatworld
+## Building floatworld
 
 I use Qt Creator as my IDE (it's pretty good, and integrates cleanly with various Qt tools). 
 
@@ -36,7 +34,7 @@ Then run
 
 The executable should then appear under `build/floatworld.app/Contents/MacOS`. I'm not providing a packaged executable as of yet.
 
-#### Existing functionality
+## Existing functionality
 
 *   Simulation at various speeds
 *   Display of floatworlds as simple bitmaps
@@ -45,7 +43,7 @@ The executable should then appear under `build/floatworld.app/Contents/MacOS`. I
 *   Changing of various world parameters
 *   Inspection of individual Creat activity
 
-#### Planned functionality
+## Planned functionality
 
 *   Drag and drop management of objects within the floatworld
 *   Animation of Creat movements and interactions using vector graphics
@@ -54,7 +52,7 @@ The executable should then appear under `build/floatworld.app/Contents/MacOS`. I
 *   A variety of interesting new objects for Creats to interact with
 *   Snapshotting of simulation runs so they can be rewound
 
-#### Similar projects
+## Similar projects
 
 A good hub is [Biota.org](http://www.biota.org/), but some (far more impressive) projects that run in a similar vein are:
 
