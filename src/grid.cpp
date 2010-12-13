@@ -46,21 +46,21 @@ RegisterVar(Grid, mutation_sd)
 RegisterVar(Grid, draw_type)
 RegisterVar(Grid, draw_creats_only)
 
-RegisterQtHook(Grid, draw_type, "Display method", EnumHook("Action\nAge\nEnergy\nPlumage"));
-RegisterQtHook(Grid, draw_creats_only, "Creats only", BoolHook());
+RegisterQtHook(Grid, draw_type, "display method", EnumHook("Action\nAge\nEnergy\nPlumage"));
+RegisterQtHook(Grid, draw_creats_only, "creats only", BoolHook());
 
-RegisterQtHook(Grid, interaction_type, "Interactions", EnumHook("None\nPenalty\nAttack\nZombie\nParasitism\nPredation\nMutualism\nAltruism\nGeneExchange\nGeneGive\nGeneReceive\nMate"))
-RegisterQtHook(Grid, timestep, "Timestep", IntegerLabel());
-RegisterQtHook(Grid, num_creats, "Population", IntegerLabel());
-RegisterQtHook(Grid, max_age, "Maximum age", IntegerHook(0,1000));
-RegisterQtHook(Grid, mutation_prob, "Mutation probability", FloatHook(0, 1, 0.05));
-RegisterQtHook(Grid, initial_energy, "Initial energy", IntegerHook(-50,50));
-RegisterQtHook(Grid, enable_respawn, "Enable respawning", BoolHook());
-RegisterQtHook(Grid, initial_mutations, "Respawn diversity", IntegerHook(0,20));
-RegisterQtHook(Grid, enable_mutation, "Enable mutation", BoolHook());
-RegisterQtHook(Grid, mutation_color_drift, "Plumage drift", BoolHook());
-RegisterQtHook(Grid, neural_net_iterations, "Neural iterations", IntegerHook(1,10));
-RegisterQtHook(Grid, energy_decay_rate, "Energy decay rate", FloatHook(0,0.5,0.01));
+RegisterQtHook(Grid, timestep, "timestep", IntegerLabel());
+RegisterQtHook(Grid, num_creats, "population", IntegerLabel());
+RegisterQtHook(Grid, interaction_type, "interaction", EnumHook("None\nPenalty\nAttack\nZombie\nParasitism\nPredation\nMutualism\nAltruism\nGeneExchange\nGeneGive\nGeneReceive\nMate"))
+RegisterQtHook(Grid, max_age, "maximum age", IntegerHook(0,1000));
+RegisterQtHook(Grid, mutation_prob, "mutation probability", FloatHook(0, 1, 0.05));
+RegisterQtHook(Grid, initial_energy, "initial energy", IntegerHook(-50,50));
+RegisterQtHook(Grid, enable_respawn, "enable respawning", BoolHook());
+RegisterQtHook(Grid, initial_mutations, "respawn diversity", IntegerHook(0,20));
+RegisterQtHook(Grid, enable_mutation, "enable mutation", BoolHook());
+RegisterQtHook(Grid, mutation_color_drift, "plumage drift", BoolHook());
+RegisterQtHook(Grid, neural_net_iterations, "neural iterations", IntegerHook(1,10));
+RegisterQtHook(Grid, energy_decay_rate, "energy decay rate", FloatHook(0,0.5,0.01));
 
 
 RegisterVar(Grid, occupant_list)
@@ -257,6 +257,17 @@ void Grid::RemoveOccupants()
     {
         occupant_list.back()->Remove();
     }
+}
+
+Occupant* Grid::SolidOccupantAt(Pos pos)
+{
+    Occupant* occ = occupant_grid[pos.row * cols + pos.col];
+    while (occ)
+    {
+        if (occ->solid) return occ;
+        occ = occ->next;
+    }
+    return NULL;
 }
   
 Occupant* Grid::LookupOccupantByID(int search_id)

@@ -19,12 +19,12 @@ RegisterVar(Creat, alive);
 RegisterVar(Creat, energy);
 RegisterVar(Creat, marker);
 
-RegisterQtHook(Creat, energy, "Energy", FloatHook(0,100,1));
-RegisterQtHook(Creat, age, "Age", IntegerHook(0,1000));
-RegisterQtHook(Creat, interaction_count, "Interactions", IntegerLabel());
-RegisterQtHook(Creat, action, "Action", EnumHook("None\nForward\nLeft\nRight\nReproduce"));
-RegisterQtHook(Creat, state, "Neurons", MatrixHook(7, true));
-RegisterQtHook(Creat, weights, "Weights", MatrixHook(7, false));
+RegisterQtHook(Creat, energy, "energy", FloatHook(0,100,1));
+RegisterQtHook(Creat, age, "age", IntegerHook(0,1000));
+RegisterQtHook(Creat, interaction_count, "interacts", IntegerLabel());
+RegisterQtHook(Creat, action, "action", EnumHook("None\nForward\nLeft\nRight\nReproduce"));
+RegisterQtHook(Creat, state, "neurons", MatrixHook(7, true));
+RegisterQtHook(Creat, weights, "weights", MatrixHook(7, false));
 
 /*
 RegisterQtHook(Creat, orient, "Orientation", QSpinBox);
@@ -157,12 +157,12 @@ void Creat::MoveForward()
 { 
     Pos front = Front();
 
-    if (Occupant* other = grid->OccupantAt(front))
+    if (Occupant* other = grid->SolidOccupantAt(front))
     {
         other->Interact(*this);
         interaction_count++;
         interacted = true;
-    } else 
+    } else
     {
         interacted = false;
         Move(front);

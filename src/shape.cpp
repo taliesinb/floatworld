@@ -8,14 +8,14 @@ RegisterVar(Shape, energy);
 RegisterVar(Shape, ratio);
 RegisterVar(Shape, p_jump);
 
-RegisterQtHook(Shape, threshold, "Energy maximum", FloatHook(-50,50,0.25));
-RegisterQtHook(Shape, energy, "Energy increment", FloatHook(-5,5,0.1));
-RegisterQtHook(Shape, ratio,  "Fill ratio", FloatHook(0,1,0.1));
-RegisterQtHook(Shape, p_jump, "Jump probability", FloatHook(0, 1, 0.001));
+RegisterQtHook(Shape, threshold, "Emax", FloatHook(-50,50,0.25));
+RegisterQtHook(Shape, energy, "Einc", FloatHook(-5,5,0.1));
+RegisterQtHook(Shape, ratio,  "fill", FloatHook(0,1,0.1));
+RegisterQtHook(Shape, p_jump, "pjump", FloatHook(0, 1, 0.001));
 
 RegisterClass(Circle, Shape);
 RegisterVar(Circle, radius);
-RegisterQtHook(Circle, radius, "Radius", IntegerHook(0, 100));
+RegisterQtHook(Circle, radius, "radius", IntegerHook(0, 100));
 
 /*
 RegisterClass(GaussianCircle, Circle);
@@ -38,6 +38,7 @@ Shape::Shape()
     ratio(1.0),
     p_jump(0.01)
 {
+    solid = false;
 }
 
 void Shape::Draw(Matrix& m)

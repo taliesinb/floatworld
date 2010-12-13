@@ -111,10 +111,21 @@ void Object::Reset()
 {
 }
 
-HookManager* Object::SetupQtHook()
+HookManager* Object::SetupQtHook(bool title)
 {
     assert (qt_hook == NULL);
     qt_hook = new HookManager(&GetClass(), this);
+    if (title)
+    {
+        QLabel* label = new QLabel;
+        label->setText(GetClass().name);
+        QFont font;
+        font.setPointSize(15);
+        font.setBold(true);
+        label->setFont(font);
+        label->setAlignment(Qt::AlignHCenter);
+        qt_hook->addRow("type", label);
+    }
     qt_hook->ConstructChildren();
     qt_hook->UpdateChildren();
     return qt_hook;

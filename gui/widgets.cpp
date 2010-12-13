@@ -286,7 +286,7 @@ void GridWidget::SelectOccupant(Occupant *occ)
 
         selected_occupant = occ;
 
-        HookManager* hm = occ->SetupQtHook();
+        HookManager* hm = occ->SetupQtHook(true);
         connect(hm, SIGNAL(value_changed()), this,
                 SLOT(Draw()));
         connect(hm, SIGNAL(being_removed()), this,
@@ -314,17 +314,17 @@ void GridWidget::SelectNextOccupant(bool forward)
     Pos p = matrix_label->highlighted.Wrap(grid->rows, grid->cols);
     int sz = grid->rows * grid->cols;
     int start = p.row * grid->cols + p.col;
-    int index = start + (forward ? 1 : -1);
+    int index = start;
     do {
+        index += (forward ? 1 : -1);
+        index += sz;
+        index %= sz;
         Occupant* occ = grid->occupant_grid[index];
         if (occ)
         {
             SelectOccupant(occ);
             return;
         }
-        index += (forward ? 1 : -1);
-        index += sz;
-        index %= sz;
     } while (index != start);
     Draw();
 }

@@ -105,6 +105,7 @@ public:
     Creat& AddCreatAt(Pos pos, int orient=0);
     void AddCreats(int number, bool fairly);
     void RemoveOccupants();
+    Occupant* SolidOccupantAt(Pos pos);
     Occupant* LookupOccupantByID(int id);
     Creat* FindCreat(int marker);
     inline Occupant*& OccupantAt(Pos pos)

@@ -23,7 +23,7 @@ public:
     void Read(std::istream& is);
 
     virtual void Reset();
-    HookManager* SetupQtHook();
+    HookManager* SetupQtHook(bool title);
     void UpdateQtHook();
     void DeleteQtHook();
     void SignalQtHook();

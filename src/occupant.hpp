@@ -18,6 +18,7 @@ class Occupant : public Object
     Pos pos;
     float signature;
     int id;
+    bool solid;
 
     virtual void Interact(Creat& c);
     virtual void Update();

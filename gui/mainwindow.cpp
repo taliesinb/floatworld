@@ -79,7 +79,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     gridWidget->Draw();
 
-    grid->SetupQtHook();
+    grid->SetupQtHook(false);
     gridBox->setLayout(grid->qt_hook);
 
     speed_group.addAction(actionPlaySlowest);

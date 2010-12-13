@@ -9,7 +9,7 @@ RegisterClass(Block, Occupant);
 
 RegisterClass(RewardBlock, Block);
 RegisterVar(RewardBlock, reward);
-RegisterQtHook(RewardBlock, reward, "Energy reward", IntegerHook(-100,100));
+RegisterQtHook(RewardBlock, reward, "ereward", IntegerHook(-100,100));
 
 RegisterClass(MoveableBlock, RewardBlock);
 
@@ -18,15 +18,15 @@ RegisterVar(SkinnerBlock, touch_count);
 RegisterVar(SkinnerBlock, threshold);
 RegisterVar(SkinnerBlock, radius);
 
-RegisterQtHook(SkinnerBlock, touch_count, "Touch count", IntegerHook(0,100));
-RegisterQtHook(SkinnerBlock, threshold, "Threshold", IntegerHook(0,20));
-RegisterQtHook(SkinnerBlock, radius, "Radius", IntegerHook(1,20));
+RegisterQtHook(SkinnerBlock, touch_count, "count", IntegerHook(0,100));
+RegisterQtHook(SkinnerBlock, threshold, "threshold", IntegerHook(0,20));
+RegisterQtHook(SkinnerBlock, radius, "radius", IntegerHook(1,20));
 
 RegisterClass(PhasedSkinnerBlock, SkinnerBlock);
 RegisterVar(PhasedSkinnerBlock, period);
 RegisterVar(PhasedSkinnerBlock, phase);
-RegisterQtHook(PhasedSkinnerBlock, period, "Period", IntegerHook(1,20));
-RegisterQtHook(PhasedSkinnerBlock, phase, "Phase", BoolHook());
+RegisterQtHook(PhasedSkinnerBlock, period, "period", IntegerHook(1,20));
+RegisterQtHook(PhasedSkinnerBlock, phase, "phase", BoolHook());
 
 Block::Block()
 {
