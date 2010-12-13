@@ -102,12 +102,12 @@
    <addaction name="actionSave"/>
    <addaction name="separator"/>
    <addaction name="actionStop"/>
-   <addaction name="actionPlay1_4"/>
-   <addaction name="actionPlay1_2"/>
-   <addaction name="actionPlay1"/>
-   <addaction name="actionPlay2"/>
-   <addaction name="actionPlay4"/>
-   <addaction name="actionActionFF"/>
+   <addaction name="actionPlaySlowest"/>
+   <addaction name="actionPlaySlow"/>
+   <addaction name="actionPlayNormal"/>
+   <addaction name="actionPlayFast"/>
+   <addaction name="actionPlayFastest"/>
+   <addaction name="actionFF"/>
    <addaction name="separator"/>
    <addaction name="actionStep"/>
    <addaction name="actionIndividualStep"/>
@@ -131,9 +131,7 @@
    <attribute name="dockWidgetArea">
     <number>1</number>
    </attribute>
-   <widget class="QWidget" name="gridBox">
-    <zorder>gridWidget</zorder>
-   </widget>
+   <widget class="QWidget" name="gridBox"/>
   </widget>
   <widget class="QDockWidget" name="dockInspector">
    <property name="minimumSize">
@@ -153,7 +151,10 @@
    </attribute>
    <widget class="QWidget" name="occupantBox"/>
   </widget>
-  <action name="actionPlay1">
+  <action name="actionPlayNormal">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="floatworld.qrc">
      <normaloff>:/icons/play-2.png</normaloff>:/icons/play-2.png</iconset>
@@ -162,19 +163,25 @@
     <string>Play</string>
    </property>
    <property name="toolTip">
-    <string>Ordinary speed</string>
+    <string>10 updates per second</string>
    </property>
    <property name="shortcut">
     <string>Space</string>
    </property>
   </action>
   <action name="actionStop">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="floatworld.qrc">
      <normaloff>:/icons/red-stop.png</normaloff>:/icons/red-stop.png</iconset>
    </property>
    <property name="text">
     <string>Stop</string>
+   </property>
+   <property name="toolTip">
+    <string>Pause simulation</string>
    </property>
    <property name="shortcut">
     <string>Esc</string>
@@ -236,7 +243,10 @@
     <string>Close</string>
    </property>
   </action>
-  <action name="actionPlay2">
+  <action name="actionPlayFast">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="floatworld.qrc">
      <normaloff>:/icons/play-3.png</normaloff>:/icons/play-3.png</iconset>
@@ -245,7 +255,7 @@
     <string>Fast</string>
    </property>
    <property name="toolTip">
-    <string>2x speed</string>
+    <string>40 updates per second</string>
    </property>
   </action>
   <action name="actionIndividualStep">
@@ -293,7 +303,10 @@
     <string>&lt;</string>
    </property>
   </action>
-  <action name="actionPlay1_2">
+  <action name="actionPlaySlow">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="floatworld.qrc">
      <normaloff>:/icons/play-1.png</normaloff>:/icons/play-1.png</iconset>
@@ -302,10 +315,13 @@
     <string>Slow</string>
    </property>
    <property name="toolTip">
-    <string>1/4 speed</string>
+    <string>4 updates per second</string>
    </property>
   </action>
-  <action name="actionPlay1_4">
+  <action name="actionPlaySlowest">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="floatworld.qrc">
      <normaloff>:/icons/play-0.png</normaloff>:/icons/play-0.png</iconset>
@@ -314,10 +330,13 @@
     <string>Slowest</string>
    </property>
    <property name="toolTip">
-    <string>1/20 speed</string>
+    <string>1 update per second</string>
    </property>
   </action>
-  <action name="actionPlay4">
+  <action name="actionPlayFastest">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="floatworld.qrc">
      <normaloff>:/icons/play-4.png</normaloff>:/icons/play-4.png</iconset>
@@ -326,19 +345,25 @@
     <string>Fastest</string>
    </property>
    <property name="toolTip">
-    <string>8x speed</string>
+    <string>160 updates per second</string>
    </property>
   </action>
-  <action name="actionActionFF">
+  <action name="actionFF">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="floatworld.qrc">
      <normaloff>:/icons/blue-right-right.png</normaloff>:/icons/blue-right-right.png</iconset>
    </property>
    <property name="text">
-    <string>actionFF</string>
+    <string>Fast forward</string>
    </property>
    <property name="toolTip">
-    <string>Fast-forward</string>
+    <string>Hold to fast forward</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Return</string>
    </property>
   </action>
  </widget>

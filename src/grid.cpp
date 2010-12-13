@@ -30,9 +30,10 @@ RegisterVar(Grid, mutation_sd)
 RegisterVar(Grid, draw_type)
 RegisterVar(Grid, draw_creats_only)
 
-//RegisterQtHook(Grid, draw_type, "Display method", EnumHook("Action\nAge\nEnergy\nPlumage"));
-//RegisterQtHook(Grid, draw_creats_only, "Creats only", BoolHook());
+RegisterQtHook(Grid, draw_type, "Display method", EnumHook("Action\nAge\nEnergy\nPlumage"));
+RegisterQtHook(Grid, draw_creats_only, "Creats only", BoolHook());
 RegisterQtHook(Grid, timestep, "Timestep", IntegerLabel());
+RegisterQtHook(Grid, num_creats, "Population", IntegerLabel());
 RegisterQtHook(Grid, max_age, "Maximum age", IntegerHook(0,1000));
 RegisterQtHook(Grid, mutation_prob, "Mutation probability", FloatHook(0, 1, 0.05));
 RegisterQtHook(Grid, initial_energy, "Initial energy", IntegerHook(-50,50));
@@ -506,7 +507,9 @@ void Grid::Step()
     list<Occupant*>::iterator it = occupant_list.begin();
     while (it != occupant_list.end())
     {
-        (*it++)->Update();
+        Occupant* occ = *it++;
+        occ->Update();
+        if (hooks_enabled) occ->UpdateQtHook();
     }
 
     if (energy_decay_rate != 0.0) energy *= (1.0 - energy_decay_rate);

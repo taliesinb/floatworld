@@ -27,22 +27,22 @@ public:
     float stepper;
     float last_stepper;
     Grid* grid;
+    QAction* previous_speed;
+    QActionGroup speed_group;
     MainWindow(QWidget *parent = 0);
 
     void SetSpeed(float speed);
 
 private slots:
 
-    void on_actionPlay1_4_triggered();
-    void on_actionPlay1_2_triggered();
-    void on_actionPlay1_triggered();
-    void on_actionPlay2_triggered();
-    void on_actionPlay4_triggered();
-    void on_actionStop_triggered();
+    void speed_trigger(QAction*);
     void on_actionStep_triggered();
     void on_actionIndividualStep_triggered();
     void on_actionNextOccupant_triggered();
     void on_actionPrevOccupant_triggered();
+
+    void ff_pressed();
+    void ff_released();
 
     void on_actionSave_triggered();
     void on_actionLoad_triggered();

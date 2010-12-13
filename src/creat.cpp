@@ -417,7 +417,6 @@ void Creat::Step()
     if (energy > 0) (this->*(grid->action_lookup[action]))();
 
     if (energy < 0 || age > grid->max_age) Remove();
-    else if (grid->hooks_enabled) UpdateQtHook();
 }
 
 void Creat::__Remove()

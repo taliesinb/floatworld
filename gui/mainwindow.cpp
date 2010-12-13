@@ -2,6 +2,8 @@
 
 #include <fstream>
 #include <QFileDialog>
+#include <QToolButton>
+#include <QWidget>
 #include "qthooks.hpp"
 
 using namespace std;
@@ -9,7 +11,8 @@ using namespace std;
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
     adam(Creat::hidden + Creat::outputs, Creat::neurons),
-    speed(0), stepper(0), last_stepper(0)
+    speed(0), stepper(0), last_stepper(0),
+    previous_speed(NULL), speed_group(this)
 {
     setupUi(this);
 
@@ -38,7 +41,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     grid->max_age = 120;
 
-    for (int i = 0; i < 12; i++)
+    for (int i = 0; i < 6; i++)
     {
         Circle* c = new Circle;
         c->Attach(*grid, grid->RandomCell());
@@ -56,14 +59,14 @@ MainWindow::MainWindow(QWidget *parent)
 
     grid->AddCreats(30, true);
 
-    for (int k = 0; k < 0; k++)
+    for (int k = 0; k < 50; k++)
     {
         Occupant* block = new SkinnerBlock();
         block->Attach(*grid, grid->RandomCell());
         block->AssignID();
     }
 
-    for (int k = 0; k < 100; k++)
+    for (int k = 0; k < 0; k++)
     {
         Occupant* block = new MoveableBlock();
         block->Attach(*grid, grid->RandomCell());
@@ -79,60 +82,105 @@ MainWindow::MainWindow(QWidget *parent)
     grid->SetupQtHook();
     gridBox->setLayout(grid->qt_hook);
 
+    speed_group.addAction(actionPlaySlowest);
+    speed_group.addAction(actionPlaySlow);
+    speed_group.addAction(actionPlayNormal);
+    speed_group.addAction(actionPlayFast);
+    speed_group.addAction(actionPlayFastest);
+    speed_group.addAction(actionStop);
+    actionStop->setChecked(true);
+    speed_group.setExclusive(true);
+    connect(&speed_group, SIGNAL(triggered(QAction*)), this, SLOT(speed_trigger(QAction*)));
+
     connect(grid->qt_hook, SIGNAL(value_changed()), gridWidget, SLOT(Draw()));
     connect(gridWidget, SIGNAL(OccupantSelected(Occupant*)), this, SLOT(DisplayInspector(Occupant*)));
 
-    gridWidget->setMaximumSize(gridWidget->sizeHint()); // 30 30 is bad, it oscillates!
+    gridWidget->setMaximumSize(gridWidget->sizeHint());
     resize(5000,5000); // force a resize to the maximum size
+
+    // hunt out the fast forward button and hack some callbacks onto it
+    QList<QWidget*> list = actionFF->associatedWidgets();
+    for_iterate(it, list)
+    {
+        QToolButton* button = dynamic_cast<QToolButton*>(*it);
+        if (button)
+        {
+            connect(button, SIGNAL(pressed()), this, SLOT(ff_pressed()));
+            connect(button, SIGNAL(released()), this, SLOT(ff_released()));
+            button->setAutoRepeat(false);
+        }
+    }
 }
 
 void MainWindow::SetSpeed(float s)
 {
     if (speed == s)
-        on_actionStop_triggered();
+        actionStop->trigger();
     else
     {
         speed = s;
         if (s >= 1)
             fast_timer.start(0);
-        else
+        else if (fast_timer.isActive())
             fast_timer.stop();
+    }
+    gridWidget->Draw();
+}
+
+void MainWindow::speed_trigger(QAction* action)
+{
+    if (action == actionPlaySlowest) SetSpeed(0.05);
+    if (action == actionPlaySlow) SetSpeed(0.2);
+    if (action == actionPlayNormal) SetSpeed(0.5);
+    if (action == actionPlayFast) SetSpeed(2.0);
+    if (action == actionPlayFastest) SetSpeed(8.0);
+
+    if (action == actionStop) {
+        speed = 0;
+        fast_timer.stop();
     }
 }
 
-void MainWindow::on_actionPlay1_4_triggered()
-{
-    SetSpeed(0.05);
-}
-
-void MainWindow::on_actionPlay1_2_triggered()
-{
-    SetSpeed(0.2);
-}
-
-
-void MainWindow::on_actionPlay1_triggered()
-{
-    SetSpeed(0.5);
-}
-
-void MainWindow::on_actionPlay2_triggered()
-{
-    SetSpeed(2.0);
-}
-
-void MainWindow::on_actionPlay4_triggered()
+void MainWindow::ff_pressed()
 {
     SetSpeed(8.0);
 }
 
-void MainWindow::on_actionStop_triggered()
+void MainWindow::ff_released()
 {
-    speed = 0;
-    fast_timer.stop();
-    //actionPlay1->setProperty("visible", true);
-    //actionStop->setProperty("visible", false);
+    speed_trigger(speed_group.checkedAction());
+
 }
+
+void MainWindow::calculateStep()
+{
+    grid->hooks_enabled = false;
+    grid->Step();
+    grid->hooks_enabled = true;
+
+    if (stepper++ > last_stepper + speed)
+        fast_timer.stop();
+    cout << "fstep" << endl;
+}
+
+void MainWindow::takeStep()
+{
+    if (!speed) return;
+
+    if (stepper > ceil(last_stepper + speed))
+    {
+        last_stepper = stepper;
+        grid->Step();
+        grid->UpdateQtHook();
+        gridWidget->Draw();
+    }
+
+    if (speed < 1)
+        stepper += speed;
+    else if (!fast_timer.isActive())
+        fast_timer.start(0);
+}
+
 
 void MainWindow::on_actionStep_triggered()
 {
@@ -182,33 +230,6 @@ void MainWindow::on_actionLoad_triggered()
     }
     grid->UpdateQtHook();
     gridWidget->Draw();
-}
-
-void MainWindow::calculateStep()
-{
-    grid->hooks_enabled = false;
-    grid->Step();
-    grid->hooks_enabled = true;
-
-    if (stepper++ > last_stepper + speed)
-        fast_timer.stop();
-}
-
-void MainWindow::takeStep()
-{
-    if (!speed) return;
-
-    if (stepper > ceil(last_stepper + speed))
-    {
-        last_stepper = stepper;
-        grid->Step();
-        grid->UpdateQtHook();
-        gridWidget->Draw();
-    }
-    if (speed < 1)
-        stepper += speed;
-    else
-        fast_timer.start(0);
 }
 
 void MainWindow::DisplayInspector(Occupant *occ)
