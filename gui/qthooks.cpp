@@ -6,6 +6,20 @@
 
 using namespace std;
 
+IntLabel::IntLabel() : Hook(NULL)
+{
+    setFrameStyle(QFrame::Panel | QFrame::Sunken);
+    setStyleSheet( "background-color: white" );
+    QFont font;
+    font.setPointSize(10);
+    setFont(font);
+}
+
+void IntLabel::Synchronize(bool inbound)
+{
+    if (inbound) setNum(*reinterpret_cast<int*>(ptr));
+}
+
 IntWidget::IntWidget(int _min, int _max) : Hook(SIGNAL(valueChanged(int)))
 {
     setRange(_min, _max);
@@ -148,7 +162,8 @@ void HookManager::ConstructChildren()
     for (int i = 0; i < mclass->nqvars; i++)
     {
         QWidget* widget = (*mclass->factories[i])(object);
-        QObject::connect(widget, dynamic_cast<Hook*>(widget)->changesignal, this, SLOT(child_changed()));
+        const char* sig = dynamic_cast<Hook*>(widget)->changesignal;
+        if (sig) QObject::connect(widget, sig, this, SLOT(child_changed()));
         addRow(mclass->labels[i], widget);
         widgets.push_back(widget);
     }

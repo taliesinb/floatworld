@@ -55,3 +55,8 @@ Hook* MatrixHook(int size, bool flip)
 {
     return new MatrixWidget(size, flip);
 }
+
+Hook* IntegerLabel()
+{
+    return new IntLabel;
+}

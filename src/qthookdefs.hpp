@@ -18,6 +18,7 @@ public:
     virtual void Synchronize(bool inbound);
 };
 
+Hook* IntegerLabel();
 Hook* IntegerHook(int min, int max);
 Hook* FloatHook(float min, float max, float step);
 Hook* BoolHook();

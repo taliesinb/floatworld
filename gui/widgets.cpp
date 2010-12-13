@@ -91,7 +91,7 @@ void MatrixLabel::paintEvent(QPaintEvent*)
     if (highlighted.Inside(h, w))
     {
         QPen pen;
-        pen.setWidth(2);
+        pen.setWidth(1);
         pen.setColor(QColor(255,255,255,100));
         painter.setPen(pen);
         painter.drawEllipse(QPoint(

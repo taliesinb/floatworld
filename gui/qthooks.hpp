@@ -19,6 +19,14 @@ class Class;
 class Object;
 class Matrix;
 
+class IntLabel : public QLabel, public Hook
+{
+public:
+    IntLabel();
+
+    virtual void Synchronize(bool inbound);
+};
+
 class IntWidget : public QSpinBox, public Hook
 {
 public:
