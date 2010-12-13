@@ -48,6 +48,8 @@ RegisterVar(Grid, draw_creats_only)
 
 RegisterQtHook(Grid, draw_type, "Display method", EnumHook("Action\nAge\nEnergy\nPlumage"));
 RegisterQtHook(Grid, draw_creats_only, "Creats only", BoolHook());
+
+RegisterQtHook(Grid, interaction_type, "Interactions", EnumHook("None\nPenalty\nAttack\nZombie\nParasitism\nPredation\nMutualism\nAltruism\nGeneExchange\nGeneGive\nGeneReceive\nMate"))
 RegisterQtHook(Grid, timestep, "Timestep", IntegerLabel());
 RegisterQtHook(Grid, num_creats, "Population", IntegerLabel());
 RegisterQtHook(Grid, max_age, "Maximum age", IntegerHook(0,1000));
@@ -97,8 +99,6 @@ void read_grid_occupant_order(Grid* g, std::istream& s)
 RegisterCustomVar(Grid, occupant_order, write_grid_occupant_order, read_grid_occupant_order)
 
 using namespace std;
-
-const char* interactionnames[] = {"None", "Wastage","Parasitism", "Predation", "Co-operation", "Gene Swap", "Gene Give", "Gene Receive", "Gene Symmetric", NULL};
 
 Grid::Grid()
 {

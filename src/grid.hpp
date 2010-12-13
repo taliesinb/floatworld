@@ -11,14 +11,17 @@ class Creat;
 enum InteractionMode
 {
     NoInteraction,
-    Wastage,
+    Penalty,
+    Attack,
+    Zombie,
     Parasitism,
     Predation,
-    Cooperation,
+    MutualCooperation,
+    AltruisticCooperation,
     GeneExchange,
     GeneGive,
     GeneReceive,
-    GeneSymmetric,
+    GeneSymmetric
 };
 
 enum {

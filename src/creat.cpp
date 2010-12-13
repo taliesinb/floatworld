@@ -198,29 +198,40 @@ void Creat::Interaction(Creat& other)
         case NoInteraction:
             break;
 
-        case Wastage:
+        case Penalty:
             energy -= 30;
+            break;
+
+        case Attack:
+            energy -= 10;
+            other.energy -= 50;
+            break;
+
+        case Zombie:
+            energy -= 80;
+            if (energy > 0) other.weights = weights;
             break;
       
         case Parasitism:
-            energy -= 20;
-            other.weights = weights;
-            break;
-      
-        case Predation: 
-            other.TransferEnergy(*this, RandFloat(50,100));
+            other.TransferEnergy(*this, RandFloat(30,60));
             break;
 
-        case Cooperation: 
-            energy += 0;
-            other.energy += 20;
-            //energy(pos) = -10;
-            //energy(other.pos) = -10;
-            //energy(other.pos) = 20;
+        case Predation:
+            other.TransferEnergy(*this, 100);
+            break;
+
+        case MutualCooperation:
+            energy += 30;
+            other.energy += 30;
+            break;
+
+        case AltruisticCooperation:
+            energy -= 5;
+            other.energy += 30;
             break;
 
         case GeneExchange: 
-            energy -= 4;
+            energy -= 10;
             if (energy > 0) ShuffleBrains(weights, other.weights);
             break;
 

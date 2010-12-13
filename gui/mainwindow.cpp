@@ -21,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent)
     // setup creatures
     Creat::Setup();
 
-    grid->interaction_type = Wastage;
+    grid->interaction_type = Penalty;
 
     // setup adam:
     grid->initial_brain = &adam;
