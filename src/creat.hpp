@@ -60,8 +60,10 @@ public:
     int action;
     int age;
     int orient;
+    int interaction_count;
     bool possessed;
     bool alive;
+    bool interacted;
     float energy;
     float marker;
 

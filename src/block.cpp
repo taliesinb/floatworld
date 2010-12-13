@@ -63,7 +63,8 @@ SkinnerBlock::SkinnerBlock()
 {
     touch_count = _touch_count = 0;
     threshold = 8;
-    reward = 40;
+    reward = 20;
+    radius = 5;
     draw_hue = 0.1;
 }
 

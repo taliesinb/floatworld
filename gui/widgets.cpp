@@ -12,7 +12,7 @@
 
 using namespace std;
 
-int sz = 150;
+int sz = 120;
 int border = 3;
 
 MatrixLabel::MatrixLabel(QWidget* parent)
@@ -124,7 +124,7 @@ GridWidget::GridWidget(QWidget* parent) :
     scroll_area = new QScrollArea;
     matrix_label = new MatrixLabel;
 
-    matrix_label->pixel_scale = 4;
+    matrix_label->pixel_scale = 6;
     matrix_label->AllocateImage(sz, sz);
     scroll_area->setWidgetResizable(true);
     scroll_area->setLineWidth(0);
@@ -212,11 +212,12 @@ void GridWidget::Rerender()
                     switch (creat->action)
                     {
                     case ActionNone: color.setRgb(150, 50, 50); break;
-                    case ActionForward: color.setRgb(80, 80, 80); break;
+                    case ActionForward: color.setRgb(150, 150, 150); break;
                     case ActionLeft: color.setRgb(180, 120, 50); break;
                     case ActionRight: color.setRgb(120, 50, 180); break;
                     case ActionReproduce: color.setRgb(0, 255, 0); break;
                     }
+                    if (creat->interacted) color.setRgb(255, 0, 0);
                 }}
             } else if (Block* block = dynamic_cast<Block*>(occ))
             {

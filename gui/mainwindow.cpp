@@ -12,7 +12,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
     adam(Creat::hidden + Creat::outputs, Creat::neurons),
     speed(0), stepper(0), last_stepper(0),
-    previous_speed(NULL), speed_group(this)
+    speed_group(this)
 {
     setupUi(this);
 
@@ -59,7 +59,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     grid->AddCreats(30, true);
 
-    for (int k = 0; k < 50; k++)
+    for (int k = 0; k < 20; k++)
     {
         Occupant* block = new SkinnerBlock();
         block->Attach(*grid, grid->RandomCell());
@@ -160,7 +160,6 @@ void MainWindow::calculateStep()
 
     if (stepper++ > last_stepper + speed)
         fast_timer.stop();
-    cout << "fstep" << endl;
 }
 
 void MainWindow::takeStep()
@@ -211,7 +210,7 @@ void MainWindow::on_actionSave_triggered()
     {
         ofstream f;
         f.open(fileName.toUtf8());
-        f << gridWidget->grid << endl;
+        f << *gridWidget->grid << endl;
         f.close();
     }
 }
@@ -225,7 +224,7 @@ void MainWindow::on_actionLoad_triggered()
     {
         ifstream f;
         f.open(fileName.toUtf8());
-        f >> *(gridWidget->grid);
+        f >> *gridWidget->grid;
         f.close();
     }
     grid->UpdateQtHook();

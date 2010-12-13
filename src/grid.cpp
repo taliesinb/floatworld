@@ -5,7 +5,23 @@
 
 #include <QPainter>
 
+using namespace std;
+
 RegisterClass(Grid, None)
+
+void write_grid_size(Grid* g, std::ostream& s)
+{
+    s << "[" << g->rows << ", " << g->cols << "]";
+}
+
+void read_grid_size(Grid* g, std::istream& s)
+{
+    int rows, cols;
+    s >> "[" >> rows >> ", " >> cols >> "]";
+    g->SetSize(rows, cols);
+}
+RegisterCustomVar(Grid, size, write_grid_size, read_grid_size)
+
 RegisterVar(Grid, energy)
 RegisterVar(Grid, energy_decay_rate)
 RegisterVar(Grid, timestep)
@@ -44,20 +60,6 @@ RegisterQtHook(Grid, mutation_color_drift, "Plumage drift", BoolHook());
 RegisterQtHook(Grid, neural_net_iterations, "Neural iterations", IntegerHook(1,10));
 RegisterQtHook(Grid, energy_decay_rate, "Energy decay rate", FloatHook(0,0.5,0.01));
 
-using namespace std;
-
-void write_grid_size(Grid* g, std::ostream& s)
-{
-    s << "[" << g->rows << ", " << g->cols << "]";
-}
-
-void read_grid_size(Grid* g, std::istream& s)
-{
-    int rows, cols;
-    s >> "[" >> rows >> ", " >> cols >> "]";
-    g->SetSize(rows, cols);
-}
-RegisterCustomVar(Grid, size, write_grid_size, read_grid_size)
 
 RegisterVar(Grid, occupant_list)
 

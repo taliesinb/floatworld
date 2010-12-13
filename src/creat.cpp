@@ -21,6 +21,7 @@ RegisterVar(Creat, marker);
 
 RegisterQtHook(Creat, energy, "Energy", FloatHook(0,100,1));
 RegisterQtHook(Creat, age, "Age", IntegerHook(0,1000));
+RegisterQtHook(Creat, interaction_count, "Interactions", IntegerLabel());
 RegisterQtHook(Creat, action, "Action", EnumHook("None\nForward\nLeft\nRight\nReproduce"));
 RegisterQtHook(Creat, state, "Neurons", MatrixHook(7, true));
 RegisterQtHook(Creat, weights, "Weights", MatrixHook(7, false));
@@ -76,6 +77,8 @@ void Creat::Reset()
     state.SetZero();
     age = 0;
     fingerprint = 0;
+    interacted = false;
+    interaction_count = 0;
     for (int k = 0; k < 64; k++) { fingerprint <<= 1; fingerprint |= RandBit(); }
     action = ActionNone;
     possessed = false;
@@ -157,8 +160,11 @@ void Creat::MoveForward()
     if (Occupant* other = grid->OccupantAt(front))
     {
         other->Interact(*this);
+        interaction_count++;
+        interacted = true;
     } else 
     {
+        interacted = false;
         Move(front);
         float de = grid->energy(front);
         energy += de;

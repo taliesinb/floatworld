@@ -27,10 +27,9 @@ public:
     float stepper;
     float last_stepper;
     Grid* grid;
-    QAction* previous_speed;
     QActionGroup speed_group;
-    MainWindow(QWidget *parent = 0);
 
+    MainWindow(QWidget *parent = 0);
     void SetSpeed(float speed);
 
 private slots:
