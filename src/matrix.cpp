@@ -340,8 +340,8 @@ istream& operator>>(istream& is, Matrix& m)
     list<list<float> > entries;
     is >> entries;
 
-    int cols = entries.front().size();
-    int rows = entries.size();
+    unsigned int cols = static_cast<unsigned int>(entries.front().size());
+    unsigned int rows = static_cast<unsigned int>(entries.size());
     for_iterate(r, entries)
         assert (cols == r->size());
 

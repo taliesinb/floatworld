@@ -9,7 +9,7 @@ using namespace std;
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
     adam(Creat::hidden + Creat::outputs, Creat::neurons),
-    speed(0), stepper(0), speed_multiplier(4)
+    speed(0), stepper(0), last_stepper(0)
 {
     setupUi(this);
 
@@ -71,7 +71,8 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
     connect(&timer, SIGNAL(timeout()), this, SLOT(takeStep()));
-    timer.start(5);
+    connect(&fast_timer, SIGNAL(timeout()), this, SLOT(calculateStep()));
+    timer.start(20);
 
     gridWidget->Draw();
 
@@ -85,19 +86,52 @@ MainWindow::MainWindow(QWidget *parent)
     resize(5000,5000); // force a resize to the maximum size
 }
 
-
-void MainWindow::on_actionPlay_triggered()
+void MainWindow::SetSpeed(float s)
 {
-    speed = 1;
-    this->actionPlay->setProperty("visible", false);
-    this->actionStop->setProperty("visible", true);
+    if (speed == s)
+        on_actionStop_triggered();
+    else
+    {
+        speed = s;
+        if (s >= 1)
+            fast_timer.start(0);
+        else
+            fast_timer.stop();
+    }
+}
+
+void MainWindow::on_actionPlay1_4_triggered()
+{
+    SetSpeed(0.05);
+}
+
+void MainWindow::on_actionPlay1_2_triggered()
+{
+    SetSpeed(0.2);
+}
+
+
+void MainWindow::on_actionPlay1_triggered()
+{
+    SetSpeed(0.5);
+}
+
+void MainWindow::on_actionPlay2_triggered()
+{
+    SetSpeed(2.0);
+}
+
+void MainWindow::on_actionPlay4_triggered()
+{
+    SetSpeed(8.0);
 }
 
 void MainWindow::on_actionStop_triggered()
 {
     speed = 0;
-    this->actionPlay->setProperty("visible", true);
-    this->actionStop->setProperty("visible", false);
+    fast_timer.stop();
+    //actionPlay1->setProperty("visible", true);
+    //actionStop->setProperty("visible", false);
 }
 
 void MainWindow::on_actionStep_triggered()
@@ -118,16 +152,6 @@ void MainWindow::on_actionPrevOccupant_triggered()
 void MainWindow::on_actionNextOccupant_triggered()
 {
     gridWidget->SelectNextOccupant(true);
-}
-
-void MainWindow::on_actionFast_triggered()
-{
-    speed *= speed_multiplier;
-}
-
-void MainWindow::on_actionSlow_triggered()
-{
-    speed /= speed_multiplier;
 }
 
 void MainWindow::on_actionSave_triggered()
@@ -160,20 +184,31 @@ void MainWindow::on_actionLoad_triggered()
     gridWidget->Draw();
 }
 
+void MainWindow::calculateStep()
+{
+    grid->hooks_enabled = false;
+    grid->Step();
+    grid->hooks_enabled = true;
+
+    if (stepper++ > last_stepper + speed)
+        fast_timer.stop();
+}
+
 void MainWindow::takeStep()
 {
     if (!speed) return;
-    if (speed < 1)
+
+    if (stepper > ceil(last_stepper + speed))
     {
-        float thresh = floor(stepper);
+        last_stepper = stepper;
+        grid->Step();
+        grid->UpdateQtHook();
+        gridWidget->Draw();
+    }
+    if (speed < 1)
         stepper += speed;
-        if (stepper > thresh + 0.9999)
-        {
-            stepper = 0;
-            grid->Step();
-        }
-    } else grid->Run(int(round(speed)), 100);
-    gridWidget->Draw();
+    else
+        fast_timer.start(0);
 }
 
 void MainWindow::DisplayInspector(Occupant *occ)

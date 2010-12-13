@@ -64,8 +64,11 @@ Creat::Creat()
     pos.row = pos.col = 0;
 }
 
-Creat::Creat(const Creat &c)
-{ throw "creat being copied"; }
+Creat::Creat(const Creat &c) : Occupant()
+{
+    cerr << "creat being copied from creat with id: " << c.id << endl;
+    throw "error";
+}
 
 void Creat::Reset()
 {
@@ -414,7 +417,7 @@ void Creat::Step()
     if (energy > 0) (this->*(grid->action_lookup[action]))();
 
     if (energy < 0 || age > grid->max_age) Remove();
-    else UpdateQtHook();
+    else if (grid->hooks_enabled) UpdateQtHook();
 }
 
 void Creat::__Remove()

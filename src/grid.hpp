@@ -80,6 +80,8 @@ public:
     void Paint(QPainter& painter);
     void Paint(QImage& image);
 
+    bool hooks_enabled;
+
     // State change
     Grid();
     virtual void Reset();

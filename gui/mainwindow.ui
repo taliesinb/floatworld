@@ -23,10 +23,10 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Floatworld</string>
   </property>
   <property name="toolButtonStyle">
-   <enum>Qt::ToolButtonTextOnly</enum>
+   <enum>Qt::ToolButtonIconOnly</enum>
   </property>
   <property name="animated">
    <bool>false</bool>
@@ -69,7 +69,7 @@
     <property name="title">
      <string>Grid</string>
     </property>
-    <addaction name="actionGrid"/>
+    <addaction name="actionNew"/>
     <addaction name="actionSave"/>
     <addaction name="actionLoad"/>
     <addaction name="actionClose"/>
@@ -98,12 +98,21 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionLoad"/>
+   <addaction name="actionSave"/>
+   <addaction name="separator"/>
    <addaction name="actionStop"/>
-   <addaction name="actionPlay"/>
-   <addaction name="actionSlow"/>
-   <addaction name="actionFast"/>
+   <addaction name="actionPlay1_4"/>
+   <addaction name="actionPlay1_2"/>
+   <addaction name="actionPlay1"/>
+   <addaction name="actionPlay2"/>
+   <addaction name="actionPlay4"/>
+   <addaction name="actionActionFF"/>
+   <addaction name="separator"/>
    <addaction name="actionStep"/>
    <addaction name="actionIndividualStep"/>
+   <addaction name="actionPrevOccupant"/>
+   <addaction name="actionNextOccupant"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QDockWidget" name="dockGridSettings">
@@ -114,7 +123,7 @@
     </size>
    </property>
    <property name="features">
-    <set>QDockWidget::AllDockWidgetFeatures</set>
+    <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
    </property>
    <property name="windowTitle">
     <string>World</string>
@@ -122,7 +131,9 @@
    <attribute name="dockWidgetArea">
     <number>1</number>
    </attribute>
-   <widget class="QWidget" name="gridBox"/>
+   <widget class="QWidget" name="gridBox">
+    <zorder>gridWidget</zorder>
+   </widget>
   </widget>
   <widget class="QDockWidget" name="dockInspector">
    <property name="minimumSize">
@@ -132,7 +143,7 @@
     </size>
    </property>
    <property name="features">
-    <set>QDockWidget::AllDockWidgetFeatures</set>
+    <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
    </property>
    <property name="windowTitle">
     <string>Inspector</string>
@@ -142,49 +153,40 @@
    </attribute>
    <widget class="QWidget" name="occupantBox"/>
   </widget>
-  <action name="actionPlay">
+  <action name="actionPlay1">
    <property name="icon">
     <iconset resource="floatworld.qrc">
-     <normaloff>:/play.png</normaloff>:/play.png</iconset>
+     <normaloff>:/icons/play-2.png</normaloff>:/icons/play-2.png</iconset>
    </property>
    <property name="text">
     <string>Play</string>
    </property>
-  </action>
-  <action name="actionPause">
-   <property name="icon">
-    <iconset resource="floatworld.qrc">
-     <normaloff>:/stop.png</normaloff>:/stop.png</iconset>
+   <property name="toolTip">
+    <string>Ordinary speed</string>
    </property>
-   <property name="text">
-    <string>Pause</string>
-   </property>
-  </action>
-  <action name="actionFast">
-   <property name="icon">
-    <iconset resource="floatworld.qrc">
-     <normaloff>:/forward.png</normaloff>:/forward.png</iconset>
-   </property>
-   <property name="text">
-    <string>Fast</string>
+   <property name="shortcut">
+    <string>Space</string>
    </property>
   </action>
   <action name="actionStop">
    <property name="icon">
     <iconset resource="floatworld.qrc">
-     <normaloff>:/icons/media-playback-pause.png</normaloff>:/icons/media-playback-pause.png</iconset>
+     <normaloff>:/icons/red-stop.png</normaloff>:/icons/red-stop.png</iconset>
    </property>
    <property name="text">
     <string>Stop</string>
    </property>
+   <property name="shortcut">
+    <string>Esc</string>
+   </property>
    <property name="visible">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionStep">
    <property name="icon">
     <iconset resource="floatworld.qrc">
-     <normaloff>:/icons/edit-redo.png</normaloff>:/icons/edit-redo.png</iconset>
+     <normaloff>:/icons/right-stop.png</normaloff>:/icons/right-stop.png</iconset>
    </property>
    <property name="text">
     <string>Step</string>
@@ -196,12 +198,20 @@
     <bool>true</bool>
    </property>
   </action>
-  <action name="actionGrid">
+  <action name="actionNew">
+   <property name="icon">
+    <iconset resource="floatworld.qrc">
+     <normaloff>:/icons/document-new.svg</normaloff>:/icons/document-new.svg</iconset>
+   </property>
    <property name="text">
     <string>New</string>
    </property>
   </action>
   <action name="actionSave">
+   <property name="icon">
+    <iconset resource="floatworld.qrc">
+     <normaloff>:/icons/document-save.svg</normaloff>:/icons/document-save.svg</iconset>
+   </property>
    <property name="text">
     <string>Save</string>
    </property>
@@ -210,6 +220,10 @@
    </property>
   </action>
   <action name="actionLoad">
+   <property name="icon">
+    <iconset resource="floatworld.qrc">
+     <normaloff>:/icons/document-open.svg</normaloff>:/icons/document-open.svg</iconset>
+   </property>
    <property name="text">
     <string>Load</string>
    </property>
@@ -222,34 +236,41 @@
     <string>Close</string>
    </property>
   </action>
-  <action name="actionSlow">
+  <action name="actionPlay2">
    <property name="icon">
     <iconset resource="floatworld.qrc">
-     <normaloff>:/icons/media-seek-backward.png</normaloff>:/icons/media-seek-backward.png</iconset>
+     <normaloff>:/icons/play-3.png</normaloff>:/icons/play-3.png</iconset>
    </property>
    <property name="text">
-    <string>Slow</string>
+    <string>Fast</string>
+   </property>
+   <property name="toolTip">
+    <string>2x speed</string>
    </property>
   </action>
   <action name="actionIndividualStep">
    <property name="icon">
     <iconset resource="floatworld.qrc">
-     <normaloff>:/icons/edit-redo.png</normaloff>:/icons/edit-redo.png</iconset>
+     <normaloff>:/icons/right-stop-1.png</normaloff>:/icons/right-stop-1.png</iconset>
    </property>
    <property name="text">
-    <string>Step</string>
+    <string>Step Selected</string>
    </property>
    <property name="toolTip">
     <string>Individual Step</string>
    </property>
    <property name="shortcut">
-    <string>Space</string>
+    <string>/</string>
    </property>
    <property name="visible">
     <bool>true</bool>
    </property>
   </action>
   <action name="actionNextOccupant">
+   <property name="icon">
+    <iconset resource="floatworld.qrc">
+     <normaloff>:/icons/green-right.png</normaloff>:/icons/green-right.png</iconset>
+   </property>
    <property name="text">
     <string>Next occupant</string>
    </property>
@@ -258,6 +279,10 @@
    </property>
   </action>
   <action name="actionPrevOccupant">
+   <property name="icon">
+    <iconset resource="floatworld.qrc">
+     <normaloff>:/icons/green-left.png</normaloff>:/icons/green-left.png</iconset>
+   </property>
    <property name="text">
     <string>Prev occupant</string>
    </property>
@@ -266,6 +291,54 @@
    </property>
    <property name="shortcut">
     <string>&lt;</string>
+   </property>
+  </action>
+  <action name="actionPlay1_2">
+   <property name="icon">
+    <iconset resource="floatworld.qrc">
+     <normaloff>:/icons/play-1.png</normaloff>:/icons/play-1.png</iconset>
+   </property>
+   <property name="text">
+    <string>Slow</string>
+   </property>
+   <property name="toolTip">
+    <string>1/4 speed</string>
+   </property>
+  </action>
+  <action name="actionPlay1_4">
+   <property name="icon">
+    <iconset resource="floatworld.qrc">
+     <normaloff>:/icons/play-0.png</normaloff>:/icons/play-0.png</iconset>
+   </property>
+   <property name="text">
+    <string>Slowest</string>
+   </property>
+   <property name="toolTip">
+    <string>1/20 speed</string>
+   </property>
+  </action>
+  <action name="actionPlay4">
+   <property name="icon">
+    <iconset resource="floatworld.qrc">
+     <normaloff>:/icons/play-4.png</normaloff>:/icons/play-4.png</iconset>
+   </property>
+   <property name="text">
+    <string>Fastest</string>
+   </property>
+   <property name="toolTip">
+    <string>8x speed</string>
+   </property>
+  </action>
+  <action name="actionActionFF">
+   <property name="icon">
+    <iconset resource="floatworld.qrc">
+     <normaloff>:/icons/blue-right-right.png</normaloff>:/icons/blue-right-right.png</iconset>
+   </property>
+   <property name="text">
+    <string>actionFF</string>
+   </property>
+   <property name="toolTip">
+    <string>Fast-forward</string>
    </property>
   </action>
  </widget>

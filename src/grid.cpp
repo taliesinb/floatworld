@@ -32,6 +32,7 @@ RegisterVar(Grid, draw_creats_only)
 
 //RegisterQtHook(Grid, draw_type, "Display method", EnumHook("Action\nAge\nEnergy\nPlumage"));
 //RegisterQtHook(Grid, draw_creats_only, "Creats only", BoolHook());
+RegisterQtHook(Grid, timestep, "Timestep", IntegerHook(0,999999));
 RegisterQtHook(Grid, max_age, "Maximum age", IntegerHook(0,1000));
 RegisterQtHook(Grid, mutation_prob, "Mutation probability", FloatHook(0, 1, 0.05));
 RegisterQtHook(Grid, initial_energy, "Initial energy", IntegerHook(-50,50));
@@ -41,6 +42,8 @@ RegisterQtHook(Grid, enable_mutation, "Enable mutation", BoolHook());
 RegisterQtHook(Grid, mutation_color_drift, "Plumage drift", BoolHook());
 RegisterQtHook(Grid, neural_net_iterations, "Neural iterations", IntegerHook(1,10));
 RegisterQtHook(Grid, energy_decay_rate, "Energy decay rate", FloatHook(0,0.5,0.01));
+
+using namespace std;
 
 void write_grid_size(Grid* g, std::ostream& s)
 {
@@ -79,10 +82,13 @@ void read_grid_occupant_order(Grid* g, std::istream& s)
     {
         short id = *it;
         Occupant* occ = g->LookupOccupantByID(id);
-
-        assert(occ);
-        occ->Attach(*g, occ->pos);
-        occ->id = id;
+        if (!occ) {
+            cerr << "Failed to find occupant by id " << id << endl;
+            assert(occ);
+        } else {
+            occ->Attach(*g, occ->pos);
+            occ->id = id;
+        }
     }
 }
 RegisterCustomVar(Grid, occupant_order, write_grid_occupant_order, read_grid_occupant_order)
@@ -123,6 +129,7 @@ Grid::Grid()
     num_creats = 0;
     births = 0;
     interaction_type = NoInteraction;
+    hooks_enabled = true;
 
     SetupActions();
 }

@@ -22,18 +22,23 @@ class MainWindow : public QMainWindow, public Ui::MainWindow
 public:
     Matrix adam;
     QTimer timer;
+    QTimer fast_timer;
     float speed;
     float stepper;
-    float speed_multiplier;
+    float last_stepper;
     Grid* grid;
     MainWindow(QWidget *parent = 0);
 
+    void SetSpeed(float speed);
+
 private slots:
 
-    void on_actionSlow_triggered();
-    void on_actionPlay_triggered();
+    void on_actionPlay1_4_triggered();
+    void on_actionPlay1_2_triggered();
+    void on_actionPlay1_triggered();
+    void on_actionPlay2_triggered();
+    void on_actionPlay4_triggered();
     void on_actionStop_triggered();
-    void on_actionFast_triggered();
     void on_actionStep_triggered();
     void on_actionIndividualStep_triggered();
     void on_actionNextOccupant_triggered();
@@ -43,6 +48,7 @@ private slots:
     void on_actionLoad_triggered();
 
     void takeStep();
+    void calculateStep();
 
     void DisplayInspector(Occupant* occ);
 };

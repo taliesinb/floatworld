@@ -94,9 +94,13 @@ void MatrixLabel::paintEvent(QPaintEvent*)
         pen.setWidth(2);
         pen.setColor(QColor(255,255,255,100));
         painter.setPen(pen);
-        painter.drawRect(QRect(border + pixel_scale * highlighted.col - 2,
-                           border + pixel_scale * highlighted.row - 2,
-                           pixel_scale + 4, pixel_scale + 4));
+        painter.drawEllipse(QPoint(
+                border + pixel_scale * (highlighted.col + 0.5),
+                border + pixel_scale * (highlighted.row + 0.5)),
+                int(3*pixel_scale), int(3*pixel_scale));
+//        painter.drawRect(QRect(border + pixel_scale * highlighted.col - 2,
+//                           border + pixel_scale * highlighted.row - 2,
+//                           pixel_scale + 4, pixel_scale + 4));
 
     }
 }
@@ -143,6 +147,7 @@ GridWidget::GridWidget(QWidget* parent) :
 std::ostream& operator<<(std::ostream& s, QSize size)
 {
     s << size.width() << ", " << size.height() << endl;
+    return s;
 }
 
 QSize GridWidget::sizeHint() const

@@ -1,32 +1,54 @@
 <RCC>
-    <qresource prefix="/" >
-        <file>icons/edit-clear.png</file>
-        <file>icons/edit-copy.png</file>
-        <file>icons/edit-cut.png</file>
-        <file>icons/edit-redo.png</file>
-        <file>icons/edit-undo.png</file>
-        <file>icons/go-bottom.png</file>
-        <file>icons/go-down.png</file>
-        <file>icons/go-first.png</file>
-        <file>icons/go-home.png</file>
-        <file>icons/go-jump.png</file>
-        <file>icons/go-last.png</file>
-        <file>icons/go-next.png</file>
-        <file>icons/go-previous.png</file>
-        <file>icons/go-top.png</file>
-        <file>icons/go-up.png</file>
-        <file alias="plus.png" >icons/list-add.png</file>
-        <file alias="minus.png" >icons/list-remove.png</file>
-        <file alias="eject.png" >icons/media-eject.png</file>
-        <file alias="save.png" >icons/media-floppy.png</file>
-        <file>icons/media-playback-pause.png</file>
-        <file alias="play.png" >icons/media-playback-start.png</file>
-        <file alias="stop.png" >icons/media-playback-stop.png</file>
-        <file alias="record.png" >icons/media-record.png</file>
-        <file>icons/media-seek-backward.png</file>
-        <file alias="forward.png" >icons/media-seek-forward.png</file>
-        <file>icons/media-skip-backward.png</file>
-        <file>icons/media-skip-forward.png</file>
-        <file>icons/process-stop.png</file>
+    <qresource prefix="/">
+        <file>icons/undo.png</file>
+        <file>icons/stop.png</file>
+        <file>icons/save.png</file>
+        <file>icons/right.png</file>
+        <file>icons/right-stop.png</file>
+        <file>icons/right-right.png</file>
+        <file>icons/right-right-stop.png</file>
+        <file>icons/right-right-right.png</file>
+        <file>icons/right-1.png</file>
+        <file>icons/redo.png</file>
+        <file>icons/red-circle.png</file>
+        <file>icons/plus.png</file>
+        <file>icons/pause.png</file>
+        <file>icons/minus.png</file>
+        <file>icons/left-stop.png</file>
+        <file>icons/left-left.png</file>
+        <file>icons/left-left-stop.png</file>
+        <file>icons/left-left-left.png</file>
+        <file>icons/home.png</file>
+        <file>icons/green-up.png</file>
+        <file>icons/green-up-stop.png</file>
+        <file>icons/green-right.png</file>
+        <file>icons/green-right-stop.png</file>
+        <file>icons/green-left.png</file>
+        <file>icons/green-left-stop.png</file>
+        <file>icons/green-down.png</file>
+        <file>icons/green-down-stop.png</file>
+        <file>icons/eject.png</file>
+        <file>icons/danger.png</file>
+        <file>icons/cut.png</file>
+        <file>icons/curve-down.png</file>
+        <file>icons/copy.png</file>
+        <file>icons/clear.png</file>
+        <file>icons/right-stop-1.png</file>
+        <file>icons/right-eighth.png</file>
+        <file>icons/right-quarter.png</file>
+        <file>icons/right-half.png</file>
+        <file>icons/play-6.png</file>
+        <file>icons/play-5.png</file>
+        <file>icons/play-4.png</file>
+        <file>icons/play-3.png</file>
+        <file>icons/play-2.png</file>
+        <file>icons/play-1.png</file>
+        <file>icons/play-0.png</file>
+        <file>icons/document-open.svg</file>
+        <file>icons/document-save-as.svg</file>
+        <file>icons/document-save.svg</file>
+        <file>icons/document-new.svg</file>
+        <file>icons/blue-right-right.png</file>
+        <file>icons/red-stop.png</file>
     </qresource>
 </RCC>
