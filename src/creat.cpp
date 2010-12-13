@@ -19,7 +19,7 @@ RegisterVar(Creat, alive);
 RegisterVar(Creat, energy);
 RegisterVar(Creat, marker);
 
-RegisterQtHook(Creat, energy, "energy", FloatHook(0,100,1));
+RegisterQtHook(Creat, energy, "energy", FloatHook(0,500,1));
 RegisterQtHook(Creat, age, "age", IntegerHook(0,1000));
 RegisterQtHook(Creat, interaction_count, "interacts", IntegerLabel());
 RegisterQtHook(Creat, action, "action", EnumHook("None\nForward\nLeft\nRight\nReproduce"));

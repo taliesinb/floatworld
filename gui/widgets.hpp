@@ -57,6 +57,8 @@ public:
     void SelectNextOccupant(bool forward);
     QSize sizeHint() const;
 
+    void keyReleaseEvent(QKeyEvent *);
+
 public slots:
     void Step();
     void Draw();

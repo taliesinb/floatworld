@@ -124,7 +124,7 @@ GridWidget::GridWidget(QWidget* parent) :
     scroll_area = new QScrollArea;
     matrix_label = new MatrixLabel;
 
-    matrix_label->pixel_scale = 6;
+    matrix_label->pixel_scale = 4;
     matrix_label->AllocateImage(sz, sz);
     scroll_area->setWidgetResizable(true);
     scroll_area->setLineWidth(0);
@@ -271,6 +271,33 @@ void GridWidget::UpdateOccupant()
         selected_occupant->Update();
         Draw();
     }
+}
+
+void GridWidget::keyReleaseEvent(QKeyEvent* event)
+{
+    Creat* creat = dynamic_cast<Creat*>(selected_occupant);
+    if (!creat) return;
+
+    bool update_rest = !(event->modifiers() & Qt::ShiftModifier);
+
+
+    int key = event->key();
+    if      (key == Qt::Key_Left) creat->action = ActionLeft;
+    else if (key == Qt::Key_Right) creat->action = ActionRight;
+    else if (key == Qt::Key_Up) creat->action = ActionForward;
+    else return;
+
+    if (update_rest) grid->occupant_list.remove(creat);
+
+    (creat->*(grid->action_lookup[creat->action]))();
+    creat->UpdateQtHook();
+
+    if (update_rest)
+    {
+        Step();
+        grid->occupant_list.push_back(creat);
+    }
+    Draw();
 }
 
 void GridWidget::SelectOccupant(Occupant *occ)
