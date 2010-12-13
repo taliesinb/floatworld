@@ -72,7 +72,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(&timer, SIGNAL(timeout()), this, SLOT(takeStep()));
     connect(&fast_timer, SIGNAL(timeout()), this, SLOT(calculateStep()));
-    timer.start(20);
+    timer.start(50); // 20 fps
 
     gridWidget->Draw();
 
