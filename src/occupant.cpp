@@ -23,7 +23,6 @@ void Occupant::Interact(Creat&)
 
 void Occupant::Reset()
 {
-    last_pos = pos;
 }
 
 void Occupant::__Remove()
@@ -42,6 +41,7 @@ void Occupant::Attach(Grid& g, Pos p)
     grid = &g;
     grid->occupant_list.push_back(this);
     Move(p);
+    last_pos = p;
 }
 
 void Occupant::Update()

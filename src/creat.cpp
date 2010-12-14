@@ -167,10 +167,10 @@ void Creat::MoveForward()
     } else
     {
         interacted = false;
-        Move(front);
-        float de = grid->energy(front);
+        float de = grid->energy(pos);
         energy += de;
         grid->energy(pos) = grid->path_energy / 2.0;
+        Move(front);
     }
 }
 

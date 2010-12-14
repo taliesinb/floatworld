@@ -286,6 +286,18 @@ void QGrid::OnChildPaint(QPainter& painter)
     for_iterate(it, grid->occupant_list)
     {
         Occupant* occ = *it;
+        Pos pos2 = occ->pos;
+        Pos pos1 = occ->last_pos;
+        if (draw_fraction != 1.0 && (pos2 - pos1).Mag() > 1)
+        {
+            if (pos1.row == grid->rows - 1) pos1.row = -1;
+            if (pos1.col == grid->cols - 1) pos1.col = -1;
+            if (pos1.row == 0) pos1.row = grid->rows;
+            if (pos1.col == 0) pos1.col = grid->cols;
+        }
+        float x = pos2.col * draw_fraction + pos1.col * (1 - draw_fraction);
+        float y = pos2.row * draw_fraction + pos1.row * (1 - draw_fraction);
+
         Creat* creat = dynamic_cast<Creat*>(occ);
         if (creat)
         {
@@ -327,15 +339,11 @@ void QGrid::OnChildPaint(QPainter& painter)
                 painter.save();
                 painter.setPen(color);
                 painter.setBrush(QBrush(color));
+                painter.translate(x + 0.5, y + 0.5);
                 int orient2 = creat->orient;
                 int orient1 = creat->last_orient;
                 if (orient1 == 3 && orient2 == 0) orient1 = -1;
                 if (orient1 == 0 && orient2 == 3) orient1 = 4;
-                Pos pos2 = occ->pos;
-                Pos pos1 = occ->last_pos;
-                if ((pos2 - pos1).Mag() > 1) pos1 = pos2 - Pos(orient2);
-                painter.translate((pos2.col * draw_fraction + pos1.col * (1 - draw_fraction)) + 0.5,
-                                  (pos2.row * draw_fraction + pos1.row * (1 - draw_fraction)) + 0.5);
                 painter.rotate((orient2 * draw_fraction + orient1 * (1 - draw_fraction)) * 90);
                 painter.drawPolygon(tri);
                 painter.restore();
@@ -347,13 +355,16 @@ void QGrid::OnChildPaint(QPainter& painter)
                 painter.save();
                 painter.setPen(blockpen);
                 blockpen.setColor(color);
-                if (block->draw_filled) painter.setBrush(color.darker());
-                painter.drawEllipse(QPointF(block->pos.col + 0.5, block->pos.row + 0.5), 0.45, 0.45);
+                float off = 1./scale;
+                if (block->draw_filled)
+                    painter.fillRect(QRectF(x + off, y + off, 1.0 - 2 * off, 1.0 - 2 * off), color);
+                else
+                    painter.drawRect(QRectF(x + off, y + off , 1.0 - 2 * off, 1.0 - 2 * off));
                 painter.restore();
             }
         }
         if (!poly && occ->solid)
-            painter.fillRect(QRectF(occ->pos.col, occ->pos.row, 1.0 - 1./scale, 1.0 - 1./scale), color);
+            painter.fillRect(QRectF(x, y, 1.0 - 1./scale, 1.0 - 1./scale), color);
     }
     painter.restore();
 }
@@ -365,13 +376,15 @@ void QGrid::keyReleaseEvent(QKeyEvent* event)
 
     bool update_rest = !(event->modifiers() & Qt::ShiftModifier);
 
-
     int key = event->key();
     if      (key == Qt::Key_A) creat->action = ActionLeft;
     else if (key == Qt::Key_D) creat->action = ActionRight;
     else if (key == Qt::Key_W) creat->action = ActionForward;
     else if (key == Qt::Key_X) creat->action = ActionReproduce;
     else return;
+
+    creat->last_pos = creat->pos;
+    creat->last_orient = creat->orient;
 
     if (update_rest) grid->occupant_list.remove(creat);
 
@@ -383,6 +396,7 @@ void QGrid::keyReleaseEvent(QKeyEvent* event)
         Step();
         grid->occupant_list.push_back(creat);
     }
+    SetDrawFraction(1.0);
     Draw();
 }
 
@@ -414,17 +428,15 @@ void QGrid::Step()
     Draw();
 }
 
+void QGrid::SetDrawFraction(float frac)
+{
+    draw_fraction = frac;
+}
+
 void QGrid::Draw()
 {
     if (selected_occupant)
         energy->highlighted = selected_occupant->pos;
-    draw_fraction = 1.0;
-    repaint();
-}
-
-void QGrid::DrawFraction(float frac)
-{
-    draw_fraction = frac;
     repaint();
 }
 

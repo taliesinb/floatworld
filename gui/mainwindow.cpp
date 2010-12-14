@@ -75,7 +75,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(&timer, SIGNAL(timeout()), this, SLOT(takeStep()));
     connect(&fast_timer, SIGNAL(timeout()), this, SLOT(calculateStep()));
-    timer.start(50); // 20 fps
+    timer.start(40); // 25 fps
 
     gridWidget->Draw();
 
@@ -169,12 +169,15 @@ void MainWindow::takeStep()
     if (stepper >= ceil(last_stepper + speed))
     {
         last_stepper = stepper;
+        stepper += speed;
         grid->Step();
         grid->UpdateQtHook();
-        if (speed < 1) gridWidget->Draw();
-        gridWidget->DrawFraction(0.0);
-    } else if (speed < 1) {
-        gridWidget->DrawFraction(stepper - floor(stepper));
+        gridWidget->SetDrawFraction(speed < 1 ? 0.0 : 1.0);
+        gridWidget->Draw();
+    } else if (speed < 1)
+    {
+        gridWidget->SetDrawFraction(stepper - floor(stepper));
+        gridWidget->Draw();
     }
 
     if (speed < 1)

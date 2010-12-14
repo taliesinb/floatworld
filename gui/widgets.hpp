@@ -73,7 +73,7 @@ public:
 public slots:
     void Step();
     void Draw();
-    void DrawFraction(float frac);
+    void SetDrawFraction(float frac);
     void SelectAtPos(Pos pos);
     void UnselectOccupant();
     void UpdateOccupant();
