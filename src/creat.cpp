@@ -76,9 +76,11 @@ void Creat::Reset()
     Occupant::Reset();
     state.SetZero();
     age = 0;
-    fingerprint = 0;
+    orient = 0;
+    last_orient = 0;
     interacted = false;
     interaction_count = 0;
+    fingerprint = 0;
     for (int k = 0; k < 64; k++) { fingerprint <<= 1; fingerprint |= RandBit(); }
     action = ActionNone;
     possessed = false;
@@ -448,11 +450,13 @@ void Creat::__Remove()
 
 void Creat::TurnLeft()
 {
+    last_orient = orient;
     orient = Mod(orient - 1, 4);
 }
 
 void Creat::TurnRight()
 {
+    last_orient = orient;
     orient = Mod(orient + 1, 4);
 }
 

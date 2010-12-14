@@ -60,6 +60,7 @@ public:
     int action;
     int age;
     int orient;
+    int last_orient;
     int interaction_count;
     bool possessed;
     bool alive;

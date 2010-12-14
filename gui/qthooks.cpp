@@ -74,49 +74,26 @@ void EnumWidget::Synchronize(bool inbound)
     else *static_cast<int*>(ptr) = currentIndex();
 }
 
-MatrixWidget::MatrixWidget(int size, bool flip)
-    : MatrixLabel(), Hook(SIGNAL(ClickedCell(Pos)))
+QRgb RedBlueColorFunc(float value)
 {
-    flipped = flip;
-    matrix = NULL;
-    pixel_scale = size;
-    rows = cols = 0;
-    draw_grid = true;
+    int sgn = value > 0 ? 1 : -1;
+    int val = 150 * log(1 + fabs(value));
+    if (val > 255) val = 255;
+    int hue = (256 + (64 + 64 * sgn)) % 256;
+    int sat = val;
+    int var = 255 - (val / 5.0);
+    return QColor::fromHsv(hue, sat, var).rgb();
+}
+
+MatrixWidget::MatrixWidget(int size, bool flip)
+    : MatrixView(size, flip, true), Hook(SIGNAL(ClickedCell(Pos)))
+{
+    color_func = &RedBlueColorFunc;
 }
 
 void MatrixWidget::OnSetPointer()
 {
     matrix = static_cast<Matrix*>(ptr);
-    rows = matrix->rows;
-    cols = matrix->cols;
-    if (flipped) swap(rows, cols);
-    AllocateImage(cols, rows);
-}
-
-void MatrixWidget::Synchronize(bool inbound)
-{
-    if (inbound) { Rerender(); repaint(); }
-}
-
-void MatrixWidget::Rerender()
-{
-    QColor color(0, 0, 0);
-    for (int i = 0; i < rows; i++)
-    {
-        QRgb* line1 = reinterpret_cast<QRgb*>(pixel_data->scanLine(i));
-        for (int j = 0; j < cols; j++)
-        {
-            float val = flipped ? (*matrix)(j, i) : (*matrix)(i, j);
-            int sgn = val > 0 ? 1 : -1;
-            val = 150 * log(1 + fabs(val));
-            if (val > 255) val = 255;
-            int hue = 256 + (64 + 64 * sgn) % 256;
-            int sat = val;
-            int var = 255 - (val / 5);
-            color.setHsv(hue, sat, var);
-            *line1++ = color.rgb();
-        }
-    }
 }
 
 HookManager::HookManager(Class *mc, Object *obj)

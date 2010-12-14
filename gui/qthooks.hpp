@@ -57,17 +57,14 @@ public:
     virtual void Synchronize(bool inbound);
 };
 
-class MatrixWidget : public MatrixLabel, public Hook
+class MatrixWidget : public MatrixView, public Hook
 {
-    Matrix* matrix;
     bool flipped;
     int rows, cols;
 
 public:
     MatrixWidget(int pixel, bool flip);
     virtual void OnSetPointer();
-    virtual void Rerender();
-    virtual void Synchronize(bool inbound);
 };
 
 class HookManager : public QFormLayout

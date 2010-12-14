@@ -16,6 +16,7 @@ class Occupant : public Object
     Occupant* next; // next occupant on this grid position
     Grid* grid;
     Pos pos;
+    Pos last_pos;
     float signature;
     int id;
     bool solid;

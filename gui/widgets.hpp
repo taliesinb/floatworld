@@ -5,23 +5,24 @@
 
 #include "src/pos.hpp"
 
-class QImage;
+class Matrix;
 
-class MatrixLabel : public QWidget
+typedef QRgb (*ColorFunc)(float);
+
+class MatrixView : public QWidget
 {
     Q_OBJECT
 
 public:
-    QImage* pixel_data;
-    float pixel_scale;
+    ColorFunc color_func;
+    Matrix* matrix;
+    int scale;
     bool draw_grid;
+    bool draw_flipped;
     Pos highlighted;
 
-    MatrixLabel(QWidget* parent);
-    MatrixLabel();
+    MatrixView(int size, bool flip, bool grid);
 
-    virtual void Rerender();
-    void AllocateImage(int rows, int cols);
     virtual QSize sizeHint() const;
     virtual QSize minimumSizeHint() const;
 
@@ -32,7 +33,10 @@ protected:
 
 signals:
 
+    void OverPaint(QPainter&);
     void ClickedCell(Pos pos);
+
+    friend class GridWidget;
 
 };
 
@@ -40,17 +44,17 @@ class Grid;
 class Occupant;
 class QScrollArea;
 
-class GridWidget : public QWidget
+class QGrid : public QWidget
 {
     Q_OBJECT
 
 private:
     QScrollArea* scroll_area;
-    MatrixLabel* matrix_label;
+    MatrixView* energy;
 
 public:
     Grid* grid;
-    GridWidget(QWidget* parent);
+    QGrid(QWidget* parent);
 
     Occupant* selected_occupant;
     void SelectOccupant(Occupant* occ);
@@ -65,10 +69,10 @@ public:
 public slots:
     void Step();
     void Draw();
-    void Rerender();
     void SelectAtPos(Pos pos);
     void UnselectOccupant();
     void UpdateOccupant();
+    void OnChildPaint(QPainter&);
 
 signals:
     void OccupantSelected(Occupant*);
