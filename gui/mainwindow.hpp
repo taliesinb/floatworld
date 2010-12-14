@@ -26,6 +26,7 @@ public:
     float speed;
     float stepper;
     float last_stepper;
+    bool block_draw;
     Grid* grid;
     QActionGroup speed_group;
 

@@ -18,24 +18,44 @@ public:
     void Update();
 };
 
-class RewardBlock : public Block
+class PushableBlock : public Block
 {
 public:
+
+    virtual void Interact(Creat& c);
+    virtual void WasPushed(Creat& c);
+};
+
+class StaticTrap : public Block
+{
+public:
+    StaticTrap();
+
+    void Interact(Creat &c);
+};
+
+class ActiveTrap : public PushableBlock
+{
+public:
+    ActiveTrap();
+
+public:
+    virtual void Update();
+};
+
+class RewardBlock : public PushableBlock
+{
+public:
+    int reward;
     RewardBlock();
 
+    virtual void WasPushed(Creat& c);
+};
+
+class SkinnerBlock : public Block
+{
+public:
     int reward;
-};
-
-class MoveableBlock : public RewardBlock
-{
-public:
-
-    void Interact(Creat& c);
-};
-
-class SkinnerBlock : public RewardBlock
-{
-public:
     int threshold;
     int touch_count;
     int _touch_count;

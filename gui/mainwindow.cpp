@@ -11,7 +11,7 @@ using namespace std;
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
     adam(Creat::hidden + Creat::outputs, Creat::neurons),
-    speed(0), stepper(0), last_stepper(0),
+    speed(0), stepper(0), last_stepper(0), block_draw(false),
     speed_group(this)
 {
     setupUi(this);
@@ -59,7 +59,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     grid->AddCreats(30, true);
 
-    for (int k = 0; k < 20; k++)
+    for (int k = 0; k < 0; k++)
     {
         Occupant* block = new SkinnerBlock();
         block->Attach(*grid, grid->RandomCell());
@@ -68,7 +68,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     for (int k = 0; k < 0; k++)
     {
-        Occupant* block = new MoveableBlock();
+        Occupant* block = new ActiveTrap();
         block->Attach(*grid, grid->RandomCell());
         block->AssignID();
     }
@@ -110,6 +110,8 @@ MainWindow::MainWindow(QWidget *parent)
             button->setAutoRepeat(false);
         }
     }
+    gridWidget->Draw();
+    repaint();
 }
 
 void MainWindow::SetSpeed(float s)
@@ -120,7 +122,7 @@ void MainWindow::SetSpeed(float s)
     {
         speed = s;
         if (s >= 1)
-            fast_timer.start(0);
+            fast_timer.start(1);
         else if (fast_timer.isActive())
             fast_timer.stop();
     }
@@ -143,23 +145,24 @@ void MainWindow::speed_trigger(QAction* action)
 
 void MainWindow::ff_pressed()
 {
-    SetSpeed(8.0);
+    //block_draw = true;
+    SetSpeed(16.0);
 }
 
 void MainWindow::ff_released()
 {
+    //block_draw = false;
+    grid->UpdateQtHook();
     speed_trigger(speed_group.checkedAction());
-
 }
 
 void MainWindow::calculateStep()
 {
     grid->hooks_enabled = false;
     grid->Step();
-    grid->hooks_enabled = true;
-
     if (stepper++ > last_stepper + speed)
         fast_timer.stop();
+    grid->hooks_enabled = true;
 }
 
 void MainWindow::takeStep()
@@ -170,10 +173,12 @@ void MainWindow::takeStep()
     {
         last_stepper = stepper;
         stepper += speed;
-        grid->Step();
-        grid->UpdateQtHook();
         gridWidget->SetDrawFraction(speed < 1 ? 0.0 : 1.0);
-        gridWidget->Draw();
+        grid->Step();
+        if (!block_draw) { // for fast forwarding
+            gridWidget->Draw();
+            grid->UpdateQtHook();
+        }
     } else if (speed < 1)
     {
         gridWidget->SetDrawFraction(stepper - floor(stepper));
@@ -183,7 +188,7 @@ void MainWindow::takeStep()
     if (speed < 1)
         stepper += speed;
     else if (!fast_timer.isActive())
-        fast_timer.start(0);
+        fast_timer.start(1);
 }
 
 

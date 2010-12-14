@@ -350,7 +350,7 @@ void QGrid::OnChildPaint(QPainter& painter)
             }
         } else if (Block* block = dynamic_cast<Block*>(occ))
         {
-            color.setHsv(255 * block->draw_hue, 110, 255);
+            color.setHsv(255 * block->draw_hue, 200, 255);
             if (poly) {
                 painter.save();
                 painter.setPen(blockpen);

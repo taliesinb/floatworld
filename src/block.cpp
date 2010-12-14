@@ -7,13 +7,16 @@ using namespace std;
 
 RegisterClass(Block, Occupant);
 
-RegisterClass(RewardBlock, Block);
+RegisterClass(PushableBlock, Block);
+
+RegisterClass(RewardBlock, PushableBlock);
 RegisterVar(RewardBlock, reward);
 RegisterQtHook(RewardBlock, reward, "ereward", IntegerHook(-100,100));
 
-RegisterClass(MoveableBlock, RewardBlock);
+RegisterClass(StaticTrap, Trap);
+RegisterClass(ActiveTrap, PushableBlock);
 
-RegisterClass(SkinnerBlock, RewardBlock);
+RegisterClass(SkinnerBlock, Block);
 RegisterVar(SkinnerBlock, touch_count);
 RegisterVar(SkinnerBlock, threshold);
 RegisterVar(SkinnerBlock, radius);
@@ -40,23 +43,69 @@ void Block::Update()
     grid->energy(pos) = 0;
 }
 
+void PushableBlock::Interact(Creat& c)
+{
+    Pos p = grid->Wrap(pos + Pos(c.orient));
+    Occupant* occ = grid->OccupantAt(p);
+  
+    if (dynamic_cast<PushableBlock*>(occ)) occ->Interact(c);
+
+    if (grid->OccupantAt(p) == NULL)
+    {
+        Move(p);
+        WasPushed(c);
+    }
+}
+
+void PushableBlock::WasPushed(Creat &c)
+{
+
+}
+
 RewardBlock::RewardBlock()
 {
     reward = 10;
 }
 
-void MoveableBlock::Interact(Creat& c)
+void RewardBlock::WasPushed(Creat &c)
 {
-    Pos p = (pos + Pos(c.orient)).Wrap(grid->rows, grid->cols);
-    Occupant* occ = grid->OccupantAt(p);
-  
-    if (dynamic_cast<MoveableBlock*>(occ)) occ->Interact(c);
+    c.energy += reward;
+}
 
-    if (grid->OccupantAt(p) == NULL)
+StaticTrap::StaticTrap()
+{
+    signature = -2.0;
+    draw_hue = 0.0;
+}
+
+void StaticTrap::Interact(Creat &c)
+{
+    c.energy = -100; // guarentee death
+}
+
+ActiveTrap::ActiveTrap()
+{
+    signature = -2.0;
+    draw_hue = 0.9;
+}
+
+void ActiveTrap::Update()
+{
+    Pos new_pos;
+    for (int dir = 0; dir < 4; dir++)
     {
-        Move(p);
-        c.energy += 6;
+        new_pos = grid->Wrap(pos + Pos(dir));
+        if (Creat* creat = grid->CreatAt(new_pos))
+        {
+            creat->Remove();
+            Move(new_pos);
+            draw_filled = true;
+            return;
+        }
     }
+    draw_filled = false;
+    new_pos = grid->Wrap(pos + Pos(RandInt(0,3)));
+    if (!grid->OccupantAt(new_pos)) Move(new_pos);
 }
 
 SkinnerBlock::SkinnerBlock()
@@ -111,3 +160,4 @@ void PhasedSkinnerBlock::Interact(Creat& c)
     else
         c.energy -= 50;
 }
+
