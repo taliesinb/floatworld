@@ -51,6 +51,7 @@ class QGrid : public QWidget
 private:
     QScrollArea* scroll_area;
     MatrixView* energy;
+    float draw_fraction;
 
 public:
     Grid* grid;
@@ -69,6 +70,7 @@ public:
 public slots:
     void Step();
     void Draw();
+    void DrawFraction(float frac);
     void SelectAtPos(Pos pos);
     void UnselectOccupant();
     void UpdateOccupant();

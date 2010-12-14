@@ -283,6 +283,8 @@ void Creat::MutateBrain()
 
 void Creat::Update()
 {
+    last_orient = orient;
+    last_pos = pos;
     Step();
 }
 

@@ -221,7 +221,7 @@ void QGrid::UpdateOccupant()
 
 void QGrid::SetZoom(int scale)
 {
-    energy->scale = scale;
+    energy->scale = scale * 2;
     energy->setMaximumSize(sizeHint());
     updateGeometry();
     repaint();
@@ -229,22 +229,33 @@ void QGrid::SetZoom(int scale)
 
 int QGrid::CurrentZoom()
 {
-    return energy->scale;
+    return energy->scale / 2;
 }
 
 void QGrid::OnChildPaint(QPainter& painter)
 {
     int draw_type = grid->draw_type;
     int scale = energy->scale;
+    bool poly = scale > 6;
     QColor color;
+    QPolygonF tri;
+    float pi = 3.1415;
+    float z = -2.0;
+    tri << QPointF(sin(0), cos(0))/z;
+    tri << QPointF(0.8 * sin(2 * pi / 3), cos(2 * pi / 3))/z;
+    tri << QPointF(0.8 * sin(4 * pi / 3), cos(4 * pi / 3))/z;
+
+    painter.save();
+    painter.translate(border, border);
+    painter.scale(scale, scale);
+
     for_iterate(it, grid->occupant_list)
     {
         Occupant* occ = *it;
         Creat* creat = dynamic_cast<Creat*>(occ);
         if (creat)
         {
-            switch (draw_type)
-            {
+            switch (draw_type) {
             case DrawAge: {
                     float stage = float(creat->age) / grid->max_age;
                     if (stage < 0.3) color.setRgb(0,128,0);
@@ -253,39 +264,63 @@ void QGrid::OnChildPaint(QPainter& painter)
                     else if (stage < 1.0) color.setRgb(250,250,250);
                 } break;
             case DrawEnergy: {
-                int val = creat->energy * 6;
-                if (val > 255) val = 255;
-                color.setRgb(val, val, val);
-                break;
-            }
-            case DrawColor:
-                {
+                    int val = creat->energy * 6;
+                    if (val > 255) val = 255;
+                    color.setRgb(val, val, val);
+                    break;
+                }
+            case DrawColor: {
                     int hue = int(255 * 255 + creat->marker * 255) % 255;
                     if (hue > 255) hue = 255;
                     if (hue < 0) hue = 0;
                     color.setHsv(hue, 220, 220);
                 } break;
-            case DrawAction:
-                {
-                switch (creat->action)
-                {
-                case ActionNone: color.setRgb(150, 50, 50); break;
-                case ActionForward: color.setRgb(150, 150, 150); break;
-                case ActionLeft: color.setRgb(180, 120, 50); break;
-                case ActionRight: color.setRgb(120, 50, 180); break;
-                case ActionReproduce: color.setRgb(0, 255, 0); break;
+            case DrawAction: {
+                    switch (creat->action)
+                    {
+                    case ActionNone: color.setRgb(150, 50, 50); break;
+                    case ActionForward: color.setRgb(150, 150, 150); break;
+                    case ActionLeft: color.setRgb(180, 120, 50); break;
+                    case ActionRight: color.setRgb(120, 50, 180); break;
+                    case ActionReproduce: color.setRgb(0, 255, 0); break;
+                    }
+                    if (creat->interacted) color.setRgb(255, 0, 0);
+                    break;
                 }
-                if (creat->interacted) color.setRgb(255, 0, 0);
-            }}
+            }
+            if (poly)
+            {
+                painter.save();
+                painter.setPen(color);
+                painter.setBrush(QBrush(color));
+                int orient2 = creat->orient;
+                int orient1 = creat->last_orient;
+                if (orient1 == 3 && orient2 == 0) orient1 = -1;
+                if (orient1 == 0 && orient2 == 3) orient1 = 4;
+                Pos pos2 = occ->pos;
+                Pos pos1 = occ->last_pos;
+                if ((pos2 - pos1).Mag() > 1) pos1 = pos2 - Pos(orient2);
+                painter.translate((pos2.col * draw_fraction + pos1.col * (1 - draw_fraction)) + 0.5,
+                                  (pos2.row * draw_fraction + pos1.row * (1 - draw_fraction)) + 0.5);
+                painter.rotate((orient2 * draw_fraction + orient1 * (1 - draw_fraction)) * 90);
+                painter.drawPolygon(tri);
+                painter.restore();
+            }
         } else if (Block* block = dynamic_cast<Block*>(occ))
         {
             color.setHsv(255 * block->draw_hue, 110, 255);
+            if (poly) {
+                painter.save();
+                painter.setPen(color);
+                if (block->draw_filled) painter.setBrush(color.darker());
+                painter.drawEllipse(QPointF(block->pos.col + 0.5, block->pos.row + 0.5), 0.45, 0.45);
+                painter.restore();
+            }
         }
-
-        painter.fillRect(border + occ->pos.col * scale,
-                         border + occ->pos.row * scale,
-                         scale-1, scale-1, color);
+        if (!poly && occ->solid)
+            painter.fillRect(QRectF(occ->pos.col, occ->pos.row, 1.0 - 1./scale, 1.0 - 1./scale), color);
     }
+    painter.restore();
 }
 
 void QGrid::keyReleaseEvent(QKeyEvent* event)
@@ -297,9 +332,10 @@ void QGrid::keyReleaseEvent(QKeyEvent* event)
 
 
     int key = event->key();
-    if      (key == Qt::Key_Left) creat->action = ActionLeft;
-    else if (key == Qt::Key_Right) creat->action = ActionRight;
-    else if (key == Qt::Key_Up) creat->action = ActionForward;
+    if      (key == Qt::Key_A) creat->action = ActionLeft;
+    else if (key == Qt::Key_D) creat->action = ActionRight;
+    else if (key == Qt::Key_W) creat->action = ActionForward;
+    else if (key == Qt::Key_X) creat->action = ActionReproduce;
     else return;
 
     if (update_rest) grid->occupant_list.remove(creat);
@@ -346,9 +382,14 @@ void QGrid::Step()
 void QGrid::Draw()
 {
     if (selected_occupant)
-    {
         energy->highlighted = selected_occupant->pos;
-    }
+    draw_fraction = 1.0;
+    repaint();
+}
+
+void QGrid::DrawFraction(float frac)
+{
+    draw_fraction = frac;
     repaint();
 }
 

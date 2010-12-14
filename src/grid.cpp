@@ -246,6 +246,7 @@ Creat& Grid::_AddCreat(Pos pos, int orient)
     fresh->AssignID();
     fresh->Reset();
     fresh->orient = orient;
+    fresh->last_orient = orient;
     fresh->alive = true;
 
     return *fresh;

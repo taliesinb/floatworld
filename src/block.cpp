@@ -84,7 +84,7 @@ void SkinnerBlock::Interact(Creat&)
 
 void SkinnerBlock::Update()
 {
-    draw_filled = (touch_count != _touch_count);
+    draw_filled = (touch_count < _touch_count);
     _touch_count = touch_count;
     grid->energy(pos) = 0;
 }

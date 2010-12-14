@@ -23,6 +23,7 @@ void Occupant::Interact(Creat&)
 
 void Occupant::Reset()
 {
+    last_pos = pos;
 }
 
 void Occupant::__Remove()

@@ -166,12 +166,15 @@ void MainWindow::takeStep()
 {
     if (!speed) return;
 
-    if (stepper > ceil(last_stepper + speed))
+    if (stepper >= ceil(last_stepper + speed))
     {
         last_stepper = stepper;
         grid->Step();
         grid->UpdateQtHook();
-        gridWidget->Draw();
+        if (speed < 1) gridWidget->Draw();
+        gridWidget->DrawFraction(0.0);
+    } else if (speed < 1) {
+        gridWidget->DrawFraction(stepper - floor(stepper));
     }
 
     if (speed < 1)
@@ -239,7 +242,7 @@ void MainWindow::on_actionZoomIn_triggered()
 void MainWindow::on_actionZoomOut_triggered()
 {
     int z = gridWidget->CurrentZoom() - 1;
-    gridWidget->SetZoom(z < 3 ? 3 : z);
+    gridWidget->SetZoom(z < 2 ? 2 : z);
 }
 
 void MainWindow::DisplayInspector(Occupant *occ)
