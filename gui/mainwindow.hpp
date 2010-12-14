@@ -45,6 +45,8 @@ private slots:
 
     void on_actionSave_triggered();
     void on_actionLoad_triggered();
+    void on_actionZoomIn_triggered();
+    void on_actionZoomOut_triggered();
 
     void takeStep();
     void calculateStep();

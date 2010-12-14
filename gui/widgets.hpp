@@ -57,6 +57,9 @@ public:
     void SelectNextOccupant(bool forward);
     QSize sizeHint() const;
 
+    void SetZoom(int scale);
+    int CurrentZoom();
+
     void keyReleaseEvent(QKeyEvent *);
 
 public slots:

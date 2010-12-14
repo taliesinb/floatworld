@@ -231,6 +231,17 @@ void MainWindow::on_actionLoad_triggered()
     gridWidget->Draw();
 }
 
+void MainWindow::on_actionZoomIn_triggered()
+{
+    gridWidget->SetZoom(gridWidget->CurrentZoom() + 1);
+}
+
+void MainWindow::on_actionZoomOut_triggered()
+{
+    int z = gridWidget->CurrentZoom() - 1;
+    gridWidget->SetZoom(z < 3 ? 3 : z);
+}
+
 void MainWindow::DisplayInspector(Occupant *occ)
 {
     if (occ->qt_hook)

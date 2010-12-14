@@ -44,11 +44,12 @@
         <file>icons/play-2.png</file>
         <file>icons/play-1.png</file>
         <file>icons/play-0.png</file>
-        <file>icons/document-open.svg</file>
-        <file>icons/document-save-as.svg</file>
-        <file>icons/document-save.svg</file>
-        <file>icons/document-new.svg</file>
         <file>icons/blue-right-right.png</file>
         <file>icons/red-stop.png</file>
+        <file>icons/new.png</file>
+        <file>icons/open.png</file>
+        <file>icons/save-as.png</file>
+        <file>icons/zoom-in.png</file>
+        <file>icons/zoom-out.png</file>
     </qresource>
 </RCC>

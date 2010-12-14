@@ -277,6 +277,19 @@ void GridWidget::UpdateOccupant()
     }
 }
 
+void GridWidget::SetZoom(int scale)
+{
+    matrix_label->pixel_scale = scale;
+    matrix_label->setMaximumSize(sizeHint());
+    updateGeometry();
+    Rerender();
+}
+
+int GridWidget::CurrentZoom()
+{
+    return matrix_label->pixel_scale;
+}
+
 void GridWidget::keyReleaseEvent(QKeyEvent* event)
 {
     Creat* creat = dynamic_cast<Creat*>(selected_occupant);
