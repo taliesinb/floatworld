@@ -28,11 +28,13 @@ public:
 
 protected:
 
+    void resizeEvent(QResizeEvent *);
     void mousePressEvent(QMouseEvent* event);
     void paintEvent(QPaintEvent *event);
 
 signals:
 
+    void WasResized();
     void OverPaint(QPainter&);
     void ClickedCell(Pos pos);
 
@@ -52,6 +54,7 @@ private:
     QScrollArea* scroll_area;
     MatrixView* energy;
     float draw_fraction;
+    float tmp_x, tmp_y;
 
 public:
     Grid* grid;
@@ -75,6 +78,7 @@ public slots:
     void UnselectOccupant();
     void UpdateOccupant();
     void OnChildPaint(QPainter&);
+    void RecenterZoom();
 
 signals:
     void OccupantSelected(Occupant*);

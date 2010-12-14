@@ -9,6 +9,7 @@
 #include <QImage>
 #include <QScrollArea>
 #include <QGridLayout>
+#include <QScrollBar>
 
 using namespace std;
 
@@ -121,6 +122,11 @@ void MatrixView::paintEvent(QPaintEvent*)
     }
 }
 
+void MatrixView::resizeEvent(QResizeEvent *)
+{
+    WasResized();
+}
+
 void MatrixView::mousePressEvent(QMouseEvent *event)
 {
     int x = (event->x() - border) / scale;
@@ -160,6 +166,7 @@ QGrid::QGrid(QWidget* parent) :
 
     connect(energy, SIGNAL(OverPaint(QPainter&)), this, SLOT(OnChildPaint(QPainter&)));
     connect(energy, SIGNAL(ClickedCell(Pos)), this, SLOT(SelectAtPos(Pos)));
+    connect(energy, SIGNAL(WasResized()), this, SLOT(RecenterZoom()));
 }
 
 std::ostream& operator<<(std::ostream& s, QSize size)
@@ -219,12 +226,34 @@ void QGrid::UpdateOccupant()
     }
 }
 
+float getScrollBarFraction(QScrollBar* s)
+{
+    float step = s->pageStep();
+    float range = s->maximum() - s->minimum() + step;
+    if (range < 1) return 0.5;
+    return (s->value() + step/2.0 - s->minimum()) / range;
+}
+
+void setScrollBarFraction(QScrollBar* s, float frac)
+{
+    float step = s->pageStep();
+    float range = s->maximum() - s->minimum() + step;
+    s->setValue(frac * range - step/2.0 + s->minimum());
+}
+
 void QGrid::SetZoom(int scale)
 {
+    tmp_x = getScrollBarFraction(scroll_area->horizontalScrollBar());
+    tmp_y = getScrollBarFraction(scroll_area->verticalScrollBar());
     energy->scale = scale * 2;
     energy->setMaximumSize(sizeHint());
     updateGeometry();
-    repaint();
+}
+
+void QGrid::RecenterZoom()
+{
+    setScrollBarFraction(scroll_area->horizontalScrollBar(), tmp_x);
+    setScrollBarFraction(scroll_area->verticalScrollBar(), tmp_y);
 }
 
 int QGrid::CurrentZoom()
@@ -237,6 +266,7 @@ void QGrid::OnChildPaint(QPainter& painter)
     int draw_type = grid->draw_type;
     int scale = energy->scale;
     bool poly = scale > 6;
+
     QColor color;
     QPolygonF tri;
     float pi = 3.1415;
@@ -244,6 +274,10 @@ void QGrid::OnChildPaint(QPainter& painter)
     tri << QPointF(sin(0), cos(0))/z;
     tri << QPointF(0.8 * sin(2 * pi / 3), cos(2 * pi / 3))/z;
     tri << QPointF(0.8 * sin(4 * pi / 3), cos(4 * pi / 3))/z;
+
+    QPen blockpen;
+    blockpen.setWidthF(1.2);
+    blockpen.setCosmetic(true);
 
     painter.save();
     painter.translate(border, border);
@@ -311,7 +345,8 @@ void QGrid::OnChildPaint(QPainter& painter)
             color.setHsv(255 * block->draw_hue, 110, 255);
             if (poly) {
                 painter.save();
-                painter.setPen(color);
+                painter.setPen(blockpen);
+                blockpen.setColor(color);
                 if (block->draw_filled) painter.setBrush(color.darker());
                 painter.drawEllipse(QPointF(block->pos.col + 0.5, block->pos.row + 0.5), 0.45, 0.45);
                 painter.restore();
