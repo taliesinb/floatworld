@@ -65,6 +65,7 @@ class MatrixWidget : public MatrixView, public Hook
 public:
     MatrixWidget(int pixel, bool flip);
     virtual void OnSetPointer();
+    virtual void Synchronize(bool inbound);
 };
 
 class HookManager : public QFormLayout

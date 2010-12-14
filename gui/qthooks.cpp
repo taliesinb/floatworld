@@ -96,6 +96,11 @@ void MatrixWidget::OnSetPointer()
     matrix = static_cast<Matrix*>(ptr);
 }
 
+void MatrixWidget::Synchronize(bool inbound)
+{
+    if (inbound) repaint();
+}
+
 HookManager::HookManager(Class *mc, Object *obj)
     : mclass(mc), object(obj)
 {
