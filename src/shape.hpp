@@ -44,7 +44,6 @@ class Circle : public Shape
     void DrawStochastic(Matrix& m, int n);
 };
 
-/*
 class GaussianCircle : public Circle
 {
   public:
@@ -53,6 +52,7 @@ class GaussianCircle : public Circle
     void DrawStochastic(Matrix& m, int n);
 };
 
+/*
 class Annalus : public Shape
 {
   public:

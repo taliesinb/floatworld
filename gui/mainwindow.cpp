@@ -41,12 +41,12 @@ MainWindow::MainWindow(QWidget *parent)
 
     grid->max_age = 120;
 
-    for (int i = 0; i < 6; i++)
+    for (int i = 0; i < 15; i++)
     {
-        Circle* c = new Circle;
+        Circle* c = new GaussianCircle;
         c->Attach(*grid, grid->RandomCell());
         c->AssignID();
-        c->radius = 12;
+        c->radius = 14;
         c->threshold = 7;
         c->p_jump = 0.01;
         for (int k = 0; k < 10; k++) c->Update();

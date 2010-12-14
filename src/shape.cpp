@@ -17,6 +17,8 @@ RegisterClass(Circle, Shape);
 RegisterVar(Circle, radius);
 RegisterQtHook(Circle, radius, "radius", IntegerHook(0, 100));
 
+RegisterClass(GaussianCircle, Circle);
+
 /*
 RegisterClass(GaussianCircle, Circle);
 
@@ -218,7 +220,7 @@ void Rectangle::DrawStochastic(Matrix& m, int n)
     Inject(m, y, x, de);
   }
 }
-
+*/
 void GaussianCircle::DrawFull(Matrix& m)
 {
   float r2 = radius * radius;
@@ -245,5 +247,5 @@ void GaussianCircle::DrawStochastic(Matrix& m, int n)
     Inject(m, r, c, de * exp(3*-d/r2));
   }
 }
-*/
+
 

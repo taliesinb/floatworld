@@ -91,17 +91,21 @@ void MatrixLabel::paintEvent(QPaintEvent*)
     if (highlighted.Inside(h, w))
     {
         QPen pen;
-        pen.setWidth(1);
+        pen.setWidth(2);
         pen.setColor(QColor(255,255,255,100));
         painter.setPen(pen);
-        painter.drawEllipse(QPoint(
-                border + pixel_scale * (highlighted.col + 0.5),
-                border + pixel_scale * (highlighted.row + 0.5)),
-                int(3*pixel_scale), int(3*pixel_scale));
-//        painter.drawRect(QRect(border + pixel_scale * highlighted.col - 2,
-//                           border + pixel_scale * highlighted.row - 2,
-//                           pixel_scale + 4, pixel_scale + 4));
-
+        if (draw_grid)
+        {
+            painter.drawRect(QRect(border + pixel_scale * highlighted.col - 2,
+                                   border + pixel_scale * highlighted.row - 2,
+                                   pixel_scale + 4, pixel_scale + 4));
+        } else
+        {
+            painter.drawEllipse(QPoint(
+                    border + pixel_scale * (highlighted.col + 0.5),
+                    border + pixel_scale * (highlighted.row + 0.5)),
+                                int(3*pixel_scale), int(3*pixel_scale));
+        }
     }
 }
 
