@@ -85,7 +85,7 @@ void read_grid_occupant_order(Grid* g, std::istream& s)
     s >> order;
     for_iterate(it, order)
     {
-        short id = *it;
+        int id = *it;
         Occupant* occ = g->LookupOccupantByID(id);
         if (!occ) {
             cerr << "Failed to find occupant by id " << id << endl;
