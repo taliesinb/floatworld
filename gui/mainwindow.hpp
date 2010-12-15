@@ -4,6 +4,7 @@
 #include <QtGui/QMainWindow>
 #include <QtGui/QGraphicsView>
 #include <QTimer>
+#include <QElapsedTimer>
 
 #include "../src/misc.hpp"
 #include "../src/pos.hpp"
@@ -21,8 +22,8 @@ class MainWindow : public QMainWindow, public Ui::MainWindow
 
 public:
     Matrix adam;
-    QTimer timer;
-    QTimer fast_timer;
+    QElapsedTimer timer;
+    QTimer ticker;
     float speed;
     float stepper;
     float last_stepper;
@@ -49,8 +50,7 @@ private slots:
     void on_actionZoomIn_triggered();
     void on_actionZoomOut_triggered();
 
-    void takeStep();
-    void calculateStep();
+    void Tick();
 
     void DisplayInspector(Occupant* occ);
 };

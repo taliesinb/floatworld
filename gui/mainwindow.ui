@@ -166,7 +166,7 @@
     <string>Play</string>
    </property>
    <property name="toolTip">
-    <string>10 updates per second</string>
+    <string>Play at about 10 updates a second</string>
    </property>
    <property name="shortcut">
     <string>Space</string>
@@ -258,7 +258,7 @@
     <string>Fast</string>
    </property>
    <property name="toolTip">
-    <string>40 updates per second</string>
+    <string>Play at high speed</string>
    </property>
   </action>
   <action name="actionIndividualStep">
@@ -318,7 +318,7 @@
     <string>Slow</string>
    </property>
    <property name="toolTip">
-    <string>4 updates per second</string>
+    <string>Play at about 5 updates a second</string>
    </property>
   </action>
   <action name="actionPlaySlowest">
@@ -333,7 +333,7 @@
     <string>Slowest</string>
    </property>
    <property name="toolTip">
-    <string>1 update per second</string>
+    <string>Play at about 1 update per second</string>
    </property>
   </action>
   <action name="actionPlayFastest">
@@ -348,7 +348,7 @@
     <string>Fastest</string>
    </property>
    <property name="toolTip">
-    <string>160 updates per second</string>
+    <string>Play at maximum speed</string>
    </property>
   </action>
   <action name="actionFF">

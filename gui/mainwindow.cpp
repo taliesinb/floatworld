@@ -73,9 +73,8 @@ MainWindow::MainWindow(QWidget *parent)
         block->AssignID();
     }
 
-    connect(&timer, SIGNAL(timeout()), this, SLOT(takeStep()));
-    connect(&fast_timer, SIGNAL(timeout()), this, SLOT(calculateStep()));
-    timer.start(40); // 25 fps
+    ticker.setInterval(1);
+    connect(&ticker, SIGNAL(timeout()), this, SLOT(Tick()));
 
     gridWidget->Draw();
 
@@ -91,6 +90,7 @@ MainWindow::MainWindow(QWidget *parent)
     actionStop->setChecked(true);
     speed_group.setExclusive(true);
     connect(&speed_group, SIGNAL(triggered(QAction*)), this, SLOT(speed_trigger(QAction*)));
+    actionFF->setAutoRepeat(false);
 
     connect(grid->qt_hook, SIGNAL(value_changed()), gridWidget, SLOT(Draw()));
     connect(gridWidget, SIGNAL(OccupantSelected(Occupant*)), this, SLOT(DisplayInspector(Occupant*)));
@@ -114,21 +114,6 @@ MainWindow::MainWindow(QWidget *parent)
     repaint();
 }
 
-void MainWindow::SetSpeed(float s)
-{
-    if (speed == s)
-        actionStop->trigger();
-    else
-    {
-        speed = s;
-        if (s >= 1)
-            fast_timer.start(1);
-        else if (fast_timer.isActive())
-            fast_timer.stop();
-    }
-    gridWidget->Draw();
-}
-
 void MainWindow::speed_trigger(QAction* action)
 {
     if (action == actionPlaySlowest) SetSpeed(0.05);
@@ -136,61 +121,65 @@ void MainWindow::speed_trigger(QAction* action)
     if (action == actionPlayNormal) SetSpeed(0.5);
     if (action == actionPlayFast) SetSpeed(2.0);
     if (action == actionPlayFastest) SetSpeed(8.0);
-
     if (action == actionStop) {
         speed = 0;
-        fast_timer.stop();
+        ticker.stop();
+        stepper = ceil(stepper);
+        gridWidget->SetDrawFraction(1.0);
+        gridWidget->Draw();
     }
+}
+
+void MainWindow::SetSpeed(float s)
+{
+    if (speed == s)
+        actionStop->trigger();
+    else
+    {
+        speed = s;
+        if (speed < 1) ticker.start(40.0);
+        else if (speed == 2) ticker.start(5.0);
+        else ticker.start(0);
+    }
+}
+
+void MainWindow::Tick()
+{
+    if (speed > 2)
+    {
+        timer.start();
+        grid->hooks_enabled = false;
+        for (int i = 0; i < speed * 2; i++)
+        {
+            grid->Step();
+            if (timer.elapsed() > 100) break;
+        }
+        grid->hooks_enabled = true;
+        grid->Step();
+    } else {
+        stepper += speed;
+        if (stepper >= last_stepper + 1)
+        {
+            stepper = last_stepper + 1;
+            last_stepper = stepper;
+            grid->Step();
+        }
+    }
+    gridWidget->SetDrawFraction(speed > 1 ? 1.0 : (stepper - floor(stepper)));
+    gridWidget->Draw();
+    grid->UpdateQtHook();
 }
 
 void MainWindow::ff_pressed()
 {
-    //block_draw = true;
-    SetSpeed(16.0);
+    SetSpeed(8.0);
 }
 
 void MainWindow::ff_released()
 {
-    //block_draw = false;
     grid->UpdateQtHook();
     speed_trigger(speed_group.checkedAction());
 }
-
-void MainWindow::calculateStep()
-{
-    grid->hooks_enabled = false;
-    grid->Step();
-    if (stepper++ > last_stepper + speed)
-        fast_timer.stop();
-    grid->hooks_enabled = true;
-}
-
-void MainWindow::takeStep()
-{
-    if (!speed) return;
-
-    if (stepper >= ceil(last_stepper + speed))
-    {
-        last_stepper = stepper;
-        stepper += speed;
-        gridWidget->SetDrawFraction(speed < 1 ? 0.0 : 1.0);
-        grid->Step();
-        if (!block_draw) { // for fast forwarding
-            gridWidget->Draw();
-            grid->UpdateQtHook();
-        }
-    } else if (speed < 1)
-    {
-        gridWidget->SetDrawFraction(stepper - floor(stepper));
-        gridWidget->Draw();
-    }
-
-    if (speed < 1)
-        stepper += speed;
-    else if (!fast_timer.isActive())
-        fast_timer.start(1);
-}
-
 
 void MainWindow::on_actionStep_triggered()
 {
