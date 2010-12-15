@@ -522,6 +522,7 @@ void Grid::Step()
     while (it != occupant_list.end())
     {
         Occupant* occ = *it++;
+        occ->last_pos = occ->pos;
         occ->Update();
         if (hooks_enabled) occ->UpdateQtHook();
     }

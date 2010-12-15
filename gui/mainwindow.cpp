@@ -41,7 +41,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     grid->max_age = 120;
 
-    for (int i = 0; i < 15; i++)
+    for (int i = 0; i < 10; i++)
     {
         Circle* c = new GaussianCircle;
         c->Attach(*grid, grid->RandomCell());
@@ -59,9 +59,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     grid->AddCreats(30, true);
 
-    for (int k = 0; k < 0; k++)
+    for (int k = 0; k < 80; k++)
     {
-        Occupant* block = new SkinnerBlock();
+        Occupant* block = new RewardBlock();
         block->Attach(*grid, grid->RandomCell());
         block->AssignID();
     }

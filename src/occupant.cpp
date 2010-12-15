@@ -78,7 +78,6 @@ void Occupant::RemoveFromLL()
 void Occupant::Move(Pos pos2)
 {
     RemoveFromLL();
-    last_pos = pos;
     pos = pos2;
     Occupant*& cell = grid->OccupantAt(pos);
     next = cell;
