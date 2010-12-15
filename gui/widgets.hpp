@@ -4,6 +4,7 @@
 #include <QtGui/QWidget>
 
 #include "src/pos.hpp"
+#include "src/metaclass.hpp"
 
 class Matrix;
 
@@ -45,10 +46,11 @@ signals:
 class Grid;
 class Occupant;
 class QScrollArea;
+class QFormLayout;
 
-class QGrid : public QWidget
+class QGrid : public QWidget, public Object
 {
-    Q_OBJECT
+    Q_OBJECT    
 
 private:
     QScrollArea* scroll_area;
@@ -57,13 +59,26 @@ private:
     float tmp_x, tmp_y;
 
 public:
+    enum {
+        DrawAction,
+        DrawAge,
+        DrawEnergy,
+        DrawColor
+    } draw_type;
+    bool draw_creats;
+    bool draw_blocks;
+    bool draw_energy;
+
+public:
     Grid* grid;
-    QGrid(QWidget* parent);
+    QGrid(QWidget* parent = NULL);
 
     Occupant* selected_occupant;
     void SelectOccupant(Occupant* occ);
     void SelectNextOccupant(bool forward);
     QSize sizeHint() const;
+
+    void ConstructSettingsPanel(QFormLayout* layout);
 
     void SetZoom(int scale);
     int CurrentZoom();

@@ -13,8 +13,25 @@
 
 using namespace std;
 
+/* IGNORE FOR NOW
+RegisterVar(QGrid, draw_type);
+RegisterVar(QGrid, draw_creats);
+RegisterVar(QGrid, draw_blocks);
+RegisterVar(QGrid, draw_energy);
+*/
+RegisterClass(QGrid, None);
+RegisterQtHook(QGrid, draw_type, "color by", EnumHook("Action\nEnergy\nAge\nPlumage"));
+RegisterQtHook(QGrid, draw_creats, "draw creats", BoolHook());
+RegisterQtHook(QGrid, draw_energy, "draw energy", BoolHook());
+RegisterQtHook(QGrid, draw_blocks, "draw blocks", BoolHook());
+
 int sz = 120;
 int border = 3;
+
+QRgb BlackColorFunc(float value)
+{
+    return qRgb(0,0,0);
+}
 
 QRgb WhiteBlueColorFunc(float value)
 {
@@ -149,6 +166,11 @@ QGrid::QGrid(QWidget* parent) :
     energy = new MatrixView(4, false, false);
     energy->matrix = &grid->energy;
 
+    draw_type = DrawAction;
+    draw_creats = true;
+    draw_blocks = true;
+    draw_energy = true;
+
     scroll_area->setWidgetResizable(true);
     scroll_area->setLineWidth(0);
     scroll_area->setFrameStyle(0);
@@ -164,6 +186,9 @@ QGrid::QGrid(QWidget* parent) :
     layout->addWidget(scroll_area);
     setLayout(layout);
 
+    SetupQtHook(false);
+
+    connect(this->qt_hook, SIGNAL(value_changed()), this, SLOT(Draw()));
     connect(energy, SIGNAL(OverPaint(QPainter&)), this, SLOT(OnChildPaint(QPainter&)));
     connect(energy, SIGNAL(ClickedCell(Pos)), this, SLOT(SelectAtPos(Pos)));
     connect(energy, SIGNAL(WasResized()), this, SLOT(RecenterZoom()));
@@ -179,7 +204,6 @@ QSize QGrid::sizeHint() const
 {
     return energy->sizeHint() + QSize(40,40);// + QSize(50,100);
 }
-
 
 void QGrid::SelectAtPos(Pos pos)
 {
@@ -263,7 +287,6 @@ int QGrid::CurrentZoom()
 
 void QGrid::OnChildPaint(QPainter& painter)
 {
-    int draw_type = grid->draw_type;
     int scale = energy->scale;
     bool poly = scale > 6;
 
@@ -286,6 +309,9 @@ void QGrid::OnChildPaint(QPainter& painter)
     for_iterate(it, grid->occupant_list)
     {
         Occupant* occ = *it;
+
+        if (!occ->solid) continue;
+
         Pos pos2 = occ->pos;
         Pos pos1 = occ->last_pos;
         if (draw_fraction != 1.0 && (pos2 - pos1).Mag() > 1)
@@ -299,7 +325,9 @@ void QGrid::OnChildPaint(QPainter& painter)
         float y = pos2.row * draw_fraction + pos1.row * (1 - draw_fraction);
 
         Creat* creat = dynamic_cast<Creat*>(occ);
-        if (creat)
+        Block* block = dynamic_cast<Block*>(occ);
+
+        if (creat && draw_creats)
         {
             switch (draw_type) {
             case DrawAge: {
@@ -347,10 +375,13 @@ void QGrid::OnChildPaint(QPainter& painter)
                 painter.rotate((orient2 * draw_fraction + orient1 * (1 - draw_fraction)) * 90);
                 painter.drawPolygon(tri);
                 painter.restore();
-            }
-        } else if (Block* block = dynamic_cast<Block*>(occ))
+            } else
+                painter.fillRect(QRectF(x, y, 1.0 - 1./scale, 1.0 - 1./scale), color);
+
+        } else if (block && draw_blocks)
         {
             color.setHsv(255 * block->draw_hue, 200, 255);
+
             if (poly) {
                 painter.save();
                 painter.setPen(blockpen);
@@ -361,10 +392,9 @@ void QGrid::OnChildPaint(QPainter& painter)
                 else
                     painter.drawRect(QRectF(x + off, y + off , 1.0 - 2 * off, 1.0 - 2 * off));
                 painter.restore();
-            }
+            } else
+                painter.fillRect(QRectF(x, y, 1.0 - 1./scale, 1.0 - 1./scale), color);
         }
-        if (!poly && occ->solid)
-            painter.fillRect(QRectF(x, y, 1.0 - 1./scale, 1.0 - 1./scale), color);
     }
     painter.restore();
 }
@@ -435,6 +465,8 @@ void QGrid::SetDrawFraction(float frac)
 
 void QGrid::Draw()
 {
+    energy->color_func = draw_energy ? &WhiteBlueColorFunc : &BlackColorFunc;
+
     if (selected_occupant)
         energy->highlighted = selected_occupant->pos;
     repaint();

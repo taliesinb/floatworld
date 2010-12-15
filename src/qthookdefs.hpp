@@ -2,6 +2,7 @@
 #define QTHOOKDEFS_HPP
 
 class QWidget;
+class QFormLayout;
 
 class Hook
 {
@@ -11,9 +12,9 @@ public:
 
     Hook(const char* sig);
     virtual ~Hook();
-    void SetPointer(void* ptr);
-    QWidget* AsWidget();
 
+    Hook* SetPointer(void* ptr);
+    QWidget* AsWidget();
     virtual void OnSetPointer();
     virtual void Synchronize(bool inbound);
 };

@@ -10,10 +10,11 @@ Hook::~Hook()
 
 }
 
-void Hook::SetPointer(void *p)
+Hook* Hook::SetPointer(void *p)
 {
     ptr = p;
     OnSetPointer();
+    return this;
 }
 
 void Hook::OnSetPointer()

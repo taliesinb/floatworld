@@ -43,11 +43,6 @@ RegisterVar(Grid, neural_net_iterations)
 RegisterVar(Grid, mutation_color_drift)
 RegisterVar(Grid, mutation_prob)
 RegisterVar(Grid, mutation_sd)
-RegisterVar(Grid, draw_type)
-RegisterVar(Grid, draw_creats_only)
-
-RegisterQtHook(Grid, draw_type, "display method", EnumHook("Action\nAge\nEnergy\nPlumage"));
-RegisterQtHook(Grid, draw_creats_only, "creats only", BoolHook());
 
 RegisterQtHook(Grid, timestep, "timestep", IntegerLabel());
 RegisterQtHook(Grid, num_creats, "population", IntegerLabel());
@@ -117,9 +112,6 @@ Grid::Grid()
     max_age = 100;
     total_steps = 0;
     next_id = 0;
-
-    draw_type = DrawAction;
-    draw_creats_only = false;
 
     initial_energy = 2;
     initial_marker = 0.0;
@@ -518,11 +510,19 @@ void Grid::ColorClusters()
 
 void Grid::Step()
 {
-    list<Occupant*>::iterator it = occupant_list.begin();
+    list<Occupant*>::iterator it;
+
+    it = occupant_list.begin();
     while (it != occupant_list.end())
     {
         Occupant* occ = *it++;
         occ->last_pos = occ->pos;
+    }
+
+    it = occupant_list.begin();
+    while (it != occupant_list.end())
+    {
+        Occupant* occ = *it++;
         occ->Update();
         if (hooks_enabled) occ->UpdateQtHook();
     }

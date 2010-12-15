@@ -92,7 +92,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(&speed_group, SIGNAL(triggered(QAction*)), this, SLOT(speed_trigger(QAction*)));
     actionFF->setAutoRepeat(false);
 
-    connect(grid->qt_hook, SIGNAL(value_changed()), gridWidget, SLOT(Draw()));
+    renderSettingsBox->setLayout(gridWidget->qt_hook);
+
     connect(gridWidget, SIGNAL(OccupantSelected(Occupant*)), this, SLOT(DisplayInspector(Occupant*)));
 
     gridWidget->setMaximumSize(gridWidget->sizeHint());
