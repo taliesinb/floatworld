@@ -527,6 +527,7 @@ void Grid::Step()
         if (hooks_enabled) occ->UpdateQtHook();
     }
 
+
     if (energy_decay_rate != 0.0) energy *= (1.0 - energy_decay_rate);
 
     if (num_creats == 0 && enable_respawn)

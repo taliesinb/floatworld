@@ -34,12 +34,12 @@ void Occupant::AssignID()
 {
     assert(grid);
     id = grid->next_id++;
+    grid->occupant_list.push_back(this);
 }
 
 void Occupant::Attach(Grid& g, Pos p)
 {
     grid = &g;
-    grid->occupant_list.push_back(this);
     Move(p);
     last_pos = p;
 }
