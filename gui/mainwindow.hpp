@@ -35,6 +35,7 @@ private slots:
 
     void speed_trigger(QAction*);
     void on_actionStep_triggered();
+    void on_actionStepBack_triggered();
     void on_actionIndividualStep_triggered();
     void on_actionNextOccupant_triggered();
     void on_actionPrevOccupant_triggered();

@@ -6,14 +6,14 @@ RegisterVar(Shape, energy);
 RegisterVar(Shape, ratio);
 RegisterVar(Shape, p_jump);
 
-RegisterQtHook(Shape, threshold, "Emax", -50,50,0.25);
-RegisterQtHook(Shape, energy, "Einc", -5,5,0.1);
-RegisterQtHook(Shape, ratio,  "fill", 0,1,0.1);
-RegisterQtHook(Shape, p_jump, "pjump", 0, 1, 0.001);
+RegisterBinding(Shape, threshold, "Emax", -50,50,0.25);
+RegisterBinding(Shape, energy, "Einc", -5,5,0.1);
+RegisterBinding(Shape, ratio,  "fill", 0,1,0.1);
+RegisterBinding(Shape, p_jump, "pjump", 0, 1, 0.001);
 
 RegisterClass(Circle, Shape);
 RegisterVar(Circle, radius);
-RegisterQtHook(Circle, radius, "radius", 0, 100);
+RegisterBinding(Circle, radius, "radius", 0, 100);
 
 RegisterClass(GaussianCircle, Circle);
 

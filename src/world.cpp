@@ -45,20 +45,20 @@ RegisterVar(World, mutation_prob)
 RegisterVar(World, mutation_sd)
 RegisterVar(World, jump_range)
 
-RegisterQtHook(World, timestep, "timestep");
-RegisterQtHook(World, num_creats, "population");
-RegisterQtHook(World, interaction_type, "interaction", "None\nPenalty\nAttack\nZombie\nParasitism\nPredation\nMutualism\nAltruism\nGeneExchange\nGeneGive\nGeneReceive\nMate");
-RegisterQtHook(World, max_age, "maximum age", 0, 1000);
-RegisterQtHook(World, mutation_prob, "mutation probability", 0, 1, 0.02);
-RegisterQtHook(World, initial_energy, "initial energy", -50, 50);
-RegisterQtHook(World, enable_respawn, "enable respawning");
-RegisterQtHook(World, initial_mutations, "respawn diversity", 0, 20);
-RegisterQtHook(World, enable_mutation, "enable mutation");
-//RegisterQtHook(World, mutation_color_drift, "plumage drift", BoolHook());
-RegisterQtHook(World, neural_net_iterations, "neural iterations", 1, 10);
-RegisterQtHook(World, energy_decay_rate, "energy decay rate", 0, 0.5, 0.01);
-RegisterQtHook(World, path_energy, "energy wake", -20, 20);
-RegisterQtHook(World, jump_range, "jump range", 0, 10);
+RegisterBinding(World, timestep, "timestep");
+RegisterBinding(World, num_creats, "population");
+RegisterBinding(World, interaction_type, "interaction", "None\nPenalty\nAttack\nZombie\nParasitism\nPredation\nMutualism\nAltruism\nGeneExchange\nGeneGive\nGeneReceive\nMate");
+RegisterBinding(World, max_age, "maximum age", 0, 1000);
+RegisterBinding(World, mutation_prob, "mutation probability", 0, 1, 0.02);
+RegisterBinding(World, initial_energy, "initial energy", -50, 50);
+RegisterBinding(World, enable_respawn, "enable respawning");
+RegisterBinding(World, initial_mutations, "respawn diversity", 0, 20);
+RegisterBinding(World, enable_mutation, "enable mutation");
+//RegisterBinding(World, mutation_color_drift, "plumage drift", BoolHook());
+RegisterBinding(World, neural_net_iterations, "neural iterations", 1, 10);
+RegisterBinding(World, energy_decay_rate, "energy decay rate", 0, 0.5, 0.01);
+RegisterBinding(World, path_energy, "energy wake", -20, 20);
+RegisterBinding(World, jump_range, "jump range", 0, 10);
 
 RegisterVar(World, occupant_list)
 
@@ -674,8 +674,8 @@ RegisterVar(Occupant, pos);
 RegisterVar(Occupant, signature);
 RegisterVar(Occupant, id);
 
-RegisterQtHook(Occupant, signature, "color", -5.0, 5.0, 0.25);
-RegisterQtHook(Occupant, solid, "solid");
+RegisterBinding(Occupant, signature, "color", -5.0, 5.0, 0.25);
+RegisterBinding(Occupant, solid, "solid");
 
 Occupant::Occupant()
   : next(NULL), grid(NULL), pos(0,0), signature(0), id(-1), solid(true)

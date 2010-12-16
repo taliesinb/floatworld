@@ -114,57 +114,20 @@ class Registrator
     Registrator(Class& metaclass, const char* label, HookFactory factory);
 };   
 
-/*
-
- we need a factory function to pass a reference to the actual
- class member. this factory function will take create a new
- widget with the right variables and then connect to a void
- pointer.
-
- registerqtchook(class, name, label, hookwidget)
- hook* factory(object* obj) =
- {
-    hook* = new hookwidget;
-    hook->SetPointer(static_cast<void*>(dynamic_cast<class*>(obj)->name)
-    return hook;
- }
-
- RegisterQtHook actually takes a new widget as a
- 'prototype'. It will copy it and then hook it to
- the corresponding value. But we want the corresponding
- classes to only be parameterized on type. So they need
- to take a pointer to the value they are hooked to.
- They also need to have refresh() method.
-
- What will registerqthook look like?
-
- registerqthook(class, name, label, hookwidget*)
-
- hookwidget will have a refresh method and an setpointer
- method. setpointer will have to be void*. It will do a
- reinterpretcast to the appropriate type.
-
- hookwidget will also know how to clone itself. but it'll
- have to clone itself from an ordinary pointer. so we need
- another cast to cast it to its own type.
-
-
-*/
-
-#define RegisterQtHook(CLASS, NAME, LABEL, ...)     \
-    QWidget* CLASS##NAME##Factory(Object* obj) {            \
+#define RegisterBinding(CLASS, NAME, LABEL, ...)                                \
+    QWidget* CLASS##NAME##Factory(Object* obj) {                                \
     Binding* h = Binding::New(dynamic_cast<CLASS*>(obj)->NAME, ##__VA_ARGS__);  \
-    return h->AsWidget(); }                                 \
-    Registrator CLASS##NAME##BindingRegistrator(CLASS##MetaClass, \
+    return h->AsWidget(); }                                                     \
+    Registrator CLASS##NAME##BindingRegistrator(CLASS##MetaClass,               \
     LABEL, &CLASS##NAME##Factory);
 
 
-#define RegisterClass(CLASS, PARENT)                           \
-    Object* CLASS##Factory() { return new CLASS; }              \
-    Class CLASS##MetaClass(#CLASS, #PARENT,                \
+#define RegisterClass(CLASS, PARENT)                                \
+    Object* CLASS##Factory() { return new CLASS; }                  \
+    Class CLASS##MetaClass(#CLASS, #PARENT,                         \
     &CLASS##Factory);
 
-#define RegisterAbstractClass(CLASS, PARENT)                   \
+#define RegisterAbstractClass(CLASS, PARENT)                        \
     Class CLASS##MetaClass(#CLASS, #PARENT, NULL);
 
 #define RegisterVar(CLASS, NAME)                                    \
@@ -172,15 +135,15 @@ class Registrator
     { os << (dynamic_cast<CLASS*>(obj))->NAME; }                    \
     void CLASS##Reader##NAME(Object* obj, std::istream& is)         \
     { is >> (dynamic_cast<CLASS*>(obj))->NAME; }                    \
-    Registrator CLASS##NAME##Registrator(CLASS##MetaClass,      \
+    Registrator CLASS##NAME##Registrator(CLASS##MetaClass,          \
     #NAME, &CLASS##Reader##NAME, &CLASS##Writer##NAME);
 
-#define RegisterCustomVar(CLASS, FIELD, SAVE, LOAD)         \
+#define RegisterCustomVar(CLASS, FIELD, SAVE, LOAD)                 \
     void CLASS##SaveHelper##FIELD(Object* obj, std::ostream& os)    \
-    { SAVE(dynamic_cast<CLASS*>(obj), os); }                    \
+    { SAVE(dynamic_cast<CLASS*>(obj), os); }                        \
     void CLASS##LoadHelper##FIELD(Object* obj, std::istream& is)    \
-    { LOAD(dynamic_cast<CLASS*>(obj), is); }                    \
-    Registrator CLASS##FIELD##Registrator(CLASS##MetaClass,     \
+    { LOAD(dynamic_cast<CLASS*>(obj), is); }                        \
+    Registrator CLASS##FIELD##Registrator(CLASS##MetaClass,         \
     #FIELD, &CLASS##LoadHelper##FIELD, &CLASS##SaveHelper##FIELD);
 
 #endif

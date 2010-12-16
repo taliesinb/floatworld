@@ -181,10 +181,21 @@ void MainWindow::ff_released()
     grid->UpdateQtHook();
     speed_trigger(speed_group.checkedAction());
 }
-
 void MainWindow::on_actionStep_triggered()
 {
+//    ostringstream str;
+//    str << qworld;
+//    world_cache.push_back(str);
     qworld->Step();
+}
+
+void MainWindow::on_actionStepBack_triggered()
+{
+//    string str;
+//    str = world_cache.back();
+//    world_cache.pop_back();
+//    qworld << str;
+//    Draw();
 }
 
 void MainWindow::on_actionIndividualStep_triggered()

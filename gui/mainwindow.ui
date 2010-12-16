@@ -424,6 +424,15 @@
     <string>Clear creatures</string>
    </property>
   </action>
+  <action name="actionStepBack">
+   <property name="icon">
+    <iconset resource="floatworld.qrc">
+     <normaloff>:/icons/left-stop.png</normaloff>:/icons/left-stop.png</iconset>
+   </property>
+   <property name="text">
+    <string>Step back</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
