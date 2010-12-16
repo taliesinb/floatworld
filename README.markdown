@@ -16,15 +16,13 @@ Unlike [genetic algorithms](http://en.wikipedia.org/wiki/Genetic_algorithm), the
 
 Objects can be introduced into the environment to interact with the creatures. 
 
+Various parameters of the world can be controlled 'live', as well as parameters of the currently selected Creat or object. 
+
 ## Screenshot
 
-Here are two rather contextless screenshots from a recent build. Various parameters of the world can be controlled 'live', as well as parameters of the currently selected Creat or object. It's easier to encourage you to play around for yourself with the code than to explain what everything is in detail -- although I need to write a comprehensive tutorial before that is realistic. 
+For some screenshots, see the (wiki)[https://github.com/taliesinb/floatworld/wiki].
 
-There is a *little* more information on the wiki at [[Home]].
-
-[[frogs-12-16-2010.png]]
-
-[[skinner-12-16-2010.png]]
+It's easier to encourage you to play around for yourself with the code than to explain what everything is in detail -- although I need to write a comprehensive tutorial before that is realistic. 
 
 ## Building floatworld
 
@@ -52,15 +50,15 @@ The executable should then appear under `build/floatworld.app/Contents/MacOS`. I
 *   Simple objects like impassable blocks and [Skinner boxes](http://en.wikipedia.org/wiki/Skinner_box)
 *   Changing of various world parameters
 *   Inspection of individual Creat activity
+*   Animation of Creat movements and interactions using vector graphics
+*   Snapshotting of simulation runs so they can be rewound
 
 ## Planned functionality
 
 *   Drag and drop management of objects within the floatworld
-*   Animation of Creat movements and interactions using vector graphics
 *   Pluggable analysis widgets to monitor population size and dynamics, genetic diversity, and Creat behavior
 *   A library of loadable scenarios to illustrate various emergent phenomena
 *   A variety of interesting new objects for Creats to interact with
-*   Snapshotting of simulation runs so they can be rewound
 
 ## Similar projects
 
