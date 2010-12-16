@@ -2,7 +2,7 @@
 #define QTHOOKDEFS_HPP
 
 class QWidget;
-class QFormLayout;
+class Matrix;
 
 class Binding
 {
@@ -17,13 +17,13 @@ public:
     QWidget* AsWidget();
     virtual void OnSetPointer();
     virtual void Synchronize(bool inbound);
-};
 
-Binding* IntegerLabel();
-Binding* BindInteger(int min, int max);
-Binding* BindFloat(float min, float max, float step);
-Binding* BindBool();
-Binding* BindEnum(const char* str);
-Binding* BindMatrix(int size, bool flip);
+    static Binding* New(int& ptr);
+    static Binding* New(int& ptr, int min, int max);
+    static Binding* New(float& ptr, float min, float max, float step);
+    static Binding* New(bool& ptr);
+    static Binding* New(int& ptr, const char* labels);
+    static Binding* New(Matrix& matrix, int size, bool flip);
+};
 
 #endif // QTHOOKDEFS_HPP

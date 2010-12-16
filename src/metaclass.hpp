@@ -151,10 +151,9 @@ class Registrator
 
 #include "qthookdefs.hpp"
 
-#define RegisterQtHook(CLASS, NAME, LABEL, PROTOTYPE)       \
+#define RegisterQtHook(CLASS, NAME, LABEL, ...)     \
     QWidget* CLASS##NAME##Factory(Object* obj) {            \
-    Binding* h = PROTOTYPE;                                    \
-    h->SetPointer(reinterpret_cast<void*>(&dynamic_cast<CLASS*>(obj)->NAME)); \
+                                                            Binding* h = Binding::New(dynamic_cast<CLASS*>(obj)->NAME, ##__VA_ARGS__);  \
     return h->AsWidget(); }                                 \
     Registrator CLASS##NAME##BindingRegistrator(CLASS##MetaClass, \
     LABEL, &CLASS##NAME##Factory);

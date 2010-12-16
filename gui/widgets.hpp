@@ -64,7 +64,8 @@ public:
         DrawAge,
         DrawEnergy,
         DrawColor
-    } draw_type;
+    };
+    int draw_type;
     bool draw_creats;
     bool draw_blocks;
     bool draw_energy;

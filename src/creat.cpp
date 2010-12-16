@@ -18,12 +18,12 @@ RegisterVar(Creat, alive);
 RegisterVar(Creat, energy);
 RegisterVar(Creat, marker);
 
-RegisterQtHook(Creat, energy, "energy", BindFloat(0,500,1));
-RegisterQtHook(Creat, age, "age", BindInteger(0,1000));
-RegisterQtHook(Creat, interaction_count, "interacts", IntegerLabel());
-RegisterQtHook(Creat, action, "action", BindEnum("None\nForward\nLeft\nRight\nReproduce"));
-RegisterQtHook(Creat, state, "neurons", BindMatrix(7, true));
-RegisterQtHook(Creat, weights, "weights", BindMatrix(7, false));
+RegisterQtHook(Creat, energy, "energy", 0, 500, 1);
+RegisterQtHook(Creat, age, "age", 0, 1000);
+RegisterQtHook(Creat, interaction_count, "interacts");
+RegisterQtHook(Creat, action, "action", "None\nForward\nLeft\nRight\nReproduce");
+RegisterQtHook(Creat, state, "neurons", 7, true);
+RegisterQtHook(Creat, weights, "weights", 7, false);
 
 /*
 RegisterQtHook(Creat, orient, "Orientation", QSpinBox);

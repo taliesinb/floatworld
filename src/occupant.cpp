@@ -8,8 +8,8 @@ RegisterVar(Occupant, pos)
 RegisterVar(Occupant, signature)
 RegisterVar(Occupant, id)
 
-RegisterQtHook(Occupant, signature, "color", BindFloat(-5.0, 5.0, 0.25));
-RegisterQtHook(Occupant, solid, "solid", BindBool());
+RegisterQtHook(Occupant, signature, "color", -5.0, 5.0, 0.25);
+RegisterQtHook(Occupant, solid, "solid");
 
 Occupant::Occupant()
   : next(NULL), grid(NULL), pos(0,0), signature(0), id(-1), solid(true)

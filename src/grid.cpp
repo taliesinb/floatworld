@@ -45,20 +45,20 @@ RegisterVar(World, mutation_prob)
 RegisterVar(World, mutation_sd)
 RegisterVar(World, jump_range)
 
-RegisterQtHook(World, timestep, "timestep", IntegerLabel());
-RegisterQtHook(World, num_creats, "population", IntegerLabel());
-RegisterQtHook(World, interaction_type, "interaction", BindEnum("None\nPenalty\nAttack\nZombie\nParasitism\nPredation\nMutualism\nAltruism\nGeneExchange\nGeneGive\nGeneReceive\nMate"))
-RegisterQtHook(World, max_age, "maximum age", BindInteger(0,1000));
-RegisterQtHook(World, mutation_prob, "mutation probability", BindFloat(0, 1, 0.02));
-RegisterQtHook(World, initial_energy, "initial energy", BindInteger(-50,50));
-RegisterQtHook(World, enable_respawn, "enable respawning", BindBool());
-RegisterQtHook(World, initial_mutations, "respawn diversity", BindInteger(0,20));
-RegisterQtHook(World, enable_mutation, "enable mutation", BindBool());
+RegisterQtHook(World, timestep, "timestep");
+RegisterQtHook(World, num_creats, "population");
+RegisterQtHook(World, interaction_type, "interaction", "None\nPenalty\nAttack\nZombie\nParasitism\nPredation\nMutualism\nAltruism\nGeneExchange\nGeneGive\nGeneReceive\nMate");
+RegisterQtHook(World, max_age, "maximum age", 0, 1000);
+RegisterQtHook(World, mutation_prob, "mutation probability", 0, 1, 0.02);
+RegisterQtHook(World, initial_energy, "initial energy", -50, 50);
+RegisterQtHook(World, enable_respawn, "enable respawning");
+RegisterQtHook(World, initial_mutations, "respawn diversity", 0, 20);
+RegisterQtHook(World, enable_mutation, "enable mutation");
 //RegisterQtHook(World, mutation_color_drift, "plumage drift", BoolHook());
-RegisterQtHook(World, neural_net_iterations, "neural iterations", BindInteger(1,10));
-RegisterQtHook(World, energy_decay_rate, "energy decay rate", BindFloat(0,0.5,0.01));
-RegisterQtHook(World, path_energy, "energy wake", BindInteger(-20, 20));
-RegisterQtHook(World, jump_range, "jump range", BindInteger(0, 10));
+RegisterQtHook(World, neural_net_iterations, "neural iterations", 1, 10);
+RegisterQtHook(World, energy_decay_rate, "energy decay rate", 0, 0.5, 0.01);
+RegisterQtHook(World, path_energy, "energy wake", -20, 20);
+RegisterQtHook(World, jump_range, "jump range", 0, 10);
 
 RegisterVar(World, occupant_list)
 

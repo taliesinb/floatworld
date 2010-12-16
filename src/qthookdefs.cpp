@@ -32,32 +32,32 @@ QWidget* Binding::AsWidget()
     return dynamic_cast<QWidget*>(this);
 }
 
-Binding* BindInteger(int min, int max)
+Binding* Binding::New(int& ptr, int min, int max)
 {
-    return new IntWidget(min, max);
+    return (new IntWidget(min, max))->SetPointer(&ptr);
 }
 
-Binding* BindFloat(float min, float max, float step)
+Binding* Binding::New(float& ptr, float min, float max, float step)
 {
-    return new FloatWidget(min, max, step);
+    return (new FloatWidget(min, max, step))->SetPointer(&ptr);
 }
 
-Binding* BindBool()
+Binding* Binding::New(bool& ptr)
 {
-    return new BoolWidget();
+    return (new BoolWidget())->SetPointer(&ptr);
 }
 
-Binding* BindEnum(const char* str)
+Binding* Binding::New(int& ptr, const char* str)
 {
-    return new EnumWidget(str);
+    return (new EnumWidget(str))->SetPointer(&ptr);
 }
 
-Binding* BindMatrix(int size, bool flip)
+Binding* Binding::New(Matrix& ptr, int size, bool flip)
 {
-    return new MatrixWidget(size, flip);
+    return (new MatrixWidget(size, flip))->SetPointer(&ptr);
 }
 
-Binding* IntegerLabel()
+Binding* Binding::New(int& ptr)
 {
-    return new IntLabel;
+    return (new IntLabel())->SetPointer(&ptr);
 }
