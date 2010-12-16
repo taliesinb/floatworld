@@ -80,7 +80,7 @@ MainWindow::MainWindow(QWidget *parent)
     qworld->Draw();
 
     grid->SetupQtHook(false);
-    gridBox->setLayout(grid->qt_hook);
+    gridBox->setLayout(grid->panel);
 
     speed_group.addAction(actionPlaySlowest);
     speed_group.addAction(actionPlaySlow);
@@ -93,7 +93,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(&speed_group, SIGNAL(triggered(QAction*)), this, SLOT(speed_trigger(QAction*)));
     actionFF->setAutoRepeat(false);
 
-    renderSettingsBox->setLayout(qworld->qt_hook);
+    renderSettingsBox->setLayout(qworld->panel);
 
     connect(qworld, SIGNAL(OccupantSelected(Occupant*)), this, SLOT(DisplayInspector(Occupant*)));
 
@@ -257,7 +257,7 @@ void MainWindow::on_actionZoomOut_triggered()
 
 void MainWindow::DisplayInspector(Occupant *occ)
 {
-    if (occ->qt_hook)
-        occupantBox->setLayout(occ->qt_hook);
+    if (occ->panel)
+        occupantBox->setLayout(occ->panel);
     qworld->Draw();
 }

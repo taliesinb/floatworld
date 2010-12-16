@@ -190,7 +190,7 @@ QWorld::QWorld(QWidget* parent) :
 
     SetupQtHook(false);
 
-    connect(this->qt_hook, SIGNAL(value_changed()), this, SLOT(Draw()));
+    connect(this->panel, SIGNAL(value_changed()), this, SLOT(Draw()));
     connect(energy, SIGNAL(OverPaint(QPainter&)), this, SLOT(OnChildPaint(QPainter&)));
     connect(energy, SIGNAL(ClickedCell(Pos)), this, SLOT(SelectAtPos(Pos)));
     connect(energy, SIGNAL(WasResized()), this, SLOT(RecenterZoom()));
@@ -448,7 +448,7 @@ void QWorld::SelectOccupant(Occupant *occ)
 
         selected_occupant = occ;
 
-        HookManager* hm = occ->SetupQtHook(true);
+        BindingsPanel* hm = occ->SetupQtHook(true);
         connect(hm, SIGNAL(value_changed()), this,
                 SLOT(Draw()));
         connect(hm, SIGNAL(being_removed()), this,

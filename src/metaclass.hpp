@@ -10,12 +10,12 @@ std::istream& operator>>(std::istream& is, const char* str);
 
 class Class;
 class Object;
-class HookManager;
+class BindingsPanel;
 
 class Object
 {
 public:
-    HookManager* qt_hook;
+    BindingsPanel* panel;
 
     Object();
     Class& GetClass();
@@ -23,7 +23,7 @@ public:
     void Read(std::istream& is);
 
     virtual void Reset();
-    HookManager* SetupQtHook(bool title);
+    BindingsPanel* SetupQtHook(bool title);
     void UpdateQtHook();
     void DeleteQtHook();
     void SignalQtHook();
@@ -153,10 +153,10 @@ class Registrator
 
 #define RegisterQtHook(CLASS, NAME, LABEL, PROTOTYPE)       \
     QWidget* CLASS##NAME##Factory(Object* obj) {            \
-    Hook* h = PROTOTYPE;                                    \
+    Binding* h = PROTOTYPE;                                    \
     h->SetPointer(reinterpret_cast<void*>(&dynamic_cast<CLASS*>(obj)->NAME)); \
     return h->AsWidget(); }                                 \
-    Registrator CLASS##NAME##HookRegistrator(CLASS##MetaClass, \
+    Registrator CLASS##NAME##BindingRegistrator(CLASS##MetaClass, \
     LABEL, &CLASS##NAME##Factory);
 
 

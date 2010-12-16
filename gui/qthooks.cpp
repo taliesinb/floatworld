@@ -6,7 +6,7 @@
 
 using namespace std;
 
-IntLabel::IntLabel() : Hook(NULL)
+IntLabel::IntLabel() : Binding(NULL)
 {
     setFrameStyle(QFrame::Panel | QFrame::Sunken);
     setStyleSheet( "background-color: white" );
@@ -20,7 +20,7 @@ void IntLabel::Synchronize(bool inbound)
     if (inbound) setNum(*reinterpret_cast<int*>(ptr));
 }
 
-IntWidget::IntWidget(int _min, int _max) : Hook(SIGNAL(valueChanged(int)))
+IntWidget::IntWidget(int _min, int _max) : Binding(SIGNAL(valueChanged(int)))
 {
     setRange(_min, _max);
     QFont font;
@@ -34,7 +34,7 @@ void IntWidget::Synchronize(bool inbound)
     else *reinterpret_cast<int*>(ptr) = value();
 }
 
-FloatWidget::FloatWidget(float min, float max, float div) : Hook(SIGNAL(valueChanged(double)))
+FloatWidget::FloatWidget(float min, float max, float div) : Binding(SIGNAL(valueChanged(double)))
 {
     setRange(min, max);
     setSingleStep(div);
@@ -49,7 +49,7 @@ void FloatWidget::Synchronize(bool inbound)
     else *reinterpret_cast<float*>(ptr) = value();
 }
 
-BoolWidget::BoolWidget() : Hook(SIGNAL(toggled(bool)))
+BoolWidget::BoolWidget() : Binding(SIGNAL(toggled(bool)))
 {
 }
 
@@ -59,7 +59,7 @@ void BoolWidget::Synchronize(bool inbound)
     else *static_cast<bool*>(ptr) = isChecked();
 }
 
-EnumWidget::EnumWidget(const char *labels) : Hook(SIGNAL(activated(int)))
+EnumWidget::EnumWidget(const char *labels) : Binding(SIGNAL(activated(int)))
 {
     QString str(labels);
     insertItems(0, str.split("\n"));
@@ -86,7 +86,7 @@ QRgb RedBlueColorFunc(float value)
 }
 
 MatrixWidget::MatrixWidget(int size, bool flip)
-    : MatrixView(size, flip, true), Hook(SIGNAL(ClickedCell(Pos)))
+    : MatrixView(size, flip, true), Binding(SIGNAL(ClickedCell(Pos)))
 {
     color_func = &RedBlueColorFunc;
 }
@@ -101,38 +101,38 @@ void MatrixWidget::Synchronize(bool inbound)
     if (inbound) repaint();
 }
 
-HookManager::HookManager(Class *mc, Object *obj)
+BindingsPanel::BindingsPanel(Class *mc, Object *obj)
     : mclass(mc), object(obj)
 {
 
 }
 
-HookManager::~HookManager()
+BindingsPanel::~BindingsPanel()
 {
     being_removed();
 }
 
-void HookManager::child_changed()
+void BindingsPanel::child_changed()
 {
     for_iterate(it, widgets)
     {
-         dynamic_cast<Hook*>(*it)->Synchronize(false);
+         dynamic_cast<Binding*>(*it)->Synchronize(false);
     }
     value_changed();
 }
 
-void HookManager::UpdateChildren()
+void BindingsPanel::UpdateChildren()
 {
     for_iterate(it, widgets)
     {
         QWidget* w = *it;
         w->blockSignals(true);
-        dynamic_cast<Hook*>(w)->Synchronize(true);
+        dynamic_cast<Binding*>(w)->Synchronize(true);
         w->blockSignals(false);
     }
 }
 
-void HookManager::ConstructChildren()
+void BindingsPanel::ConstructChildren()
 {
     if (Class* parent = Class::Lookup(mclass->pname))
     {
@@ -144,7 +144,7 @@ void HookManager::ConstructChildren()
     for (int i = 0; i < mclass->nqvars; i++)
     {
         QWidget* widget = (*mclass->factories[i])(object);
-        const char* sig = dynamic_cast<Hook*>(widget)->changesignal;
+        const char* sig = dynamic_cast<Binding*>(widget)->changesignal;
         if (sig) QObject::connect(widget, sig, this, SLOT(child_changed()));
         addRow(mclass->labels[i], widget);
         widgets.push_back(widget);

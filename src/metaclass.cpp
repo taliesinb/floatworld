@@ -97,7 +97,7 @@ Class* Class::metaclasses[128];
 
 Object::Object()
 {
-    qt_hook = NULL;
+    panel = NULL;
 }
 
 const char* Object::Name()
@@ -111,10 +111,10 @@ void Object::Reset()
 {
 }
 
-HookManager* Object::SetupQtHook(bool title)
+BindingsPanel* Object::SetupQtHook(bool title)
 {
-    assert (qt_hook == NULL);
-    qt_hook = new HookManager(&GetClass(), this);
+    assert (panel == NULL);
+    panel = new BindingsPanel(&GetClass(), this);
     if (title)
     {
         QLabel* label = new QLabel;
@@ -124,32 +124,32 @@ HookManager* Object::SetupQtHook(bool title)
         font.setBold(true);
         label->setFont(font);
         label->setAlignment(Qt::AlignHCenter);
-        qt_hook->addRow("type", label);
+        panel->addRow("type", label);
     }
-    qt_hook->ConstructChildren();
-    qt_hook->UpdateChildren();
-    return qt_hook;
+    panel->ConstructChildren();
+    panel->UpdateChildren();
+    return panel;
 }
 
 void Object::UpdateQtHook()
 {
-    if (qt_hook)
+    if (panel)
     {
-        qt_hook->UpdateChildren();
+        panel->UpdateChildren();
     }
 }
 
 void Object::DeleteQtHook()
 {    
-    if (qt_hook) {
+    if (panel) {
         QLayoutItem *child;
-        while ((child = qt_hook->takeAt(0)) != 0) {
+        while ((child = panel->takeAt(0)) != 0) {
                 child->widget()->deleteLater();
                 delete child;
         }
-        delete qt_hook;
+        delete panel;
     }
-    qt_hook = NULL;
+    panel = NULL;
 }
 
 Class& Object::GetClass()

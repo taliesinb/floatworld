@@ -1,63 +1,63 @@
 #include "qthookdefs.hpp"
 #include "../gui/qthooks.hpp"
 
-Hook::Hook(const char *sig) : changesignal(sig)
+Binding::Binding(const char *sig) : changesignal(sig)
 {
 }
 
-Hook::~Hook()
+Binding::~Binding()
 {
 
 }
 
-Hook* Hook::SetPointer(void *p)
+Binding* Binding::SetPointer(void *p)
 {
     ptr = p;
     OnSetPointer();
     return this;
 }
 
-void Hook::OnSetPointer()
+void Binding::OnSetPointer()
 {
 
 }
 
-void Hook::Synchronize(bool)
+void Binding::Synchronize(bool)
 {
 
 }
 
-QWidget* Hook::AsWidget()
+QWidget* Binding::AsWidget()
 {
     return dynamic_cast<QWidget*>(this);
 }
 
-Hook* IntegerHook(int min, int max)
+Binding* IntegerHook(int min, int max)
 {
     return new IntWidget(min, max);
 }
 
-Hook* FloatHook(float min, float max, float step)
+Binding* FloatHook(float min, float max, float step)
 {
     return new FloatWidget(min, max, step);
 }
 
-Hook* BoolHook()
+Binding* BoolHook()
 {
     return new BoolWidget();
 }
 
-Hook* EnumHook(const char* str)
+Binding* EnumHook(const char* str)
 {
     return new EnumWidget(str);
 }
 
-Hook* MatrixHook(int size, bool flip)
+Binding* MatrixHook(int size, bool flip)
 {
     return new MatrixWidget(size, flip);
 }
 
-Hook* IntegerLabel()
+Binding* IntegerLabel()
 {
     return new IntLabel;
 }

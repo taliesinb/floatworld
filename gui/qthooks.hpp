@@ -19,7 +19,7 @@ class Class;
 class Object;
 class Matrix;
 
-class IntLabel : public QLabel, public Hook
+class IntLabel : public QLabel, public Binding
 {
 public:
     IntLabel();
@@ -27,7 +27,7 @@ public:
     virtual void Synchronize(bool inbound);
 };
 
-class IntWidget : public QSpinBox, public Hook
+class IntWidget : public QSpinBox, public Binding
 {
 public:
     IntWidget(int min, int max);
@@ -35,7 +35,7 @@ public:
     virtual void Synchronize(bool inbound);
 };
 
-class FloatWidget : public QDoubleSpinBox, public Hook
+class FloatWidget : public QDoubleSpinBox, public Binding
 {
 public:
     FloatWidget(float min, float max, float div);
@@ -43,21 +43,21 @@ public:
     virtual void Synchronize(bool inbound);
 };
 
-class BoolWidget : public QCheckBox, public Hook
+class BoolWidget : public QCheckBox, public Binding
 {
 public:
     BoolWidget();
     virtual void Synchronize(bool inbound);
 };
 
-class EnumWidget : public QComboBox, public Hook
+class EnumWidget : public QComboBox, public Binding
 {
 public:
     EnumWidget(const char* labels);
     virtual void Synchronize(bool inbound);
 };
 
-class MatrixWidget : public MatrixView, public Hook
+class MatrixWidget : public MatrixView, public Binding
 {
     bool flipped;
     int rows, cols;
@@ -68,7 +68,7 @@ public:
     virtual void Synchronize(bool inbound);
 };
 
-class HookManager : public QFormLayout
+class BindingsPanel : public QFormLayout
 {
     Q_OBJECT
 
@@ -78,8 +78,8 @@ public:
     Object* object;
     std::list<QWidget*> widgets;
 
-    HookManager(Class* mc, Object* obj);
-    virtual ~HookManager();
+    BindingsPanel(Class* mc, Object* obj);
+    virtual ~BindingsPanel();
 
 public slots:
     void child_changed();

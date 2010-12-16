@@ -4,26 +4,26 @@
 class QWidget;
 class QFormLayout;
 
-class Hook
+class Binding
 {
 public:
     void* ptr;
     const char* changesignal;
 
-    Hook(const char* sig);
-    virtual ~Hook();
+    Binding(const char* sig);
+    virtual ~Binding();
 
-    Hook* SetPointer(void* ptr);
+    Binding* SetPointer(void* ptr);
     QWidget* AsWidget();
     virtual void OnSetPointer();
     virtual void Synchronize(bool inbound);
 };
 
-Hook* IntegerLabel();
-Hook* IntegerHook(int min, int max);
-Hook* FloatHook(float min, float max, float step);
-Hook* BoolHook();
-Hook* EnumHook(const char* str);
-Hook* MatrixHook(int size, bool flip);
+Binding* IntegerLabel();
+Binding* IntegerHook(int min, int max);
+Binding* FloatHook(float min, float max, float step);
+Binding* BoolHook();
+Binding* EnumHook(const char* str);
+Binding* MatrixHook(int size, bool flip);
 
 #endif // QTHOOKDEFS_HPP
