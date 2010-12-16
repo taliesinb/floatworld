@@ -18,11 +18,13 @@ Objects can be introduced into the environment to interact with the creatures.
 
 ## Screenshot
 
-Here are two rather contextless screenshots. It's easier to encourage you to play around for yourself with the code than to explain what everything is in detail -- although I need to write a comprehensive tutorial before that is realistic. 
+Here are two rather contextless screenshots from a recent build. Various parameters of the world can be controlled 'live', as well as parameters of the currently selected Creat or object. It's easier to encourage you to play around for yourself with the code than to explain what everything is in detail -- although I need to write a comprehensive tutorial before that is realistic. 
 
-[demo-12-16-2010.png]     
+There is a *little* more information on the wiki at [[Home]].
 
-[frogs-12-16-2010.png]
+[[frogs-12-16-2010.png]]
+
+[[skinner-12-16-2010.png]]
 
 ## Building floatworld
 
@@ -30,7 +32,7 @@ I use Qt Creator as my IDE (it's pretty good, and integrates cleanly with variou
 
 Download and install the Qt SDK for your platform from [their website](http://qt.nokia.com/downloads/downloads).
 
-I've only built *floatworld* on Snow Leopard, so I can't yet speak about building it on other platforms. The build process is painless: first ask Qt to produce a makefile using the `qmake` library, then actually build the sources using `make`. In more detail:
+I've only built *floatworld* on Snow Leopard, so I can't yet speak about building it on other platforms. The build process is painless: first ask Qt to produce a makefile using `qmake`, then actually build the sources using `make`. In more detail:
 
 To build an appropriate Makefile using `qmake`, run the following command from the project directory. 
 
