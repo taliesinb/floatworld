@@ -320,42 +320,57 @@ void SwapContents(Matrix& m1, Matrix& m2)
 
 ostream& operator<<(ostream& os, const Matrix& m)
 {
-    os << "[";
-    for (int i = 0; i < m.rows; i++)
+    if (human_readable)
     {
-        if (i != 0) os << "], ";
-        os << endl << "\t[";
-        for (int j = 0; j < m.cols; j++)
+        os << "[";
+        for (int i = 0; i < m.rows; i++)
         {
-            if (j != 0) os << ", ";
-            os << m.data[i * m.cols + j];
+            if (i != 0) os << "], ";
+            os << endl << "\t[";
+            for (int j = 0; j < m.cols; j++)
+            {
+                if (j != 0) os << ", ";
+                os << m.data[i * m.cols + j];
+            }
         }
+        os << "]\n]";
+    } else {
+        os << m.rows << " " << m.cols << " ";
+        for (int i = 0; i < m.rows * m.cols; i++)
+            os << m.data[i] << " ";
     }
-    os << "]\n]";
     return os;
 }
 
 istream& operator>>(istream& is, Matrix& m)
 {
-    list<list<float> > entries;
-    is >> entries;
-
-    unsigned int cols = static_cast<unsigned int>(entries.front().size());
-    unsigned int rows = static_cast<unsigned int>(entries.size());
-    for_iterate(r, entries)
-        assert (cols == r->size());
-
-    m.Resize(rows, cols);
-    int i = 0;
-    for_iterate(row, entries)
+    if (human_readable)
     {
-        list<float>& r = *row;
-        for_iterate(col, r)
-        {
-            m.data[i++] = *col;
-        }
-    }
+        list<list<float> > entries;
+        is >> entries;
 
+        unsigned int cols = static_cast<unsigned int>(entries.front().size());
+        unsigned int rows = static_cast<unsigned int>(entries.size());
+        for_iterate(r, entries)
+                assert (cols == r->size());
+
+        m.Resize(rows, cols);
+        int i = 0;
+        for_iterate(row, entries)
+        {
+            list<float>& r = *row;
+            for_iterate(col, r)
+            {
+                m.data[i++] = *col;
+            }
+        }
+    } else {
+        int r, c;
+        is >> r >> c;
+        m.Resize(r, c);
+        for (int i = 0; i < r * c; i++)
+            is >> m.data[i];
+    }
     return is;
 }
 

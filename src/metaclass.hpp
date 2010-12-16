@@ -10,6 +10,8 @@ static const char* whitespace = "\t";
 
 std::istream& operator>>(std::istream& is, const char* str);
 
+extern bool human_readable;
+
 class Class;
 class Object;
 class BindingsPanel;
@@ -38,35 +40,57 @@ std::istream& operator>>(std::istream& os, Object& c);
 template<class T>
 std::ostream& operator<<(std::ostream& os, std::list<T>& lst)
 {
-    os << "[";
-    int count = 0;
-    typename std::list<T>::iterator i = lst.begin();
-    while (i != lst.end())
+    if (human_readable)
     {
-        if (count++) os << ", ";
-        os << *i++;
+        os << "[";
+        int count = 0;
+        typename std::list<T>::iterator i = lst.begin();
+        while (i != lst.end())
+        {
+            if (count++) os << ", ";
+            os << *i++;
+        }
+        os << "]";
+    } else {
+        os << lst.size() << " ";
+        typename std::list<T>::iterator i = lst.begin();
+        while (i != lst.end())
+        {
+            os << *i++ << " ";
+        }
     }
-    os << "]";
     return os;
 }
 
 template<class T>
 std::istream& operator>>(std::istream& is, std::list<T>& lst)
 {
-    is >> "[" >> whitespace;
-    char ch;
-    while (is.get(ch) && ch)
+    if (human_readable)
     {
-        if (ch == ']') break;
-        else is.putback(ch);
+        is >> "[" >> whitespace;
+        char ch;
+        while (is.get(ch) && ch)
+        {
+            if (ch == ']') break;
+            else is.putback(ch);
 
-        T t;
-        is >> whitespace >> t >> whitespace;
-        lst.push_back(t);
+            T t;
+            is >> whitespace >> t >> whitespace;
+            lst.push_back(t);
 
-        is.get(ch);
-        if (ch != ',') is.putback(ch);
-        else is >> whitespace;
+            is.get(ch);
+            if (ch != ',') is.putback(ch);
+            else is >> whitespace;
+        }
+    } else {
+        int sz;
+        is >> sz;
+        for (int i = 0; i < sz; i++)
+        {
+            T t;
+            is >> t;
+            lst.push_back(t);
+        }
     }
     return is;
 }

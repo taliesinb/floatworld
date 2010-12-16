@@ -10,6 +10,8 @@
 #include "metaclass.hpp"
 #include "misc.hpp"
 
+bool human_readable = true;
+
 using namespace std;
 
 std::istream& operator>>(std::istream& is, const char* str)
@@ -77,17 +79,22 @@ std::string get_word(std::istream& is)
 
 std::ostream& operator<<(std::ostream& os, Object& c)
 {
-    os << "{" << endl;
-    os << "\t\"class\": \"" << c.Name() << "\"," << endl;
+    if (human_readable) os << "{" << endl;
+    if (human_readable) os << "\t\"class\": \"";
+    os << c.Name();
+    if (human_readable) os << "\",";
+    os << endl;
     c.Write(os);
-    os << "}" << endl;
+    if (human_readable) os << "}" << endl;
     return os;
 }
 
 std::istream& operator>>(std::istream& is, Object& c)
 {
     const char* name = c.Name();
-    is >> "{\t\"class\": \"" >> name >> "\",";
+    if (human_readable) is >> "{\t\"class\": \"";
+    is >> name;
+    if (human_readable) is >> "\",";
     c.Read(is);
     return is;
 }
@@ -159,14 +166,17 @@ Class& Object::GetClass()
 
 void Object::Write(ostream& os)
 {
-    stringstream ostr;
-    string line;
-
-    GetClass().Write(this, ostr);
-
-    while(std::getline(ostr, line))
+    if (human_readable)
     {
-       os << "\t" << line << endl;
+        stringstream ostr;
+        string line;
+        GetClass().Write(this, ostr);
+        while(std::getline(ostr, line))
+        {
+            os << "\t" << line << endl;
+        }
+    } else {
+        GetClass().Write(this, os);
     }
 }
 
@@ -198,7 +208,11 @@ Class* Class::Lookup(const char* name)
 Object* Class::MakeNew(const char* name)
 {
     Class* metaclass = Lookup(name);
-    assert(metaclass);
+    if (!metaclass)
+    {
+        cerr << "Couldn't find class \"" << name << "\"!" << endl;
+        assert(metaclass);
+    }
 
     return (*metaclass->maker)();
 }
@@ -206,13 +220,16 @@ Object* Class::MakeNew(const char* name)
 Object* Class::Create(std::istream& is)
 {
 //    cout << "Trying to read class" << endl;
-    is >> "{\t\"class\": \"";
+    if (human_readable) is >> "{\t\"class\": \"";
+    is >> whitespace;
     string name = get_word(is);
-    is >> "\"" >> whitespace >> "," >> whitespace;
+    if (human_readable) is >> "\"" >> whitespace >> ",";
+    is >> whitespace;
 //    cout << "Read the following classname: " << name << endl;
     Object* serial = MakeNew(name.c_str());
     serial->Read(is);
-    is >> whitespace >> "}";
+    is >> whitespace;
+    if (human_readable) is >> "}";
     return serial;
 }
 
@@ -223,16 +240,19 @@ void Class::Read(Object* c, istream& is)
     if (parent)
     {
         parent->Read(c, is);
-        is >> whitespace >> "," >> whitespace;
+        if (human_readable) is >> whitespace >> ",";
+        is >> whitespace;
     }
     c->Reset();
     for (int i = 0; i < nvars; i++)
     {
 //        cout << "Reading \"" << varname[i] << "\", var " << i << " of " << c->Name() << endl;
-        if (i != 0) is >> whitespace >> "," >> whitespace;
-        is >> whitespace >> "\"";
-        is >> varname[i];
-        is >> "\":" >> whitespace;
+        if (human_readable) {
+            if (i != 0) is >> whitespace >> "," >> whitespace;
+            is >> whitespace >> "\"";
+            is >> varname[i];
+            is >> "\":" >> whitespace;
+        } else is >> whitespace;
         (*readers[i])(c, is);
     }
 //    cout << "Done reading class: " << name << endl;
@@ -244,12 +264,14 @@ void Class::Write(Object* c, ostream& os)
     if (parent)
     {
         parent->Write(c, os);
-        os << ", \n";
+        if (human_readable) os << ", \n"; else os << endl;
     }
     for (int i = 0; i < nvars; i++)
     {
-        if (i != 0) os << ",\n";
-        os << '"' << varname[i] << "\": ";
+        if (human_readable) {
+            if (i != 0) os << ",\n";
+            os << '"' << varname[i] << "\": ";
+        } else os << endl;
         (*writers[i])(c, os);
     }
 }

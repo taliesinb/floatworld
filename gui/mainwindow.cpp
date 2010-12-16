@@ -186,16 +186,20 @@ void MainWindow::ff_released()
 void MainWindow::on_actionStep_triggered()
 {
     ostringstream str;
+    human_readable = false;
     str << *qworld->world;
+    human_readable = true;
     world_cache.push_back(str.str());
-    qworld->Step();
+    qworld->Step();    
 }
 
 void MainWindow::on_actionStepBack_triggered()
 {
     if (world_cache.size()) {
         istringstream s(world_cache.back());
+        human_readable = false;
         s >> *qworld->world;
+        human_readable = true;
         world_cache.pop_back();
         world->UpdateQtHook();
         qworld->Draw();
@@ -232,7 +236,6 @@ void MainWindow::on_actionSave_triggered()
 {
     QString fileName = QFileDialog::getSaveFileName(this,\
     "Save World as", QDir::homePath(), tr("Floatworlds (*.fw)"));
-
     if (fileName.size() > 0)
     {
         ofstream f;
