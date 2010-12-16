@@ -68,6 +68,7 @@ public:
     bool draw_creats;
     bool draw_blocks;
     bool draw_energy;
+    bool draw_block_colors;
 
 public:
     Grid* grid;

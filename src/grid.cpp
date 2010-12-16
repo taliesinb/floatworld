@@ -56,7 +56,7 @@ RegisterQtHook(Grid, enable_mutation, "enable mutation", BoolHook());
 RegisterQtHook(Grid, mutation_color_drift, "plumage drift", BoolHook());
 RegisterQtHook(Grid, neural_net_iterations, "neural iterations", IntegerHook(1,10));
 RegisterQtHook(Grid, energy_decay_rate, "energy decay rate", FloatHook(0,0.5,0.01));
-
+RegisterQtHook(Grid, path_energy, "energy wake", IntegerHook(-20, 20));
 
 RegisterVar(Grid, occupant_list)
 

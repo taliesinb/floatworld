@@ -43,12 +43,13 @@ MainWindow::MainWindow(QWidget *parent)
 
     for (int i = 0; i < 8; i++)
     {
-        Circle* c = new GaussianCircle;
+        Circle* c = new Circle;
         c->Attach(*grid, grid->RandomCell());
         c->AssignID();
-        c->radius = 10;
+        c->radius = RandInt(8,20);
         c->threshold = 7;
-        c->p_jump = 0.01;
+        c->p_jump = 0.002;
+        c->ratio = 0.1;
         for (int k = 0; k < 10; k++) c->Update();
     }
 
@@ -59,7 +60,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     grid->AddCreats(30, true);
 
-    for (int k = 0; k < 110; k++)
+    for (int k = 0; k < 0; k++)
     {
         Occupant* block = new RewardBlock();
         block->Attach(*grid, grid->RandomCell());

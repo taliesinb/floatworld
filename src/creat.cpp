@@ -149,7 +149,7 @@ void Creat::Reproduce()
     child.MutateBrain();
 
     float excess = state(inputs + hidden + ActionReproduce - 1) - 0.8;
-    if (excess > 0) TransferEnergy(child, excess * 10);
+    if (excess > 0) TransferEnergy(child, excess * 50);
 
     grid->births++;
 }
@@ -168,7 +168,7 @@ void Creat::MoveForward()
         interacted = false;
         float de = grid->energy(pos);
         energy += de;
-        grid->energy(pos) = grid->path_energy / 2.0;
+        grid->energy(pos) = grid->path_energy;
         Move(front);
     }
 }

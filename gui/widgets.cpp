@@ -24,6 +24,7 @@ RegisterQtHook(QGrid, draw_type, "color by", EnumHook("Action\nAge\nEnergy\nPlum
 RegisterQtHook(QGrid, draw_creats, "draw creats", BoolHook());
 RegisterQtHook(QGrid, draw_energy, "draw energy", BoolHook());
 RegisterQtHook(QGrid, draw_blocks, "draw blocks", BoolHook());
+RegisterQtHook(QGrid, draw_block_colors, "color blocks", BoolHook());
 
 int sz = 120;
 int border = 3;
@@ -170,6 +171,7 @@ QGrid::QGrid(QWidget* parent) :
     draw_creats = true;
     draw_blocks = true;
     draw_energy = true;
+    draw_block_colors = true;
 
     scroll_area->setWidgetResizable(true);
     scroll_area->setLineWidth(0);
@@ -379,7 +381,8 @@ void QGrid::OnChildPaint(QPainter& painter)
 
         } else if (block && draw_blocks)
         {
-            color.setHsv(255 * block->draw_hue, 200, 255);
+            if (draw_block_colors) color.setHsv(255 * block->draw_hue, 200, 255);
+            else color.setRgb(100,100,100);
 
             if (poly) {
                 painter.save();
