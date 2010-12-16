@@ -20,10 +20,10 @@ public:
 };
 
 Binding* IntegerLabel();
-Binding* IntegerHook(int min, int max);
-Binding* FloatHook(float min, float max, float step);
-Binding* BoolHook();
-Binding* EnumHook(const char* str);
-Binding* MatrixHook(int size, bool flip);
+Binding* BindInteger(int min, int max);
+Binding* BindFloat(float min, float max, float step);
+Binding* BindBool();
+Binding* BindEnum(const char* str);
+Binding* BindMatrix(int size, bool flip);
 
 #endif // QTHOOKDEFS_HPP

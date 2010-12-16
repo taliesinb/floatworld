@@ -32,27 +32,27 @@ QWidget* Binding::AsWidget()
     return dynamic_cast<QWidget*>(this);
 }
 
-Binding* IntegerHook(int min, int max)
+Binding* BindInteger(int min, int max)
 {
     return new IntWidget(min, max);
 }
 
-Binding* FloatHook(float min, float max, float step)
+Binding* BindFloat(float min, float max, float step)
 {
     return new FloatWidget(min, max, step);
 }
 
-Binding* BoolHook()
+Binding* BindBool()
 {
     return new BoolWidget();
 }
 
-Binding* EnumHook(const char* str)
+Binding* BindEnum(const char* str)
 {
     return new EnumWidget(str);
 }
 
-Binding* MatrixHook(int size, bool flip)
+Binding* BindMatrix(int size, bool flip)
 {
     return new MatrixWidget(size, flip);
 }

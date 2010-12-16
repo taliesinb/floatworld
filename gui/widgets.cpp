@@ -20,11 +20,11 @@ RegisterVar(QGrid, draw_blocks);
 RegisterVar(QGrid, draw_energy);
 */
 RegisterClass(QWorld, None);
-RegisterQtHook(QWorld, draw_type, "color by", EnumHook("Action\nAge\nEnergy\nPlumage"));
-RegisterQtHook(QWorld, draw_creats, "draw creats", BoolHook());
-RegisterQtHook(QWorld, draw_energy, "draw energy", BoolHook());
-RegisterQtHook(QWorld, draw_blocks, "draw blocks", BoolHook());
-RegisterQtHook(QWorld, draw_block_colors, "color blocks", BoolHook());
+RegisterQtHook(QWorld, draw_type, "color by", BindEnum("Action\nAge\nEnergy\nPlumage"));
+RegisterQtHook(QWorld, draw_creats, "draw creats", BindBool());
+RegisterQtHook(QWorld, draw_energy, "draw energy", BindBool());
+RegisterQtHook(QWorld, draw_blocks, "draw blocks", BindBool());
+RegisterQtHook(QWorld, draw_block_colors, "color blocks", BindBool());
 
 int sz = 120;
 int border = 3;
