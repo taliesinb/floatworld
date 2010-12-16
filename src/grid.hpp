@@ -66,6 +66,7 @@ public:
     bool mutation_color_drift;
     float mutation_prob;
     float mutation_sd;
+    int jump_range;
 
     Occupant** occupant_grid;
 

@@ -43,20 +43,22 @@ RegisterVar(Grid, neural_net_iterations)
 RegisterVar(Grid, mutation_color_drift)
 RegisterVar(Grid, mutation_prob)
 RegisterVar(Grid, mutation_sd)
+RegisterVar(Grid, jump_range)
 
 RegisterQtHook(Grid, timestep, "timestep", IntegerLabel());
 RegisterQtHook(Grid, num_creats, "population", IntegerLabel());
 RegisterQtHook(Grid, interaction_type, "interaction", EnumHook("None\nPenalty\nAttack\nZombie\nParasitism\nPredation\nMutualism\nAltruism\nGeneExchange\nGeneGive\nGeneReceive\nMate"))
 RegisterQtHook(Grid, max_age, "maximum age", IntegerHook(0,1000));
-RegisterQtHook(Grid, mutation_prob, "mutation probability", FloatHook(0, 1, 0.05));
+RegisterQtHook(Grid, mutation_prob, "mutation probability", FloatHook(0, 1, 0.02));
 RegisterQtHook(Grid, initial_energy, "initial energy", IntegerHook(-50,50));
 RegisterQtHook(Grid, enable_respawn, "enable respawning", BoolHook());
 RegisterQtHook(Grid, initial_mutations, "respawn diversity", IntegerHook(0,20));
 RegisterQtHook(Grid, enable_mutation, "enable mutation", BoolHook());
-RegisterQtHook(Grid, mutation_color_drift, "plumage drift", BoolHook());
+//RegisterQtHook(Grid, mutation_color_drift, "plumage drift", BoolHook());
 RegisterQtHook(Grid, neural_net_iterations, "neural iterations", IntegerHook(1,10));
 RegisterQtHook(Grid, energy_decay_rate, "energy decay rate", FloatHook(0,0.5,0.01));
 RegisterQtHook(Grid, path_energy, "energy wake", IntegerHook(-20, 20));
+RegisterQtHook(Grid, jump_range, "jump range", IntegerHook(0, 10));
 
 RegisterVar(Grid, occupant_list)
 
@@ -113,9 +115,9 @@ Grid::Grid()
     total_steps = 0;
     next_id = 0;
 
-    initial_energy = 10;
+    initial_energy = 20;
     initial_marker = 0.0;
-    initial_mutations = 10;
+    initial_mutations = 5;
     record_lineages = false;
     neural_net_iterations = 5;
 
@@ -125,6 +127,7 @@ Grid::Grid()
     births = 0;
     interaction_type = NoInteraction;
     hooks_enabled = true;
+    jump_range = 3;
 
     SetupActions();
 }
@@ -531,7 +534,11 @@ void Grid::Step()
     if (energy_decay_rate != 0.0) energy *= (1.0 - energy_decay_rate);
 
     if (num_creats == 0 && enable_respawn)
-        AddCreats(50, true);
+    {
+        initial_energy *= 2; // just to get them off to a good start
+        AddCreats(300, true);
+        initial_energy /= 2;
+    }
 
     timestep++;
 }

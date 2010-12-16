@@ -156,7 +156,16 @@ void Creat::Reproduce()
 
 void Creat::MoveForward()
 { 
-    Pos front = Front();
+    Pos front;
+    if (int jump = grid->jump_range)
+    {
+        float excess = ClipFloat((state(inputs + hidden + ActionForward - 1) - 1) * 2 * jump, 0, jump);
+        int dist = round(excess);
+        energy -= dist;
+        front = grid->Wrap(pos + Pos(orient) * (1 + dist));
+    } else {
+        front = Front();
+    }
 
     if (Occupant* other = grid->SolidOccupantAt(front))
     {
@@ -205,11 +214,11 @@ void Creat::Interaction(Creat& other)
 
         case Attack:
             energy -= 10;
-            other.energy -= 50;
+            other.energy = -100;
             break;
 
         case Zombie:
-            energy -= 80;
+            energy -= 50;
             if (energy > 0) other.weights = weights;
             break;
       
@@ -218,7 +227,7 @@ void Creat::Interaction(Creat& other)
             break;
 
         case Predation:
-            other.TransferEnergy(*this, 100);
+            other.TransferEnergy(*this, 200);
             break;
 
         case MutualCooperation:
@@ -273,7 +282,7 @@ void Creat::MutateBrain()
     if (mutated)
     {
         if (grid->mutation_color_drift)
-            marker += RandSign() * 0.02;
+            marker += RandSign() * RandGauss(0.05, 0.03);
 
         fingerprint <<= 1;
         fingerprint |= RandBit();

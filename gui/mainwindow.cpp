@@ -36,20 +36,20 @@ MainWindow::MainWindow(QWidget *parent)
     };
     int offset = Creat::inputs;
     adam(breed - offset, energy) = 1.0;
-    adam(move - offset, cons) = 1.1;
+    adam(move - offset, cons) = 0.81;
     adam(left - offset, random) = 1.05;
 
     grid->max_age = 120;
 
-    for (int i = 0; i < 8; i++)
+    for (int i = 0; i < 15; i++)
     {
         Circle* c = new Circle;
         c->Attach(*grid, grid->RandomCell());
         c->AssignID();
-        c->radius = RandInt(8,20);
+        c->radius = RandInt(8,15);
         c->threshold = 7;
-        c->p_jump = 0.002;
-        c->ratio = 0.1;
+        c->p_jump = 0.008;
+        c->ratio = 0.2;
         for (int k = 0; k < 10; k++) c->Update();
     }
 
@@ -58,7 +58,7 @@ MainWindow::MainWindow(QWidget *parent)
     grid->mutation_prob = 0.1;
     grid->path_energy = 0;
 
-    grid->AddCreats(30, true);
+    grid->AddCreats(300, true);
 
     for (int k = 0; k < 0; k++)
     {
@@ -201,6 +201,17 @@ void MainWindow::on_actionPrevOccupant_triggered()
 void MainWindow::on_actionNextOccupant_triggered()
 {
     gridWidget->SelectNextOccupant(true);
+}
+
+void MainWindow::on_actionClearCreats_triggered()
+{
+    std::list<Occupant*>::iterator it = grid->occupant_list.begin();
+    while (it != grid->occupant_list.end())
+    {
+        Creat* creat = dynamic_cast<Creat*>(*it++);
+        if (creat) creat->Remove();
+    }
+    gridWidget->Draw();
 }
 
 void MainWindow::on_actionSave_triggered()

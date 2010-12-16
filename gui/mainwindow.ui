@@ -97,6 +97,7 @@
    </attribute>
    <addaction name="actionLoad"/>
    <addaction name="actionSave"/>
+   <addaction name="actionClearCreats"/>
    <addaction name="separator"/>
    <addaction name="actionStop"/>
    <addaction name="actionPlaySlowest"/>
@@ -412,6 +413,15 @@
    </property>
    <property name="shortcut">
     <string>-</string>
+   </property>
+  </action>
+  <action name="actionClearCreats">
+   <property name="icon">
+    <iconset resource="floatworld.qrc">
+     <normaloff>:/icons/danger.png</normaloff>:/icons/danger.png</iconset>
+   </property>
+   <property name="text">
+    <string>Clear creatures</string>
    </property>
   </action>
  </widget>

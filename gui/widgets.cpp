@@ -316,13 +316,17 @@ void QGrid::OnChildPaint(QPainter& painter)
 
         Pos pos2 = occ->pos;
         Pos pos1 = occ->last_pos;
-        if (draw_fraction != 1.0 && (pos2 - pos1).Mag() > 1)
+        if (draw_fraction != 1.0 && abs(pos1.row - pos2.row) > 20)
         {
-            if (pos1.row == grid->rows - 1) pos1.row = -1;
-            if (pos1.col == grid->cols - 1) pos1.col = -1;
-            if (pos1.row == 0) pos1.row = grid->rows;
-            if (pos1.col == 0) pos1.col = grid->cols;
+            if (pos1.row < grid->rows/2) pos1.row += grid->rows;
+            else pos1.row -= grid->rows;
         }
+        if (draw_fraction != 1.0 && abs(pos1.col - pos2.col) > 20)
+        {
+            if (pos1.col < grid->cols/2) pos1.col += grid->cols;
+            else pos1.col -= grid->cols;
+        }
+
         float x = pos2.col * draw_fraction + pos1.col * (1 - draw_fraction);
         float y = pos2.row * draw_fraction + pos1.row * (1 - draw_fraction);
 
