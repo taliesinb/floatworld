@@ -1,14 +1,14 @@
 #README
 
-WARNING: *THIS PROJECT IS NOT YET READY FOR PUBLIC CONSUMPTION. CHECK IT OUT AT YOUR OWN RISK, AS IT IS CHANGING VERY FAST*
-
 ## About *floatworld*	
 
-*floatworld* is an artificial life environment in which virtual creatures ('Creats') compete for space and energy.
+*floatworld* is an artificial life laboratory in which virtual creatures ('Creats') compete for space and energy. 
 
 Each creature is controlled by a recurrent neural network and harvests energy in order to reproduce. Time and space are discretized. 
 
-Creats obtain a variety of data from their environments that is fed to their neural network inputs, including a simple short-range 'sense of smell' and information about the state of their bodies.
+Creats obtain a variety of data from their environments that is fed to their neural network inputs, including a simple short-range 'sense of smell' and information about the state of their bodies. 
+
+At every time step Creats choose from a variety of actions to perform, ranging from movement to interaction with other Creats to reproduction (should they possess sufficient energy). There is no objective fitness function.
 
 Random mutation and natural selection result in the evolution of different strategies. Creats can variously learn to co-operate, fight, become efficient at harvesting energy, and perform simple communication.
 
@@ -16,11 +16,11 @@ Unlike [genetic algorithms](http://en.wikipedia.org/wiki/Genetic_algorithm), the
 
 Objects can be introduced into the environment to interact with the creatures. 
 
-Various parameters of the world can be controlled 'live', as well as parameters of the currently selected Creat or object. 
+Various parameters of the world can be controlled 'live' using side panels, as well as parameters of the currently selected Creat or object. 
 
 ## Screenshot
 
-For some screenshots, see the (wiki)[https://github.com/taliesinb/floatworld/wiki].
+For some screenshots, see the [wiki](https://github.com/taliesinb/floatworld/wiki).
 
 It's easier to encourage you to play around for yourself with the code than to explain what everything is in detail -- although I need to write a comprehensive tutorial before that is realistic. 
 
