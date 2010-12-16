@@ -113,7 +113,7 @@ Grid::Grid()
     total_steps = 0;
     next_id = 0;
 
-    initial_energy = 2;
+    initial_energy = 10;
     initial_marker = 0.0;
     initial_mutations = 10;
     record_lineages = false;

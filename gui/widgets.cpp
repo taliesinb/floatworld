@@ -20,7 +20,7 @@ RegisterVar(QGrid, draw_blocks);
 RegisterVar(QGrid, draw_energy);
 */
 RegisterClass(QGrid, None);
-RegisterQtHook(QGrid, draw_type, "color by", EnumHook("Action\nEnergy\nAge\nPlumage"));
+RegisterQtHook(QGrid, draw_type, "color by", EnumHook("Action\nAge\nEnergy\nPlumage"));
 RegisterQtHook(QGrid, draw_creats, "draw creats", BoolHook());
 RegisterQtHook(QGrid, draw_energy, "draw energy", BoolHook());
 RegisterQtHook(QGrid, draw_blocks, "draw blocks", BoolHook());
@@ -332,17 +332,17 @@ void QGrid::OnChildPaint(QPainter& painter)
             switch (draw_type) {
             case DrawAge: {
                     float stage = float(creat->age) / grid->max_age;
-                    if (stage < 0.3) color.setRgb(0,128,0);
-                    else if (stage < 0.6) color.setRgb(128,128,0);
-                    else if (stage < 0.95) color.setRgb(128,0,0);
-                    else if (stage < 1.0) color.setRgb(250,250,250);
+                    int hue = 255 * (0.3 * (1 - stage));
+                    if (hue > 255) hue = 255;
+                    if (hue < 0) hue = 0;
+                    color.setHsv(hue, 240, 240);
                 } break;
             case DrawEnergy: {
-                    int val = creat->energy * 6;
-                    if (val > 255) val = 255;
-                    color.setRgb(val, val, val);
-                    break;
-                }
+                    float stage = float(creat->energy) / 100;
+                    int hue = 255 * (0.75 + stage * 0.4);
+                    if (hue > 350) hue = 350;
+                    color.setHsv(hue, 240, 240);
+                } break;
             case DrawColor: {
                     int hue = int(255 * 255 + creat->marker * 255) % 255;
                     if (hue > 255) hue = 255;
@@ -359,8 +359,7 @@ void QGrid::OnChildPaint(QPainter& painter)
                     case ActionReproduce: color.setRgb(0, 255, 0); break;
                     }
                     if (creat->interacted) color.setRgb(255, 0, 0);
-                    break;
-                }
+                } break;
             }
             if (poly)
             {
@@ -417,15 +416,14 @@ void QGrid::keyReleaseEvent(QKeyEvent* event)
     creat->last_orient = creat->orient;
 
     if (update_rest) grid->occupant_list.remove(creat);
-
-    (creat->*(grid->action_lookup[creat->action]))();
-    creat->UpdateQtHook();
-
     if (update_rest)
     {
         Step();
         grid->occupant_list.push_back(creat);
     }
+    (creat->*(grid->action_lookup[creat->action]))();
+    creat->UpdateQtHook();
+
     SetDrawFraction(1.0);
     Draw();
 }

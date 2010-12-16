@@ -62,7 +62,6 @@ public:
     int orient;
     int last_orient;
     int interaction_count;
-    bool possessed;
     bool alive;
     bool interacted;
     float energy;

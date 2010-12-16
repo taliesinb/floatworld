@@ -14,7 +14,6 @@ RegisterVar(Creat, state);
 RegisterVar(Creat, action);
 RegisterVar(Creat, age);
 RegisterVar(Creat, orient);
-RegisterVar(Creat, possessed);
 RegisterVar(Creat, alive);
 RegisterVar(Creat, energy);
 RegisterVar(Creat, marker);
@@ -83,7 +82,6 @@ void Creat::Reset()
     fingerprint = 0;
     for (int k = 0; k < 64; k++) { fingerprint <<= 1; fingerprint |= RandBit(); }
     action = ActionNone;
-    possessed = false;
     alive = false;
     marker = grid ? grid->initial_marker : 0;
     energy = grid ? grid->initial_energy : 0;
@@ -143,14 +141,15 @@ void Creat::Reproduce()
 {
     Pos front = Front();
 
-    if (grid->OccupantAt(front)) return;
+    if (grid->OccupantAt(front))
+        return;
   
-    Creat& child = grid->_AddCreat(front, Mod(orient+RandSign(),4));
+    Creat& child = grid->_AddCreat(front, Mod(orient,4));
     child.CopyBrain(*this);
     child.MutateBrain();
 
     float excess = state(inputs + hidden + ActionReproduce - 1) - 0.8;
-    TransferEnergy(child, excess * 10);
+    if (excess > 0) TransferEnergy(child, excess * 10);
 
     grid->births++;
 }
@@ -424,7 +423,6 @@ void Creat::Step()
             action = i + 1;
         }
     }
-    if (possessed) { action = ActionNone; possessed = false; }
 
     // CALCULATE ACTION COST
     energy -= grid->action_cost[action];
