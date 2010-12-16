@@ -25,6 +25,7 @@ public:
     ColorFunc color_func;
     Matrix* matrix;
     int scale;
+    int border;
     bool draw_grid;
     bool draw_flipped;
     Pos highlighted;

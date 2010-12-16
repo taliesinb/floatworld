@@ -28,7 +28,7 @@ public:
     float stepper;
     float last_stepper;
     bool block_draw;
-    World* grid;
+    World* world;
     QActionGroup speed_group;
     std::list<std::string> world_cache;
 

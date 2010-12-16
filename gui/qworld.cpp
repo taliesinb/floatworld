@@ -28,143 +28,16 @@ RegisterBinding(QWorld, draw_block_colors, "color blocks");
 int sz = 120;
 int border = 3;
 
-QRgb BlackColorFunc(float value)
-{
-    return qRgb(0,0,0);
-}
-
-QRgb WhiteBlueColorFunc(float value)
-{
-    int val = value * 10;
-    if (val > 0) val = 10 * log(1 + val);
-    if (val > 255) val = 255;
-    if (val < -200) val = -200;
-    if (val > 0) return qRgb(val, val, val);
-    else return qRgb(10 - val, 0, 0);
-}
-
-MatrixView::MatrixView(int size, bool flip, bool grid)
-{
-    //setAttribute(Qt::WA_PaintOnScreen);
-    setAttribute(Qt::WA_OpaquePaintEvent);
-    setFocusPolicy(Qt::StrongFocus);
-    color_func = &WhiteBlueColorFunc;
-    draw_flipped = flip;
-    matrix = NULL;
-    scale = size;
-    draw_grid = grid;
-}
-
-QSize MatrixView::sizeHint() const
-{
-    return draw_flipped ?
-            QSize(matrix->rows * scale + 2 * border + 1,
-                  matrix->cols * scale + 2 * border + 1) :
-            QSize(matrix->cols * scale + 2 * border + 1,
-                  matrix->rows * scale + 2 * border + 1);
-}
-
-QSize MatrixView::minimumSizeHint() const
-{
-   return sizeHint();
-}
-
-void MatrixView::paintEvent(QPaintEvent*)
-{
-    QPainter painter(this);
-
-    int w = draw_flipped ? matrix->rows : matrix->cols;
-    int h = draw_flipped ? matrix->cols : matrix->rows;
-
-    int W = w * scale, H = h * scale;
-
-    painter.setPen(Qt::black);
-    painter.drawRect(QRect(0, 0, W + 2 * border, H + 2 * border));
-    painter.setPen(Qt::white);
-    painter.drawRect(QRect(1, 1, W + 2 * border - 2, H + 2 * border - 2));
-    painter.fillRect(QRect(2, 2, W + 2 * border - 3, H + 2 * border - 3), Qt::white);
-
-    QImage image(w, h, QImage::Format_RGB32);
-    if (draw_flipped)
-    {
-        QRgb* line;
-        for (int i = 0; i < h; i++)
-        {
-            line = reinterpret_cast<QRgb*>(image.scanLine(i));
-            for (int j = 0; j < w; j++)
-            {
-                *line++ = (*color_func)(matrix->operator ()(j, i));
-            }
-        }
-    } else {
-        float* val = matrix->data;
-        QRgb* line;
-        for (int i = 0; i < h; i++)
-        {
-            line = reinterpret_cast<QRgb*>(image.scanLine(i));
-            for (int j = 0; j < w; j++)
-            {
-                *line++ = (*color_func)(*val++);
-            }
-        }
-    }
-    painter.drawImage(QRect(border, border, W, H), image, QRect(0, 0, w, h));
-
-
-    if (draw_grid) {
-        painter.setPen(Qt::gray);
-        for (int i = 0; i <= w; i++)
-        {
-            int x = border + i * scale;
-            painter.drawLine(x, border, x, border + h * scale);
-        }
-        for (int i = 0; i <= h; i++)
-        {
-            int y = border + i * scale;
-            painter.drawLine(border, y, border + w * scale, y);
-        }
-    }
-
-    OverPaint(painter);
-
-    if (highlighted.Inside(h, w))
-    {
-        QPen pen;
-        pen.setWidth(1);
-        pen.setColor(QColor(255,255,255,100));
-        painter.setPen(pen);
-        painter.drawRect(QRect(border + scale * highlighted.col - 2,
-                               border + scale * highlighted.row - 2,
-                               scale + 2, scale + 2));
-    }
-}
-
-void MatrixView::resizeEvent(QResizeEvent *)
-{
-    WasResized();
-}
-
-void MatrixView::mousePressEvent(QMouseEvent *event)
-{
-    int x = (event->x() - border) / scale;
-    int y = (event->y() - border) / scale;
-    if (draw_flipped) swap(x, y);
-    if (0 <= x && x < matrix->cols && 0 <= y && y < matrix->rows)
-    {
-        ClickedCell(Pos(y, x));
-    }
-}
-
 QWorld::QWorld(QWidget* parent) :
         QWidget(parent),
         selected_occupant(NULL)
 {
-    grid = new World();
-    grid->SetSize(sz,sz);
+    world = new World();
+    world->SetSize(sz,sz);
 
     scroll_area = new QScrollArea;
     energy = new MatrixView(4, false, false);
-    energy->matrix = &grid->energy;
+    energy->matrix = &world->energy;
 
     draw_type = DrawAction;
     draw_creats = true;
@@ -208,7 +81,7 @@ QSize QWorld::sizeHint() const
 
 void QWorld::SelectAtPos(Pos pos)
 {
-    Occupant* occ = grid->OccupantAt(pos);
+    Occupant* occ = world->OccupantAt(pos);
 
     if (occ)
     {
@@ -217,7 +90,7 @@ void QWorld::SelectAtPos(Pos pos)
     {
         float min_d = 10000;
         Occupant* occ = NULL;
-        for_iterate(it, grid->occupant_list)
+        for_iterate(it, world->occupant_list)
         {
             Occupant* o = *it;
             float d = (o->pos - pos).Mag();
@@ -230,7 +103,7 @@ void QWorld::SelectAtPos(Pos pos)
         if (min_d < 3)
             SelectOccupant(occ);
         else
-            grid->energy(pos) += 5;
+            world->energy(pos) += 5;
     }
 
     Draw();
@@ -307,7 +180,7 @@ void QWorld::OnChildPaint(QPainter& painter)
     painter.translate(border, border);
     painter.scale(scale, scale);
 
-    for_iterate(it, grid->occupant_list)
+    for_iterate(it, world->occupant_list)
     {
         Occupant* occ = *it;
 
@@ -317,13 +190,13 @@ void QWorld::OnChildPaint(QPainter& painter)
         Pos pos1 = occ->last_pos;
         if (draw_fraction != 1.0 && abs(pos1.row - pos2.row) > 20)
         {
-            if (pos1.row < grid->rows/2) pos1.row += grid->rows;
-            else pos1.row -= grid->rows;
+            if (pos1.row < world->rows/2) pos1.row += world->rows;
+            else pos1.row -= world->rows;
         }
         if (draw_fraction != 1.0 && abs(pos1.col - pos2.col) > 20)
         {
-            if (pos1.col < grid->cols/2) pos1.col += grid->cols;
-            else pos1.col -= grid->cols;
+            if (pos1.col < world->cols/2) pos1.col += world->cols;
+            else pos1.col -= world->cols;
         }
 
         float x = pos2.col * draw_fraction + pos1.col * (1 - draw_fraction);
@@ -336,7 +209,7 @@ void QWorld::OnChildPaint(QPainter& painter)
         {
             switch (draw_type) {
             case DrawAge: {
-                    float stage = float(creat->age) / grid->max_age;
+                    float stage = float(creat->age) / world->max_age;
                     int hue = 255 * (0.3 * (1 - stage));
                     if (hue > 255) hue = 255;
                     if (hue < 0) hue = 0;
@@ -421,13 +294,13 @@ void QWorld::keyReleaseEvent(QKeyEvent* event)
     creat->last_pos = creat->pos;
     creat->last_orient = creat->orient;
 
-    if (update_rest) grid->occupant_list.remove(creat);
+    if (update_rest) world->occupant_list.remove(creat);
     if (update_rest)
     {
         Step();
-        grid->occupant_list.push_back(creat);
+        world->occupant_list.push_back(creat);
     }
-    (creat->*(grid->action_lookup[creat->action]))();
+    (creat->*(world->action_lookup[creat->action]))();
     creat->UpdateQtHook();
 
     SetDrawFraction(1.0);
@@ -458,7 +331,7 @@ void QWorld::SelectOccupant(Occupant *occ)
 
 void QWorld::Step()
 {
-    grid->Step();
+    world->Step();
     Draw();
 }
 
@@ -466,6 +339,22 @@ void QWorld::SetDrawFraction(float frac)
 {
     draw_fraction = frac;
 }
+
+QRgb BlackColorFunc(float value)
+{
+    return qRgb(0,0,0);
+}
+
+QRgb WhiteBlueColorFunc(float value)
+{
+    int val = value * 10;
+    if (val > 0) val = 10 * log(1 + val);
+    if (val > 255) val = 255;
+    if (val < -200) val = -200;
+    if (val > 0) return qRgb(val, val, val);
+    else return qRgb(10 - val, 0, 0);
+}
+
 
 void QWorld::Draw()
 {
@@ -478,15 +367,15 @@ void QWorld::Draw()
 
 void QWorld::SelectNextOccupant(bool forward)
 {
-    Pos p = energy->highlighted.Wrap(grid->rows, grid->cols);
-    int sz = grid->rows * grid->cols;
-    int start = p.row * grid->cols + p.col;
+    Pos p = energy->highlighted.Wrap(world->rows, world->cols);
+    int sz = world->rows * world->cols;
+    int start = p.row * world->cols + p.col;
     int index = start;
     do {
         index += (forward ? 1 : -1);
         index += sz;
         index %= sz;
-        Occupant* occ = grid->occupant_grid[index];
+        Occupant* occ = world->occupant_grid[index];
         if (occ)
         {
             SelectOccupant(occ);

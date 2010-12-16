@@ -16,15 +16,15 @@ MainWindow::MainWindow(QWidget *parent)
 {
     setupUi(this);
 
-    grid = qworld->grid;
+    world = qworld->world;
 
     // setup creatures
     Creat::Setup();
 
-    grid->interaction_type = Penalty;
+    world->interaction_type = Penalty;
 
     // setup adam:
-    grid->initial_brain = &adam;
+    world->initial_brain = &adam;
     adam.SetZero();
     enum {
         energyF = 0, energyL, energyR, creatF, creatL, creatR,
@@ -39,12 +39,12 @@ MainWindow::MainWindow(QWidget *parent)
     adam(move - offset, cons) = 0.81;
     adam(left - offset, random) = 1.05;
 
-    grid->max_age = 120;
+    world->max_age = 120;
 
     for (int i = 0; i < 15; i++)
     {
         Circle* c = new Circle;
-        c->Attach(*grid, grid->RandomCell());
+        c->Attach(*world, world->RandomCell());
         c->AssignID();
         c->radius = RandInt(8,15);
         c->threshold = 7;
@@ -53,24 +53,24 @@ MainWindow::MainWindow(QWidget *parent)
         for (int k = 0; k < 10; k++) c->Update();
     }
 
-    grid->energy_decay_rate = 0.08;
-    grid->enable_respawn = true;
-    grid->mutation_prob = 0.1;
-    grid->path_energy = 0;
+    world->energy_decay_rate = 0.08;
+    world->enable_respawn = true;
+    world->mutation_prob = 0.1;
+    world->path_energy = 0;
 
-    grid->AddCreats(300, true);
+    world->AddCreats(300, true);
 
     for (int k = 0; k < 0; k++)
     {
         Occupant* block = new RewardBlock();
-        block->Attach(*grid, grid->RandomCell());
+        block->Attach(*world, world->RandomCell());
         block->AssignID();
     }
 
     for (int k = 0; k < 0; k++)
     {
         Occupant* block = new ActiveTrap();
-        block->Attach(*grid, grid->RandomCell());
+        block->Attach(*world, world->RandomCell());
         block->AssignID();
     }
 
@@ -79,8 +79,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     qworld->Draw();
 
-    grid->SetupQtHook(false);
-    gridBox->setLayout(grid->panel);
+    world->SetupQtHook(false);
+    gridBox->setLayout(world->panel);
 
     speed_group.addAction(actionPlaySlowest);
     speed_group.addAction(actionPlaySlow);
@@ -151,26 +151,26 @@ void MainWindow::Tick()
     if (speed > 2)
     {
         timer.start();
-        grid->hooks_enabled = false;
+        world->hooks_enabled = false;
         for (int i = 0; i < speed * 2; i++)
         {
-            grid->Step();
+            world->Step();
             if (timer.elapsed() > 100) break;
         }
-        grid->hooks_enabled = true;
-        grid->Step();
+        world->hooks_enabled = true;
+        world->Step();
     } else {
         stepper += speed;
         if (stepper >= last_stepper + 1)
         {
             stepper = last_stepper + 1;
             last_stepper = stepper;
-            grid->Step();
+            world->Step();
         }
     }
     qworld->SetDrawFraction(speed > 1 ? 1.0 : (stepper - floor(stepper)));
     qworld->Draw();
-    grid->UpdateQtHook();
+    world->UpdateQtHook();
 }
 
 void MainWindow::ff_pressed()
@@ -180,13 +180,13 @@ void MainWindow::ff_pressed()
 
 void MainWindow::ff_released()
 {
-    grid->UpdateQtHook();
+    world->UpdateQtHook();
     speed_trigger(speed_group.checkedAction());
 }
 void MainWindow::on_actionStep_triggered()
 {
     ostringstream str;
-    str << *qworld->grid;
+    str << *qworld->world;
     world_cache.push_back(str.str());
     qworld->Step();
 }
@@ -195,9 +195,9 @@ void MainWindow::on_actionStepBack_triggered()
 {
     if (world_cache.size()) {
         istringstream s(world_cache.back());
-        s >> *qworld->grid;
+        s >> *qworld->world;
         world_cache.pop_back();
-        grid->UpdateQtHook();
+        world->UpdateQtHook();
         qworld->Draw();
     }
 }
@@ -219,8 +219,8 @@ void MainWindow::on_actionNextOccupant_triggered()
 
 void MainWindow::on_actionClearCreats_triggered()
 {
-    std::list<Occupant*>::iterator it = grid->occupant_list.begin();
-    while (it != grid->occupant_list.end())
+    std::list<Occupant*>::iterator it = world->occupant_list.begin();
+    while (it != world->occupant_list.end())
     {
         Creat* creat = dynamic_cast<Creat*>(*it++);
         if (creat) creat->Remove();
@@ -237,7 +237,7 @@ void MainWindow::on_actionSave_triggered()
     {
         ofstream f;
         f.open(fileName.toUtf8());
-        f << *qworld->grid << endl;
+        f << *qworld->world << endl;
         f.close();
     }
 }
@@ -251,10 +251,10 @@ void MainWindow::on_actionLoad_triggered()
     {
         ifstream f;
         f.open(fileName.toUtf8());
-        f >> *qworld->grid;
+        f >> *qworld->world;
         f.close();
     }
-    grid->UpdateQtHook();
+    world->UpdateQtHook();
     qworld->Draw();
 }
 

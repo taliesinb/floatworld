@@ -35,7 +35,7 @@ public:
     bool draw_block_colors;
 
 public:
-    World* grid;
+    World* world;
     QWorld(QWidget* parent = NULL);
 
     Occupant* selected_occupant;

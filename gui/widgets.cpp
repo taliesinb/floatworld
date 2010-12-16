@@ -4,8 +4,125 @@
 #include "../src/misc.hpp"
 #include "../src/matrix.hpp"
 
+#include <QPainter>
+#include <QMouseEvent>
+
 using namespace std;
 
+QRgb RedBlueColorFunc(float value);
+
+MatrixView::MatrixView(int size, bool flip, bool grid)
+{
+    //setAttribute(Qt::WA_PaintOnScreen);
+    setAttribute(Qt::WA_OpaquePaintEvent);
+    setFocusPolicy(Qt::StrongFocus);
+    color_func = &RedBlueColorFunc;
+    draw_flipped = flip;
+    matrix = NULL;
+    border = 3;
+    scale = size;
+    draw_grid = grid;
+}
+
+QSize MatrixView::sizeHint() const
+{
+    return draw_flipped ?
+            QSize(matrix->rows * scale + 2 * border + 1,
+                  matrix->cols * scale + 2 * border + 1) :
+            QSize(matrix->cols * scale + 2 * border + 1,
+                  matrix->rows * scale + 2 * border + 1);
+}
+
+QSize MatrixView::minimumSizeHint() const
+{
+   return sizeHint();
+}
+
+void MatrixView::paintEvent(QPaintEvent*)
+{
+    QPainter painter(this);
+
+    int w = draw_flipped ? matrix->rows : matrix->cols;
+    int h = draw_flipped ? matrix->cols : matrix->rows;
+
+    int W = w * scale, H = h * scale;
+
+    painter.setPen(Qt::black);
+    painter.drawRect(QRect(0, 0, W + 2 * border, H + 2 * border));
+    painter.setPen(Qt::white);
+    painter.drawRect(QRect(1, 1, W + 2 * border - 2, H + 2 * border - 2));
+    painter.fillRect(QRect(2, 2, W + 2 * border - 3, H + 2 * border - 3), Qt::white);
+
+    QImage image(w, h, QImage::Format_RGB32);
+    if (draw_flipped)
+    {
+        QRgb* line;
+        for (int i = 0; i < h; i++)
+        {
+            line = reinterpret_cast<QRgb*>(image.scanLine(i));
+            for (int j = 0; j < w; j++)
+            {
+                *line++ = (*color_func)(matrix->operator ()(j, i));
+            }
+        }
+    } else {
+        float* val = matrix->data;
+        QRgb* line;
+        for (int i = 0; i < h; i++)
+        {
+            line = reinterpret_cast<QRgb*>(image.scanLine(i));
+            for (int j = 0; j < w; j++)
+            {
+                *line++ = (*color_func)(*val++);
+            }
+        }
+    }
+    painter.drawImage(QRect(border, border, W, H), image, QRect(0, 0, w, h));
+
+
+    if (draw_grid) {
+        painter.setPen(Qt::gray);
+        for (int i = 0; i <= w; i++)
+        {
+            int x = border + i * scale;
+            painter.drawLine(x, border, x, border + h * scale);
+        }
+        for (int i = 0; i <= h; i++)
+        {
+            int y = border + i * scale;
+            painter.drawLine(border, y, border + w * scale, y);
+        }
+    }
+
+    OverPaint(painter);
+
+    if (highlighted.Inside(h, w))
+    {
+        QPen pen;
+        pen.setWidth(1);
+        pen.setColor(QColor(255,255,255,100));
+        painter.setPen(pen);
+        painter.drawRect(QRect(border + scale * highlighted.col - 2,
+                               border + scale * highlighted.row - 2,
+                               scale + 2, scale + 2));
+    }
+}
+
+void MatrixView::resizeEvent(QResizeEvent *)
+{
+    WasResized();
+}
+
+void MatrixView::mousePressEvent(QMouseEvent *event)
+{
+    int x = (event->x() - border) / scale;
+    int y = (event->y() - border) / scale;
+    if (draw_flipped) swap(x, y);
+    if (0 <= x && x < matrix->cols && 0 <= y && y < matrix->rows)
+    {
+        ClickedCell(Pos(y, x));
+    }
+}
 IntLabel::IntLabel() : Binding(NULL)
 {
     setFrameStyle(QFrame::Panel | QFrame::Sunken);
