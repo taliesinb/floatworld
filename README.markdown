@@ -16,6 +16,14 @@ Unlike [genetic algorithms](http://en.wikipedia.org/wiki/Genetic_algorithm), the
 
 Objects can be introduced into the environment to interact with the creatures. 
 
+## Screenshot
+
+Here are two rather contextless screenshots. It's easier to encourage you to play around for yourself with the code than to explain what everything is in detail -- although I need to write a comprehensive tutorial before that is realistic. 
+
+[demo-12-16-2010.png]     
+
+[frogs-12-16-2010.png]
+
 ## Building floatworld
 
 I use Qt Creator as my IDE (it's pretty good, and integrates cleanly with various Qt tools). 

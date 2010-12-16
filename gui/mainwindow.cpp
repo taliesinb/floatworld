@@ -41,7 +41,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     world->max_age = 120;
 
-    for (int i = 0; i < 15; i++)
+    for (int i = 0; i < 8; i++)
     {
         Circle* c = new Circle;
         c->Attach(*world, world->RandomCell());
@@ -60,9 +60,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     world->AddCreats(300, true);
 
-    for (int k = 0; k < 0; k++)
+    for (int k = 0; k < 30; k++)
     {
-        Occupant* block = new RewardBlock();
+        Occupant* block = new SkinnerBlock();
         block->Attach(*world, world->RandomCell());
         block->AssignID();
     }

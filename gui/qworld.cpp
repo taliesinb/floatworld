@@ -257,7 +257,7 @@ void QWorld::OnChildPaint(QPainter& painter)
         } else if (block && draw_blocks)
         {
             if (draw_block_colors) color.setHsv(255 * block->draw_hue, 200, 255);
-            else color.setRgb(100,100,100);
+            else color.setRgb(250,250,250);
 
             if (poly) {
                 painter.save();
