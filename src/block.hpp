@@ -3,8 +3,7 @@
 
 #include <iostream>
 
-#include "occupant.hpp"
-#include "pos.hpp"
+#include "world.hpp"
 
 class Block : public Occupant
 {

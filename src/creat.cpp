@@ -1,6 +1,4 @@
 #include "creat.hpp"
-#include "grid.hpp"
-#include "qthookdefs.hpp"
 
 #include <fstream>
 

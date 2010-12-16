@@ -6,7 +6,7 @@
 #include <QObject>
 #include <QWidget>
 
-#include "../gui/qthooks.hpp"
+#include "../gui/widgets.hpp"
 #include "metaclass.hpp"
 #include "misc.hpp"
 

@@ -1,5 +1,5 @@
-#include "qthookdefs.hpp"
-#include "../gui/qthooks.hpp"
+#include "binding.hpp"
+#include "../gui/widgets.hpp"
 
 Binding::Binding(const char *sig) : changesignal(sig)
 {

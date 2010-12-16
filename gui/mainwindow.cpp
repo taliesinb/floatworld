@@ -4,7 +4,6 @@
 #include <QFileDialog>
 #include <QToolButton>
 #include <QWidget>
-#include "qthooks.hpp"
 
 using namespace std;
 

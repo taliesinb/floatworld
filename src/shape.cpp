@@ -1,6 +1,4 @@
 #include "shape.hpp"
-#include "matrix.hpp"
-#include "grid.hpp"
 
 RegisterAbstractClass(Shape, Occupant);
 RegisterVar(Shape, threshold);

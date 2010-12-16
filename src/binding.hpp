@@ -1,5 +1,5 @@
-#ifndef QTHOOKDEFS_HPP
-#define QTHOOKDEFS_HPP
+#ifndef BINDING_HPP
+#define BINDING_HPP
 
 class QWidget;
 class Matrix;
@@ -26,4 +26,4 @@ public:
     static Binding* New(Matrix& matrix, int size, bool flip);
 };
 
-#endif // QTHOOKDEFS_HPP
+#endif

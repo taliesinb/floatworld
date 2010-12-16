@@ -430,7 +430,7 @@
   <customwidget>
    <class>QWorld</class>
    <extends>QWidget</extends>
-   <header>gui/widgets.hpp</header>
+   <header>gui/qworld.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

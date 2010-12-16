@@ -2,9 +2,16 @@
 #define WIDGETS_HPP
 
 #include <QtGui/QWidget>
+#include <QFormLayout>
+#include <QSpinBox>
+#include <QCheckBox>
+#include <QDoubleSpinBox>
+#include <QComboBox>
+#include <QLabel>
 
-#include "src/pos.hpp"
+#include "src/binding.hpp"
 #include "src/metaclass.hpp"
+#include "src/pos.hpp"
 
 class Matrix;
 
@@ -43,63 +50,84 @@ signals:
 
 };
 
-class World;
-class Occupant;
-class QScrollArea;
-class QFormLayout;
+class Class;
+class Object;
+class Matrix;
 
-class QWorld : public QWidget, public Object
+class IntLabel : public QLabel, public Binding
 {
-    Q_OBJECT    
+public:
+    IntLabel();
 
-private:
-    QScrollArea* scroll_area;
-    MatrixView* energy;
-    float draw_fraction;
-    float tmp_x, tmp_y;
+    virtual void Synchronize(bool inbound);
+};
+
+class IntWidget : public QSpinBox, public Binding
+{
+public:
+    IntWidget(int min, int max);
+
+    virtual void Synchronize(bool inbound);
+};
+
+class FloatWidget : public QDoubleSpinBox, public Binding
+{
+public:
+    FloatWidget(float min, float max, float div);
+
+    virtual void Synchronize(bool inbound);
+};
+
+class BoolWidget : public QCheckBox, public Binding
+{
+public:
+    BoolWidget();
+    virtual void Synchronize(bool inbound);
+};
+
+class EnumWidget : public QComboBox, public Binding
+{
+public:
+    EnumWidget(const char* labels);
+    virtual void Synchronize(bool inbound);
+};
+
+class MatrixWidget : public MatrixView, public Binding
+{
+    bool flipped;
+    int rows, cols;
 
 public:
-    enum {
-        DrawAction,
-        DrawAge,
-        DrawEnergy,
-        DrawColor
-    };
-    int draw_type;
-    bool draw_creats;
-    bool draw_blocks;
-    bool draw_energy;
-    bool draw_block_colors;
+    MatrixWidget(int pixel, bool flip);
+    virtual void OnSetPointer();
+    virtual void Synchronize(bool inbound);
+};
+
+class BindingsPanel : public QFormLayout
+{
+    Q_OBJECT
 
 public:
-    World* grid;
-    QWorld(QWidget* parent = NULL);
 
-    Occupant* selected_occupant;
-    void SelectOccupant(Occupant* occ);
-    void SelectNextOccupant(bool forward);
-    QSize sizeHint() const;
+    Class* mclass;
+    Object* object;
+    std::list<QWidget*> widgets;
 
-    void ConstructSettingsPanel(QFormLayout* layout);
-
-    void SetZoom(int scale);
-    int CurrentZoom();
-
-    void keyReleaseEvent(QKeyEvent *);
+    BindingsPanel(Class* mc, Object* obj);
+    virtual ~BindingsPanel();
 
 public slots:
-    void Step();
-    void Draw();
-    void SetDrawFraction(float frac);
-    void SelectAtPos(Pos pos);
-    void UnselectOccupant();
-    void UpdateOccupant();
-    void OnChildPaint(QPainter&);
-    void RecenterZoom();
+    void child_changed();
 
 signals:
-    void OccupantSelected(Occupant*);
+    void value_changed();
+    void being_removed();
+
+public:
+    void ConstructChildren();
+    void UpdateChildren();
 };
+
 
 
 #endif // WIDGETS_HPP

@@ -6,10 +6,7 @@
 #include <QTimer>
 #include <QElapsedTimer>
 
-#include "../src/misc.hpp"
-#include "../src/pos.hpp"
-#include "../src/matrix.hpp"
-#include "../src/grid.hpp"
+#include "../src/world.hpp"
 #include "../src/shape.hpp"
 #include "../src/block.hpp"
 

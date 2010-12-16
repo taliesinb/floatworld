@@ -1,8 +1,7 @@
 #ifndef SHAPE_HPP
 #define SHAPE_HPP
 
-#include "matrix.hpp"
-#include "occupant.hpp"
+#include "world.hpp"
 
 class Shape : public Occupant
 {

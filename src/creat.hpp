@@ -4,8 +4,7 @@
 #include <iostream>
 #include <list>
 
-#include "occupant.hpp"
-#include "matrix.hpp"
+#include "world.hpp"
 
 enum CreatAction
 {
@@ -19,7 +18,6 @@ enum CreatAction
 
 class World;
 class Creat;
-typedef void (Creat::*CreatFunc)();
 
 class LineageNode
 {

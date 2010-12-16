@@ -1,13 +1,14 @@
 #ifndef GRID_HPP
 #define GRID_HPP
 
+#include "metaclass.hpp"
+#include "pos.hpp"
 #include "misc.hpp"
-#include "creat.hpp"
+#include "matrix.hpp"
 
 #include <iostream>
 #include <list>
 
-class Creat;
 enum InteractionMode
 {
     NoInteraction,
@@ -27,6 +28,43 @@ enum InteractionMode
 class Occupant;
 class QPainter;
 class QImage;
+class World;
+class Creat;
+typedef void (Creat::*CreatFunc)();
+
+class Occupant : public Object
+{
+  public:
+
+    Occupant();
+
+    Occupant* next; // next occupant on this grid position
+    World* grid;
+    Pos pos;
+    Pos last_pos;
+    float signature;
+    int id;
+    bool solid;
+
+    virtual void Interact(Creat& c);
+    virtual void Update();
+
+    virtual void Reset();
+    virtual void __Remove();
+    void AssignID();
+
+    void Attach(World& grid, Pos pos);
+    void Remove();
+    void RemoveFromLL();
+    void Move(Pos p);
+    void MoveRandom();
+};
+
+std::ostream& operator<<(std::ostream& s, Occupant*& o);
+std::istream& operator>>(std::istream& i, Occupant*& o);
+
+// Creat depends on Occupant
+#include "creat.hpp"
 
 class World : public Object
 {
@@ -50,8 +88,8 @@ public:
     int path_energy;
     bool record_lineages;
 
-    float action_cost[NumberActions];
-    CreatFunc action_lookup[NumberActions];
+    float action_cost[16];
+    CreatFunc action_lookup[16];
     int initial_energy;
     int initial_marker;
     int initial_mutations;
@@ -69,10 +107,6 @@ public:
     int jump_range;
 
     Occupant** occupant_grid;
-
-    // Paint
-    void Paint(QPainter& painter);
-    void Paint(QImage& image);
 
     bool hooks_enabled;
 
@@ -96,13 +130,12 @@ public:
     Creat& AddCreatAt(Pos pos, int orient=0);
     void AddCreats(int number, bool fairly);
     void RemoveOccupants();
+
     Occupant* SolidOccupantAt(Pos pos);
+    Creat* CreatAt(Pos pos);
     Occupant* LookupOccupantByID(int id);
     Creat* FindCreat(int marker);
-    inline Occupant*& OccupantAt(Pos pos)
-    { return occupant_grid[pos.row * cols + pos.col]; }
-    inline Creat* CreatAt(Pos pos)
-    { return dynamic_cast<Creat*>(occupant_grid[pos.row * cols + pos.col]); }
+    inline Occupant*& OccupantAt(Pos pos) { return occupant_grid[pos.row * cols + pos.col]; }
 
     // Scoring
     Matrix FindDominantGenome();

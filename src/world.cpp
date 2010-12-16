@@ -1,4 +1,4 @@
-#include "grid.hpp"
+#include "world.hpp"
 #include "creat.hpp"
 #include <fstream>
 #include <assert.h>
@@ -257,7 +257,7 @@ void World::RemoveOccupants()
 
 Occupant* World::SolidOccupantAt(Pos pos)
 {
-    Occupant* occ = occupant_grid[pos.row * cols + pos.col];
+    Occupant* occ = OccupantAt(pos);
     while (occ)
     {
         if (occ->solid) return occ;
@@ -265,7 +265,19 @@ Occupant* World::SolidOccupantAt(Pos pos)
     }
     return NULL;
 }
-  
+
+Creat* World::CreatAt(Pos pos)
+{
+    Occupant* occ = OccupantAt(pos);
+    while (occ)
+    {
+        Creat* creat = dynamic_cast<Creat*>(occ);
+        if (creat) return creat;
+        occ = occ->next;
+    }
+    return NULL;
+}
+
 Occupant* World::LookupOccupantByID(int search_id)
 {
     for_iterate(it, occupant_list)
@@ -511,6 +523,8 @@ void World::ColorClusters()
     cout << "done" << endl;
 }
 
+typedef void (Creat::*CreatFunc)();
+
 void World::Step()
 {
     list<Occupant*>::iterator it;
@@ -655,34 +669,101 @@ Matrix World::Evolve(int steps)
     return FindDominantGenome();
 }
 
-void World::Paint(QImage& image)
+RegisterAbstractClass(Occupant, None);
+RegisterVar(Occupant, pos);
+RegisterVar(Occupant, signature);
+RegisterVar(Occupant, id);
+
+RegisterQtHook(Occupant, signature, "color", -5.0, 5.0, 0.25);
+RegisterQtHook(Occupant, solid, "solid");
+
+Occupant::Occupant()
+  : next(NULL), grid(NULL), pos(0,0), signature(0), id(-1), solid(true)
 {
-    QRgb red = qRgb(255,0,0);
-    for (int i = 0; i < rows; i++)
+}
+
+void Occupant::Interact(Creat&)
+{
+
+}
+
+void Occupant::Reset()
+{
+}
+
+void Occupant::__Remove()
+{
+
+}
+
+void Occupant::AssignID()
+{
+    assert(grid);
+    id = grid->next_id++;
+    grid->occupant_list.push_back(this);
+}
+
+void Occupant::Attach(World& g, Pos p)
+{
+    grid = &g;
+    Move(p);
+    last_pos = p;
+}
+
+void Occupant::Update()
+{
+
+}
+
+// remove an occupant
+void Occupant::Remove()
+{
+    RemoveFromLL();
+    grid->occupant_list.remove(this);
+    DeleteQtHook();
+    __Remove();
+}
+
+// remove an occupant but only from the internal LL
+void Occupant::RemoveFromLL()
+{
+    Occupant** cell = &(grid->OccupantAt(pos));
+    while (*cell)
     {
-        QRgb* line1 = reinterpret_cast<QRgb*>(image.scanLine(i));
-        float* line2 = energy[i];
-        for (int j = 0; j < cols; j++)
+        if (*cell == this)
         {
-            int val = *line2++ * 5;
-            if (OccupantAt(Pos(i,j)))
-                *line1++ = red;
-            else
-                *line1++ = qRgb(val,val,val);
+            *cell = next;
+            next = NULL;
+            return;
         }
+        cell = &((*cell)->next);
     }
 }
 
-void World::Paint(QPainter& painter)
+// move an occupant from an existing position
+void Occupant::Move(Pos pos2)
 {
-    for (int i = 0; i < rows; i++)
-    {
-        for (int j = 0; j < cols; j++)
-        {
-            int value = energy(i,j) * 5;
-            if (value < 0) value = 0;
-            if (value > 255) value = 255;
-            painter.fillRect(j,i,1,1,QColor(value,value,value));
-        }
-    }
+    RemoveFromLL();
+    pos = pos2;
+    Occupant*& cell = grid->OccupantAt(pos);
+    next = cell;
+    cell = this;
 }
+
+void Occupant::MoveRandom()
+{
+    Move(grid->RandomCell());
+}
+
+std::ostream& operator<<(std::ostream& s, Occupant*& o)
+{
+    s << *o;
+    return s;
+}
+
+std::istream& operator>>(std::istream& s, Occupant*& o)
+{
+    o = dynamic_cast<Occupant*>(Class::Create(s));
+    return s;
+}
+
