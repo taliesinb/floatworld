@@ -107,6 +107,7 @@
    <addaction name="actionPlayFastest"/>
    <addaction name="actionFF"/>
    <addaction name="separator"/>
+   <addaction name="actionStepBack"/>
    <addaction name="actionStep"/>
    <addaction name="actionIndividualStep"/>
    <addaction name="actionPrevOccupant"/>

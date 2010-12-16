@@ -13,6 +13,9 @@
 #include "ui_mainwindow.h"
 #include "widgets.hpp"
 
+#include <list>
+#include <string>
+
 class MainWindow : public QMainWindow, public Ui::MainWindow
 {
     Q_OBJECT
@@ -27,6 +30,7 @@ public:
     bool block_draw;
     World* grid;
     QActionGroup speed_group;
+    std::list<std::string> world_cache;
 
     MainWindow(QWidget *parent = 0);
     void SetSpeed(float speed);

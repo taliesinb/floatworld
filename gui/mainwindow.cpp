@@ -1,5 +1,6 @@
 #include "mainwindow.hpp"
 
+#include <sstream>
 #include <fstream>
 #include <QFileDialog>
 #include <QToolButton>
@@ -133,6 +134,7 @@ void MainWindow::speed_trigger(QAction* action)
 
 void MainWindow::SetSpeed(float s)
 {
+    if (world_cache.size()) world_cache.clear();
     if (speed == s)
         actionStop->trigger();
     else
@@ -183,19 +185,21 @@ void MainWindow::ff_released()
 }
 void MainWindow::on_actionStep_triggered()
 {
-//    ostringstream str;
-//    str << qworld;
-//    world_cache.push_back(str);
+    ostringstream str;
+    str << *qworld->grid;
+    world_cache.push_back(str.str());
     qworld->Step();
 }
 
 void MainWindow::on_actionStepBack_triggered()
 {
-//    string str;
-//    str = world_cache.back();
-//    world_cache.pop_back();
-//    qworld << str;
-//    Draw();
+    if (world_cache.size()) {
+        istringstream s(world_cache.back());
+        s >> *qworld->grid;
+        world_cache.pop_back();
+        grid->UpdateQtHook();
+        qworld->Draw();
+    }
 }
 
 void MainWindow::on_actionIndividualStep_triggered()
