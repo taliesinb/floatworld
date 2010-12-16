@@ -28,7 +28,7 @@ class Occupant;
 class QPainter;
 class QImage;
 
-class Grid : public Object
+class World : public Object
 {
 public:      
     
@@ -77,9 +77,9 @@ public:
     bool hooks_enabled;
 
     // State change
-    Grid();
+    World();
     virtual void Reset();
-    ~Grid();
+    ~World();
 
     // Setup
     void SetupActions();

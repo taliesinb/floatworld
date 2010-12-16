@@ -4,7 +4,7 @@
 #include "pos.hpp"
 #include "metaclass.hpp"
 
-class Grid;
+class World;
 class Creat;
 
 class Occupant : public Object
@@ -14,7 +14,7 @@ class Occupant : public Object
     Occupant();
     
     Occupant* next; // next occupant on this grid position
-    Grid* grid;
+    World* grid;
     Pos pos;
     Pos last_pos;
     float signature;
@@ -28,7 +28,7 @@ class Occupant : public Object
     virtual void __Remove();
     void AssignID();
 
-    void Attach(Grid& grid, Pos pos);
+    void Attach(World& grid, Pos pos);
     void Remove();
     void RemoveFromLL();
     void Move(Pos p);

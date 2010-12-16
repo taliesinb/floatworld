@@ -17,7 +17,7 @@ enum CreatAction
     NumberActions, // dummy for bookkeeping purposes
 };
 
-class Grid;
+class World;
 class Creat;
 typedef void (Creat::*CreatFunc)();
 

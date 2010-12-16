@@ -7,62 +7,62 @@
 
 using namespace std;
 
-RegisterClass(Grid, None)
+RegisterClass(World, None)
 
-void write_grid_size(Grid* g, std::ostream& s)
+void write_grid_size(World* g, std::ostream& s)
 {
     s << "[" << g->rows << ", " << g->cols << "]";
 }
 
-void read_grid_size(Grid* g, std::istream& s)
+void read_grid_size(World* g, std::istream& s)
 {
     int rows, cols;
     s >> "[" >> rows >> ", " >> cols >> "]";
     g->SetSize(rows, cols);
 }
-RegisterCustomVar(Grid, size, write_grid_size, read_grid_size)
+RegisterCustomVar(World, size, write_grid_size, read_grid_size)
 
-RegisterVar(Grid, energy)
-RegisterVar(Grid, energy_decay_rate)
-RegisterVar(Grid, timestep)
-RegisterVar(Grid, births)
-RegisterVar(Grid, num_creats)
-RegisterVar(Grid, interaction_type)
-RegisterVar(Grid, enable_mutation)
-RegisterVar(Grid, enable_respawn)
-RegisterVar(Grid, path_energy)
-RegisterVar(Grid, record_lineages)
-RegisterVar(Grid, initial_energy)
-RegisterVar(Grid, initial_marker)
-//RegisterVar(Grid, action_cost)
-//RegisterVar(Grid, initial_brain)
-RegisterVar(Grid, max_age)
-RegisterVar(Grid, total_steps)
-RegisterVar(Grid, next_id)
-RegisterVar(Grid, neural_net_iterations)
-RegisterVar(Grid, mutation_color_drift)
-RegisterVar(Grid, mutation_prob)
-RegisterVar(Grid, mutation_sd)
-RegisterVar(Grid, jump_range)
+RegisterVar(World, energy)
+RegisterVar(World, energy_decay_rate)
+RegisterVar(World, timestep)
+RegisterVar(World, births)
+RegisterVar(World, num_creats)
+RegisterVar(World, interaction_type)
+RegisterVar(World, enable_mutation)
+RegisterVar(World, enable_respawn)
+RegisterVar(World, path_energy)
+RegisterVar(World, record_lineages)
+RegisterVar(World, initial_energy)
+RegisterVar(World, initial_marker)
+//RegisterVar(World, action_cost)
+//RegisterVar(World, initial_brain)
+RegisterVar(World, max_age)
+RegisterVar(World, total_steps)
+RegisterVar(World, next_id)
+RegisterVar(World, neural_net_iterations)
+RegisterVar(World, mutation_color_drift)
+RegisterVar(World, mutation_prob)
+RegisterVar(World, mutation_sd)
+RegisterVar(World, jump_range)
 
-RegisterQtHook(Grid, timestep, "timestep", IntegerLabel());
-RegisterQtHook(Grid, num_creats, "population", IntegerLabel());
-RegisterQtHook(Grid, interaction_type, "interaction", EnumHook("None\nPenalty\nAttack\nZombie\nParasitism\nPredation\nMutualism\nAltruism\nGeneExchange\nGeneGive\nGeneReceive\nMate"))
-RegisterQtHook(Grid, max_age, "maximum age", IntegerHook(0,1000));
-RegisterQtHook(Grid, mutation_prob, "mutation probability", FloatHook(0, 1, 0.02));
-RegisterQtHook(Grid, initial_energy, "initial energy", IntegerHook(-50,50));
-RegisterQtHook(Grid, enable_respawn, "enable respawning", BoolHook());
-RegisterQtHook(Grid, initial_mutations, "respawn diversity", IntegerHook(0,20));
-RegisterQtHook(Grid, enable_mutation, "enable mutation", BoolHook());
-//RegisterQtHook(Grid, mutation_color_drift, "plumage drift", BoolHook());
-RegisterQtHook(Grid, neural_net_iterations, "neural iterations", IntegerHook(1,10));
-RegisterQtHook(Grid, energy_decay_rate, "energy decay rate", FloatHook(0,0.5,0.01));
-RegisterQtHook(Grid, path_energy, "energy wake", IntegerHook(-20, 20));
-RegisterQtHook(Grid, jump_range, "jump range", IntegerHook(0, 10));
+RegisterQtHook(World, timestep, "timestep", IntegerLabel());
+RegisterQtHook(World, num_creats, "population", IntegerLabel());
+RegisterQtHook(World, interaction_type, "interaction", EnumHook("None\nPenalty\nAttack\nZombie\nParasitism\nPredation\nMutualism\nAltruism\nGeneExchange\nGeneGive\nGeneReceive\nMate"))
+RegisterQtHook(World, max_age, "maximum age", IntegerHook(0,1000));
+RegisterQtHook(World, mutation_prob, "mutation probability", FloatHook(0, 1, 0.02));
+RegisterQtHook(World, initial_energy, "initial energy", IntegerHook(-50,50));
+RegisterQtHook(World, enable_respawn, "enable respawning", BoolHook());
+RegisterQtHook(World, initial_mutations, "respawn diversity", IntegerHook(0,20));
+RegisterQtHook(World, enable_mutation, "enable mutation", BoolHook());
+//RegisterQtHook(World, mutation_color_drift, "plumage drift", BoolHook());
+RegisterQtHook(World, neural_net_iterations, "neural iterations", IntegerHook(1,10));
+RegisterQtHook(World, energy_decay_rate, "energy decay rate", FloatHook(0,0.5,0.01));
+RegisterQtHook(World, path_energy, "energy wake", IntegerHook(-20, 20));
+RegisterQtHook(World, jump_range, "jump range", IntegerHook(0, 10));
 
-RegisterVar(Grid, occupant_list)
+RegisterVar(World, occupant_list)
 
-void write_grid_occupant_order(Grid* g, std::ostream& s)
+void write_grid_occupant_order(World* g, std::ostream& s)
 {
     std::list<int> order;
     for (int i = 0; i < g->rows * g->cols; i++)
@@ -76,7 +76,7 @@ void write_grid_occupant_order(Grid* g, std::ostream& s)
     }
     s << order;
 }
-void read_grid_occupant_order(Grid* g, std::istream& s)
+void read_grid_occupant_order(World* g, std::istream& s)
 {
     std::list<int> order;
     s >> order;
@@ -93,11 +93,11 @@ void read_grid_occupant_order(Grid* g, std::istream& s)
         }
     }
 }
-RegisterCustomVar(Grid, occupant_order, write_grid_occupant_order, read_grid_occupant_order)
+RegisterCustomVar(World, occupant_order, write_grid_occupant_order, read_grid_occupant_order)
 
 using namespace std;
 
-Grid::Grid()
+World::World()
 {
     initial_brain = NULL;
     occupant_grid = NULL;
@@ -132,13 +132,13 @@ Grid::Grid()
     SetupActions();
 }
 
-Grid::~Grid()
+World::~World()
 {
     // for (unsigned int i = 0; i < watchers.size(); i++)
     //    watchers[i]->grid = NULL;
 }
 
-void Grid::SetSize(int rs, int cs)
+void World::SetSize(int rs, int cs)
 {
     rows = rs;
     cols = cs;
@@ -163,7 +163,7 @@ void Grid::SetSize(int rs, int cs)
     occupant_list.clear();
 }
 
-void Grid::SetupActions()
+void World::SetupActions()
 {
     action_lookup[ActionNone] = &Creat::DoNothing;
     action_lookup[ActionForward] = &Creat::MoveForward;
@@ -178,12 +178,12 @@ void Grid::SetupActions()
     action_cost[ActionReproduce] = 60.0;
 }
 
-Pos Grid::RandomCell()
+Pos World::RandomCell()
 {
     return Pos(RandInt(rows-1), RandInt(cols-1));
 }
 
-Pos Grid::EmptyCell()
+Pos World::EmptyCell()
 {
     Pos pos = RandomCell();
     while (OccupantAt(pos)) pos = RandomCell();
@@ -191,7 +191,7 @@ Pos Grid::EmptyCell()
     return pos;
 }
 
-Pos Grid::FairCell()
+Pos World::FairCell()
 {
     float thresh = 10;
     for (int i = 0; i < 100; i++)
@@ -203,7 +203,7 @@ Pos Grid::FairCell()
     return EmptyCell();
 }
 
-void Grid::AddCreats(int number, bool fairly)
+void World::AddCreats(int number, bool fairly)
 {
     float mp = mutation_prob;
     mutation_prob = 0.5;
@@ -215,7 +215,7 @@ void Grid::AddCreats(int number, bool fairly)
     mutation_prob = mp;
 }
 
-Creat& Grid::AddCreatAt(Pos pos, int orient)
+Creat& World::AddCreatAt(Pos pos, int orient)
 {
     Creat& creat = _AddCreat(pos, orient);
 
@@ -224,7 +224,7 @@ Creat& Grid::AddCreatAt(Pos pos, int orient)
     return creat;
 }
 
-Creat& Grid::_AddCreat(Pos pos, int orient)
+Creat& World::_AddCreat(Pos pos, int orient)
 {
     num_creats++;  
 
@@ -247,7 +247,7 @@ Creat& Grid::_AddCreat(Pos pos, int orient)
     return *fresh;
 }
 
-void Grid::RemoveOccupants()
+void World::RemoveOccupants()
 {
     while (occupant_list.size())
     {
@@ -255,7 +255,7 @@ void Grid::RemoveOccupants()
     }
 }
 
-Occupant* Grid::SolidOccupantAt(Pos pos)
+Occupant* World::SolidOccupantAt(Pos pos)
 {
     Occupant* occ = occupant_grid[pos.row * cols + pos.col];
     while (occ)
@@ -266,7 +266,7 @@ Occupant* Grid::SolidOccupantAt(Pos pos)
     return NULL;
 }
   
-Occupant* Grid::LookupOccupantByID(int search_id)
+Occupant* World::LookupOccupantByID(int search_id)
 {
     for_iterate(it, occupant_list)
     {
@@ -275,7 +275,7 @@ Occupant* Grid::LookupOccupantByID(int search_id)
     return NULL;
 }
 
-Creat* Grid::FindCreat(int marker)
+Creat* World::FindCreat(int marker)
 {
     if (num_creats == 0) return NULL;
   
@@ -301,7 +301,7 @@ Creat* Grid::FindCreat(int marker)
 static inline float Kernel2(Occupant* occ)
 { return occ ? occ->signature : 0; }
 
-float Grid::EnergyKernel(Pos pos, int dir)
+float World::EnergyKernel(Pos pos, int dir)
 {
     int r = pos.row, c = pos.col;
     int cs = cols, rs = rows;
@@ -328,7 +328,7 @@ float Grid::EnergyKernel(Pos pos, int dir)
     return 0;
 }
 
-float Grid::CreatKernel(Pos pos, int dir)
+float World::CreatKernel(Pos pos, int dir)
 {
     int r = pos.row, c = pos.col;
     int cs = cols, rs = rows;
@@ -364,7 +364,7 @@ float aligned(Creat* creat, int d)
 }
 #define KERNEL3(x,y) aligned(occupant_grid[cs * Mod(r + x, rs) + Mod(c + y, cs)], creat.orient)
 
-void Grid::Run(int steps, int report)
+void World::Run(int steps, int report)
 {
     for (int i = 0; i < steps; i++)
     {
@@ -416,7 +416,7 @@ void Grid::RunLineage(const char* file, int steps, int every)
     }
 }*/
 
-void Grid::Report()
+void World::Report()
 {
     float avg_complexity = 0;
 
@@ -441,7 +441,7 @@ namespace std { using namespace __gnu_cxx; }
 
 // THIS DOESN'T WORK YET. NEED TO USE LONGEST COMMON SUBSTRING
 // AS A DISTANCE METRIC AND THEN DO K-MEANS, AND THEN EMBED INTO R/Z
-void Grid::ColorClusters()
+void World::ColorClusters()
 {
     /* Assume that things within 4 mutations are 'the same species'
 
@@ -511,7 +511,7 @@ void Grid::ColorClusters()
     cout << "done" << endl;
 }
 
-void Grid::Step()
+void World::Step()
 {
     list<Occupant*>::iterator it;
 
@@ -549,7 +549,7 @@ float CompeteFunction(int numa, int numb)
     return atan(log(float(numa) / float(numb))) / (3.14159265357979 / 2);
 }
 
-float Grid::CompeteScore(Matrix& a, Matrix& b)
+float World::CompeteScore(Matrix& a, Matrix& b)
 {
     Matrix* last = initial_brain;
 
@@ -586,7 +586,7 @@ float Grid::CompeteScore(Matrix& a, Matrix& b)
     return scores;
 }
 
-int Grid::CountCreatsByMarker(int marker)
+int World::CountCreatsByMarker(int marker)
 {
   int n = 0;
   for_iterate(it, occupant_list)
@@ -599,7 +599,7 @@ int Grid::CountCreatsByMarker(int marker)
   return n;
 }
 
-void Grid::Reset()
+void World::Reset()
 {
     RemoveOccupants();
 }
@@ -635,7 +635,7 @@ void Grid::SaveOccupant(std::ostream& os, Occupant* occ)
     occ->Write(os);
 }
 */
-Matrix Grid::FindDominantGenome()
+Matrix World::FindDominantGenome()
 {
     enable_mutation = false;
     Run(1000);
@@ -646,7 +646,7 @@ Matrix Grid::FindDominantGenome()
     return c->weights;
 }
 
-Matrix Grid::Evolve(int steps)
+Matrix World::Evolve(int steps)
 {
     // cout << "Beginning evolution of " << steps << " steps." << endl;
     RemoveOccupants();
@@ -655,7 +655,7 @@ Matrix Grid::Evolve(int steps)
     return FindDominantGenome();
 }
 
-void Grid::Paint(QImage& image)
+void World::Paint(QImage& image)
 {
     QRgb red = qRgb(255,0,0);
     for (int i = 0; i < rows; i++)
@@ -673,7 +673,7 @@ void Grid::Paint(QImage& image)
     }
 }
 
-void Grid::Paint(QPainter& painter)
+void World::Paint(QPainter& painter)
 {
     for (int i = 0; i < rows; i++)
     {

@@ -43,12 +43,12 @@ signals:
 
 };
 
-class Grid;
+class World;
 class Occupant;
 class QScrollArea;
 class QFormLayout;
 
-class QGrid : public QWidget, public Object
+class QWorld : public QWidget, public Object
 {
     Q_OBJECT    
 
@@ -71,8 +71,8 @@ public:
     bool draw_block_colors;
 
 public:
-    Grid* grid;
-    QGrid(QWidget* parent = NULL);
+    World* grid;
+    QWorld(QWidget* parent = NULL);
 
     Occupant* selected_occupant;
     void SelectOccupant(Occupant* occ);

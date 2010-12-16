@@ -37,7 +37,7 @@ void Occupant::AssignID()
     grid->occupant_list.push_back(this);
 }
 
-void Occupant::Attach(Grid& g, Pos p)
+void Occupant::Attach(World& g, Pos p)
 {
     grid = &g;
     Move(p);

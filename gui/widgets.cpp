@@ -19,12 +19,12 @@ RegisterVar(QGrid, draw_creats);
 RegisterVar(QGrid, draw_blocks);
 RegisterVar(QGrid, draw_energy);
 */
-RegisterClass(QGrid, None);
-RegisterQtHook(QGrid, draw_type, "color by", EnumHook("Action\nAge\nEnergy\nPlumage"));
-RegisterQtHook(QGrid, draw_creats, "draw creats", BoolHook());
-RegisterQtHook(QGrid, draw_energy, "draw energy", BoolHook());
-RegisterQtHook(QGrid, draw_blocks, "draw blocks", BoolHook());
-RegisterQtHook(QGrid, draw_block_colors, "color blocks", BoolHook());
+RegisterClass(QWorld, None);
+RegisterQtHook(QWorld, draw_type, "color by", EnumHook("Action\nAge\nEnergy\nPlumage"));
+RegisterQtHook(QWorld, draw_creats, "draw creats", BoolHook());
+RegisterQtHook(QWorld, draw_energy, "draw energy", BoolHook());
+RegisterQtHook(QWorld, draw_blocks, "draw blocks", BoolHook());
+RegisterQtHook(QWorld, draw_block_colors, "color blocks", BoolHook());
 
 int sz = 120;
 int border = 3;
@@ -156,11 +156,11 @@ void MatrixView::mousePressEvent(QMouseEvent *event)
     }
 }
 
-QGrid::QGrid(QWidget* parent) :
+QWorld::QWorld(QWidget* parent) :
         QWidget(parent),
         selected_occupant(NULL)
 {
-    grid = new Grid();
+    grid = new World();
     grid->SetSize(sz,sz);
 
     scroll_area = new QScrollArea;
@@ -202,12 +202,12 @@ std::ostream& operator<<(std::ostream& s, QSize size)
     return s;
 }
 
-QSize QGrid::sizeHint() const
+QSize QWorld::sizeHint() const
 {
     return energy->sizeHint() + QSize(40,40);// + QSize(50,100);
 }
 
-void QGrid::SelectAtPos(Pos pos)
+void QWorld::SelectAtPos(Pos pos)
 {
     Occupant* occ = grid->OccupantAt(pos);
 
@@ -237,13 +237,13 @@ void QGrid::SelectAtPos(Pos pos)
     Draw();
 }
 
-void QGrid::UnselectOccupant()
+void QWorld::UnselectOccupant()
 {
     selected_occupant = NULL;
     Draw();
 }
 
-void QGrid::UpdateOccupant()
+void QWorld::UpdateOccupant()
 {
     if (selected_occupant)
     {
@@ -267,7 +267,7 @@ void setScrollBarFraction(QScrollBar* s, float frac)
     s->setValue(frac * range - step/2.0 + s->minimum());
 }
 
-void QGrid::SetZoom(int scale)
+void QWorld::SetZoom(int scale)
 {
     tmp_x = getScrollBarFraction(scroll_area->horizontalScrollBar());
     tmp_y = getScrollBarFraction(scroll_area->verticalScrollBar());
@@ -276,18 +276,18 @@ void QGrid::SetZoom(int scale)
     updateGeometry();
 }
 
-void QGrid::RecenterZoom()
+void QWorld::RecenterZoom()
 {
     setScrollBarFraction(scroll_area->horizontalScrollBar(), tmp_x);
     setScrollBarFraction(scroll_area->verticalScrollBar(), tmp_y);
 }
 
-int QGrid::CurrentZoom()
+int QWorld::CurrentZoom()
 {
     return energy->scale / 2;
 }
 
-void QGrid::OnChildPaint(QPainter& painter)
+void QWorld::OnChildPaint(QPainter& painter)
 {
     int scale = energy->scale;
     bool poly = scale > 6;
@@ -405,7 +405,7 @@ void QGrid::OnChildPaint(QPainter& painter)
     painter.restore();
 }
 
-void QGrid::keyReleaseEvent(QKeyEvent* event)
+void QWorld::keyReleaseEvent(QKeyEvent* event)
 {
     Creat* creat = dynamic_cast<Creat*>(selected_occupant);
     if (!creat) return;
@@ -435,7 +435,7 @@ void QGrid::keyReleaseEvent(QKeyEvent* event)
     Draw();
 }
 
-void QGrid::SelectOccupant(Occupant *occ)
+void QWorld::SelectOccupant(Occupant *occ)
 {
     if (selected_occupant && occ != selected_occupant)
         selected_occupant->DeleteQtHook();
@@ -457,18 +457,18 @@ void QGrid::SelectOccupant(Occupant *occ)
     }
 }
 
-void QGrid::Step()
+void QWorld::Step()
 {
     grid->Step();
     Draw();
 }
 
-void QGrid::SetDrawFraction(float frac)
+void QWorld::SetDrawFraction(float frac)
 {
     draw_fraction = frac;
 }
 
-void QGrid::Draw()
+void QWorld::Draw()
 {
     energy->color_func = draw_energy ? &WhiteBlueColorFunc : &BlackColorFunc;
 
@@ -477,7 +477,7 @@ void QGrid::Draw()
     repaint();
 }
 
-void QGrid::SelectNextOccupant(bool forward)
+void QWorld::SelectNextOccupant(bool forward)
 {
     Pos p = energy->highlighted.Wrap(grid->rows, grid->cols);
     int sz = grid->rows * grid->cols;

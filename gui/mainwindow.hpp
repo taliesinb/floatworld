@@ -28,7 +28,7 @@ public:
     float stepper;
     float last_stepper;
     bool block_draw;
-    Grid* grid;
+    World* grid;
     QActionGroup speed_group;
 
     MainWindow(QWidget *parent = 0);

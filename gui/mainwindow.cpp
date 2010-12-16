@@ -16,7 +16,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     setupUi(this);
 
-    grid = gridWidget->grid;
+    grid = qworld->grid;
 
     // setup creatures
     Creat::Setup();
@@ -77,7 +77,7 @@ MainWindow::MainWindow(QWidget *parent)
     ticker.setInterval(1);
     connect(&ticker, SIGNAL(timeout()), this, SLOT(Tick()));
 
-    gridWidget->Draw();
+    qworld->Draw();
 
     grid->SetupQtHook(false);
     gridBox->setLayout(grid->qt_hook);
@@ -93,11 +93,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(&speed_group, SIGNAL(triggered(QAction*)), this, SLOT(speed_trigger(QAction*)));
     actionFF->setAutoRepeat(false);
 
-    renderSettingsBox->setLayout(gridWidget->qt_hook);
+    renderSettingsBox->setLayout(qworld->qt_hook);
 
-    connect(gridWidget, SIGNAL(OccupantSelected(Occupant*)), this, SLOT(DisplayInspector(Occupant*)));
+    connect(qworld, SIGNAL(OccupantSelected(Occupant*)), this, SLOT(DisplayInspector(Occupant*)));
 
-    gridWidget->setMaximumSize(gridWidget->sizeHint());
+    qworld->setMaximumSize(qworld->sizeHint());
     resize(5000,5000); // force a resize to the maximum size
 
     // hunt out the fast forward button and hack some callbacks onto it
@@ -112,7 +112,7 @@ MainWindow::MainWindow(QWidget *parent)
             button->setAutoRepeat(false);
         }
     }
-    gridWidget->Draw();
+    qworld->Draw();
     repaint();
 }
 
@@ -127,8 +127,8 @@ void MainWindow::speed_trigger(QAction* action)
         speed = 0;
         ticker.stop();
         stepper = ceil(stepper);
-        gridWidget->SetDrawFraction(1.0);
-        gridWidget->Draw();
+        qworld->SetDrawFraction(1.0);
+        qworld->Draw();
     }
 }
 
@@ -167,8 +167,8 @@ void MainWindow::Tick()
             grid->Step();
         }
     }
-    gridWidget->SetDrawFraction(speed > 1 ? 1.0 : (stepper - floor(stepper)));
-    gridWidget->Draw();
+    qworld->SetDrawFraction(speed > 1 ? 1.0 : (stepper - floor(stepper)));
+    qworld->Draw();
     grid->UpdateQtHook();
 }
 
@@ -185,22 +185,22 @@ void MainWindow::ff_released()
 
 void MainWindow::on_actionStep_triggered()
 {
-    gridWidget->Step();
+    qworld->Step();
 }
 
 void MainWindow::on_actionIndividualStep_triggered()
 {
-    gridWidget->UpdateOccupant();
+    qworld->UpdateOccupant();
 }
 
 void MainWindow::on_actionPrevOccupant_triggered()
 {
-    gridWidget->SelectNextOccupant(false);
+    qworld->SelectNextOccupant(false);
 }
 
 void MainWindow::on_actionNextOccupant_triggered()
 {
-    gridWidget->SelectNextOccupant(true);
+    qworld->SelectNextOccupant(true);
 }
 
 void MainWindow::on_actionClearCreats_triggered()
@@ -211,7 +211,7 @@ void MainWindow::on_actionClearCreats_triggered()
         Creat* creat = dynamic_cast<Creat*>(*it++);
         if (creat) creat->Remove();
     }
-    gridWidget->Draw();
+    qworld->Draw();
 }
 
 void MainWindow::on_actionSave_triggered()
@@ -223,7 +223,7 @@ void MainWindow::on_actionSave_triggered()
     {
         ofstream f;
         f.open(fileName.toUtf8());
-        f << *gridWidget->grid << endl;
+        f << *qworld->grid << endl;
         f.close();
     }
 }
@@ -237,27 +237,27 @@ void MainWindow::on_actionLoad_triggered()
     {
         ifstream f;
         f.open(fileName.toUtf8());
-        f >> *gridWidget->grid;
+        f >> *qworld->grid;
         f.close();
     }
     grid->UpdateQtHook();
-    gridWidget->Draw();
+    qworld->Draw();
 }
 
 void MainWindow::on_actionZoomIn_triggered()
 {
-    gridWidget->SetZoom(gridWidget->CurrentZoom() + 1);
+    qworld->SetZoom(qworld->CurrentZoom() + 1);
 }
 
 void MainWindow::on_actionZoomOut_triggered()
 {
-    int z = gridWidget->CurrentZoom() - 1;
-    gridWidget->SetZoom(z < 2 ? 2 : z);
+    int z = qworld->CurrentZoom() - 1;
+    qworld->SetZoom(z < 2 ? 2 : z);
 }
 
 void MainWindow::DisplayInspector(Occupant *occ)
 {
     if (occ->qt_hook)
         occupantBox->setLayout(occ->qt_hook);
-    gridWidget->Draw();
+    qworld->Draw();
 }
