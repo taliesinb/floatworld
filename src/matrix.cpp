@@ -346,7 +346,7 @@ istream& operator>>(istream& is, Matrix& m)
 {
     if (human_readable)
     {
-        list<list<float> > entries;
+        list<list<double> > entries;
         is >> entries;
 
         unsigned int cols = static_cast<unsigned int>(entries.front().size());
@@ -358,7 +358,7 @@ istream& operator>>(istream& is, Matrix& m)
         int i = 0;
         for_iterate(row, entries)
         {
-            list<float>& r = *row;
+            list<double>& r = *row;
             for_iterate(col, r)
             {
                 m.data[i++] = *col;

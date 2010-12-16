@@ -26,7 +26,6 @@ RegisterBinding(QWorld, draw_blocks, "draw blocks");
 RegisterBinding(QWorld, draw_block_colors, "color blocks");
 
 int sz = 120;
-int border = 3;
 
 QWorld::QWorld(QWidget* parent) :
         QWidget(parent),
@@ -36,7 +35,7 @@ QWorld::QWorld(QWidget* parent) :
     world->SetSize(sz,sz);
 
     scroll_area = new QScrollArea;
-    energy = new MatrixView(4, false, false);
+    energy = new MatrixView(5, false, false);
     energy->matrix = &world->energy;
 
     draw_type = DrawAction;
@@ -177,7 +176,7 @@ void QWorld::OnChildPaint(QPainter& painter)
     blockpen.setCosmetic(true);
 
     painter.save();
-    painter.translate(border, border);
+    painter.translate(energy->border, energy->border);
     painter.scale(scale, scale);
 
     for_iterate(it, world->occupant_list)
