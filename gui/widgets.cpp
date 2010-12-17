@@ -6,6 +6,7 @@
 
 #include <QPainter>
 #include <QMouseEvent>
+#include <QToolTip>
 
 using namespace std;
 
@@ -99,12 +100,21 @@ void MatrixView::paintEvent(QPaintEvent*)
     if (highlighted.Inside(h, w))
     {
         QPen pen;
-        pen.setWidth(1);
-        pen.setColor(QColor(255,255,255,100));
-        painter.setPen(pen);
-        painter.drawRect(QRect(border + scale * highlighted.col - 2,
-                               border + scale * highlighted.row - 2,
-                               scale + 2, scale + 2));
+        if (draw_grid) {
+            pen.setWidth(1);
+            pen.setColor(Qt::black);
+            painter.setPen(pen);
+            painter.drawRect(QRect(border + scale * highlighted.col,
+                                   border + scale * highlighted.row,
+                                   scale, scale));
+        } else {
+            pen.setWidth(1);
+            pen.setColor(QColor(255,255,255,100));
+            painter.setPen(pen);
+            painter.drawRect(QRect(border + scale * highlighted.col - 2,
+                                   border + scale * highlighted.row - 2,
+                                   scale + 2, scale + 2));
+        }
     }
 }
 
@@ -202,10 +212,19 @@ QRgb RedBlueColorFunc(float value)
     return QColor::fromHsv(hue, sat, var).rgb();
 }
 
-MatrixWidget::MatrixWidget(int size, bool flip, const char* row_labels, const char* column_labels)
+MatrixWidget::MatrixWidget(int size, bool flip, QString rlabels, QString clabels)
     : MatrixView(size, flip, true), Binding(SIGNAL(ClickedCell(Pos)))
 {
     color_func = &RedBlueColorFunc;
+    row_labels = rlabels.split("\n");
+    col_labels = clabels.split("\n");
+    connect(this, SIGNAL(ClickedCell(Pos)), this, SLOT(ShowTooltip(Pos)));
+    setMouseTracking(true);
+}
+
+void MatrixWidget::mouseMoveEvent(QMouseEvent *event)
+{
+    mousePressEvent(event);
 }
 
 void MatrixWidget::OnSetPointer()
@@ -216,6 +235,33 @@ void MatrixWidget::OnSetPointer()
 void MatrixWidget::Synchronize(bool inbound)
 {
     if (inbound) repaint();
+}
+
+void MatrixWidget::ShowTooltip(Pos p)
+{
+    QString str = "<table>"
+                  "<tr><td><b>value</b>   </td><td>%1</td></tr>"
+                  "<tr><td><b>row</b></td><td>%2</td></tr>"
+                  "<tr><td><b>col</b></td><td>%3</td></tr>"
+                  "</table>";
+    str = str.arg(matrix->operator ()(p));
+    if (row_labels.size() && p.row < row_labels.size())
+        str = str.arg(row_labels.at(p.row));
+    else
+        str = str.arg(p.row + 1);
+
+    if (col_labels.size() && p.col < col_labels.size())
+        str = str.arg(col_labels.at(p.col));
+    else
+        str = str.arg(p.col + 1);
+
+    if (draw_flipped) p = p.Transpose();
+
+    QToolTip::showText(mapToGlobal(QPoint(p.col, p.row) * scale) + QPoint(0, 10),
+                       str);
+
+    highlighted = p;
+    update();
 }
 
 BindingsPanel::BindingsPanel(Class *mc, Object *obj)

@@ -39,7 +39,7 @@ MainWindow::MainWindow(QWidget *parent)
     adam(move - offset, cons) = 0.81;
     adam(left - offset, random) = 1.05;
 
-    world->max_age = 120;
+    world->max_age = 50;
 
     for (int i = 0; i < 15; i++)
     {

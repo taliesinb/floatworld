@@ -8,6 +8,7 @@
 #include <QDoubleSpinBox>
 #include <QComboBox>
 #include <QLabel>
+#include <QStringList>
 
 #include "src/binding.hpp"
 #include "src/metaclass.hpp"
@@ -95,13 +96,21 @@ public:
 
 class MatrixWidget : public MatrixView, public Binding
 {
+    Q_OBJECT
+
+    QStringList row_labels;
+    QStringList col_labels;
     bool flipped;
     int rows, cols;
 
 public:
-    MatrixWidget(int pixel_size, bool flip, const char* row_labels, const char* column_labels);
+    MatrixWidget(int pixel_size, bool flip, QString row_labels, QString column_labels);
     virtual void OnSetPointer();
     virtual void Synchronize(bool inbound);
+    void mouseMoveEvent(QMouseEvent *event);
+
+private slots:
+    void ShowTooltip(Pos p);
 };
 
 class BindingsPanel : public QFormLayout

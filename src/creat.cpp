@@ -17,12 +17,42 @@ RegisterVar(Creat, alive);
 RegisterVar(Creat, energy);
 RegisterVar(Creat, marker);
 
+const char* neuron_labels = "energy in front\n"
+"energy on left\n"
+"energy on right\n"
+"creats in front\n"
+"creats on left\n"
+"creats on right\n"
+"parallel orientation\n"
+"perpendicular orientation\n"
+"constant input\n"
+"own energy\n"
+"own age\n"
+"random input\n"
+"hidden 1\n"
+"hidden 2\n"
+"hidden 3\n"
+"hidden 4\n"
+"move forward\n"
+"turn left\n"
+"turn right\n"
+"reproduce";
+
+const char* outputs = "hidden 1\n"
+                      "hidden 2\n"
+                      "hidden 3\n"
+                      "hidden 4\n"
+                      "move forward\n"
+                      "turn left\n"
+                      "turn right\n"
+                      "reproduce";
+
 RegisterBinding(Creat, energy, "energy", 0, 500, 1);
 RegisterBinding(Creat, age, "age", 0, 1000);
 RegisterBinding(Creat, interaction_count, "interacts");
 RegisterBinding(Creat, action, "action", "None\nForward\nLeft\nRight\nReproduce");
-RegisterBinding(Creat, state, "neurons", 7, true);
-RegisterBinding(Creat, weights, "weights", 7, false);
+RegisterBinding(Creat, state, "neurons", 7, true, neuron_labels, "");
+RegisterBinding(Creat, weights, "weights", 7, false, outputs, neuron_labels);
 
 /*
 RegisterBinding(Creat, orient, "Orientation", QSpinBox);
@@ -456,8 +486,8 @@ void Creat::__Remove()
     grid->num_creats--;
     grid->graveyard.push_front(this);
     if (lineage) lineage->Decrement();
-    if (desired_id >= 0) Peer(desired_id)->desirer_id = -1;
-    if (desirer_id >= 0) Peer(desirer_id)->desired_id = -1;
+    if (desired_id >= 0) if (Creat* peer = Peer(desired_id)) peer->desirer_id = -1;
+    if (desirer_id >= 0) if (Creat* peer = Peer(desirer_id)) peer->desired_id = -1;
 }
 
 void Creat::TurnLeft()
@@ -486,8 +516,8 @@ void Creat::CopyBrain(Creat& parent)
 
 void Creat::ChooseMate(Creat* other)
 {
-    if (desired_id >= 0) Peer(desired_id)->desirer_id = -1;
-    other->desirer_id = id;
+    if (desired_id >= 0) if (Creat* peer = Peer(desired_id)) peer->desirer_id = -1;
+    if (other) other->desirer_id = id;
     desired_id = other ? other->id : -1;
 }
 
@@ -541,16 +571,12 @@ vector<Matrix> ReconstructBrains(list<LineageNode>& lineage, Matrix& initial, in
 
 void ShuffleBrains(Matrix& a, Matrix& b)
 {
-    for (int i = 0; i < Creat::neurons; i++)
-        for (int j = 0; j < Creat::neurons; j++)
-        {
-            if (RandBit()) Swap(a(i,j), b(i,j));
-        }
+    for (int i = 0; i < a.Len(); i++)
+        if (RandBit()) Swap(a.data[i], b.data[i]);
 }
 
 void Creat::BlendBrain(Creat& other)
 {
-    for (int i = 0; i < hidden + outputs; i++)
-        for (int j = 0; j < neurons; j++)
-            if (RandBit()) weights(i,j) = other.weights(i,j);
+    for (int i = 0; i < weights.Len(); i++)
+        if (RandBit()) weights.data[i] = other.weights.data[i];
 }

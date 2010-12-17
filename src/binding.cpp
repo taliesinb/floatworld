@@ -52,9 +52,9 @@ Binding* Binding::New(int& ptr, const char* str)
     return (new EnumWidget(str))->SetPointer(&ptr);
 }
 
-Binding* Binding::New(Matrix& ptr, int size, bool flip)
+Binding* Binding::New(Matrix& ptr, int size, bool flip, const char* rows, const char* cols)
 {
-    return (new MatrixWidget(size, flip, NULL, NULL))->SetPointer(&ptr);
+    return (new MatrixWidget(size, flip, rows, cols))->SetPointer(&ptr);
 }
 
 Binding* Binding::New(int& ptr)
