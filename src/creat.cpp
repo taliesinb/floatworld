@@ -212,7 +212,7 @@ void Creat::Interaction(Creat& other)
             break;
 
         case Attack:
-            energy -= 10;
+            energy -= 3;
             other.energy = -100;
             break;
 
@@ -382,6 +382,8 @@ void Creat::Step()
     state(3) = grid->CreatKernel(pos, orient);
     state(4) = grid->CreatKernel(pos, orient - 1);
     state(5) = grid->CreatKernel(pos, orient + 1);
+    state(6) = grid->DirKernel(pos, orient);
+    state(7) = grid->DirKernel(pos, orient + 1);
 
     // SETUP INTERNAL INPUTS
     state(extinputs + 0) = 1.0;

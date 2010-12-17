@@ -193,7 +193,7 @@ Pos World::EmptyCell()
 
 Pos World::FairCell()
 {
-    float thresh = 10;
+    float thresh = 5;
     for (int i = 0; i < 100; i++)
     {
         Pos pos = EmptyCell();
@@ -309,9 +309,6 @@ Creat* World::FindCreat(int marker)
 }
 
 #define KERNEL(r2,c2) data[cs * Mod(r + r2, rs) + Mod(c + c2, cs)]
-#define KERNEL2(x,y) Kernel2(occupant_grid[cs * Mod(r + x, rs) + Mod(c + y, cs)])
-static inline float Kernel2(Occupant* occ)
-{ return occ ? occ->signature : 0; }
 
 float World::EnergyKernel(Pos pos, int dir)
 {
@@ -339,6 +336,33 @@ float World::EnergyKernel(Pos pos, int dir)
     }
     return 0;
 }
+
+
+float World::DirKernel(Pos pos, int dir)
+{
+    int dir1 = Mod(dir, 4);
+    int dir2 = Mod(dir + 2, 4);
+    int total = 0;
+    for (int i = -2; i <= 2; i++)
+        for (int j = -2; j <= 2; j++)
+        {
+        if (i == 0 && j == 0) continue;
+        if (abs(i) + abs(j) == 4) continue;
+
+        Creat* c = CreatAt(Wrap(pos + Pos(i,j)));
+        if (c)
+        {
+            if (c->orient == dir1) total++;
+            else if (c->orient == dir2) total--;
+        }
+    }
+    return total;
+}
+
+#define KERNEL2(x,y) Kernel2(occupant_grid[cs * Mod(r + x, rs) + Mod(c + y, cs)])
+static inline float Kernel2(Occupant* occ)
+{ return occ ? occ->signature : 0; }
+
 
 float World::CreatKernel(Pos pos, int dir)
 {

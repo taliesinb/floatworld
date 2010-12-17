@@ -154,6 +154,7 @@ public:
     // Creature vision functions
     float CreatKernel(Pos pos, int dir);
     float EnergyKernel(Pos pos, int dir);
+    float DirKernel(Pos pos, int dir);
 };
 
 float CompeteFunction(int numa, int numb);

@@ -54,7 +54,7 @@ Binding* Binding::New(int& ptr, const char* str)
 
 Binding* Binding::New(Matrix& ptr, int size, bool flip)
 {
-    return (new MatrixWidget(size, flip))->SetPointer(&ptr);
+    return (new MatrixWidget(size, flip, NULL, NULL))->SetPointer(&ptr);
 }
 
 Binding* Binding::New(int& ptr)

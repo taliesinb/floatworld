@@ -99,7 +99,7 @@ class MatrixWidget : public MatrixView, public Binding
     int rows, cols;
 
 public:
-    MatrixWidget(int pixel, bool flip);
+    MatrixWidget(int pixel_size, bool flip, const char* row_labels, const char* column_labels);
     virtual void OnSetPointer();
     virtual void Synchronize(bool inbound);
 };

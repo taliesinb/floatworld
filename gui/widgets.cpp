@@ -202,7 +202,7 @@ QRgb RedBlueColorFunc(float value)
     return QColor::fromHsv(hue, sat, var).rgb();
 }
 
-MatrixWidget::MatrixWidget(int size, bool flip)
+MatrixWidget::MatrixWidget(int size, bool flip, const char* row_labels, const char* column_labels)
     : MatrixView(size, flip, true), Binding(SIGNAL(ClickedCell(Pos)))
 {
     color_func = &RedBlueColorFunc;

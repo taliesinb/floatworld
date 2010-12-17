@@ -36,7 +36,7 @@ public:
 class Creat : public Occupant
 {
 public:
-    static const int extinputs = 6;
+    static const int extinputs = 8;
     static const int intinputs = 4;
     static const int inputs = extinputs + intinputs;
     static const int hidden = 4;

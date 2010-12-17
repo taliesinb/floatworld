@@ -27,7 +27,7 @@ MainWindow::MainWindow(QWidget *parent)
     world->initial_brain = &adam;
     adam.SetZero();
     enum {
-        energyF = 0, energyL, energyR, creatF, creatL, creatR,
+        energyF = 0, energyL, energyR, creatF, creatL, creatR, dirA, dirB,
         cons, energy, age, random,
         move = Creat::inputs + Creat::hidden,
         left,
@@ -41,15 +41,16 @@ MainWindow::MainWindow(QWidget *parent)
 
     world->max_age = 120;
 
-    for (int i = 0; i < 8; i++)
+    for (int i = 0; i < 15; i++)
     {
         Circle* c = new Circle;
         c->Attach(*world, world->RandomCell());
         c->AssignID();
-        c->radius = RandInt(8,15);
-        c->threshold = 7;
-        c->p_jump = 0.008;
-        c->ratio = 0.2;
+        c->radius = RandInt(5,17);
+        c->threshold = 2 + max(25 - (c->radius - 5) * (c->radius - 5) / 2, 0);
+        c->energy = 2;
+        c->p_jump = 0.01;
+        //c->ratio = 0.2;
         for (int k = 0; k < 10; k++) c->Update();
     }
 
@@ -60,7 +61,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     world->AddCreats(300, true);
 
-    for (int k = 0; k < 30; k++)
+    for (int k = 0; k < 0; k++)
     {
         Occupant* block = new SkinnerBlock();
         block->Attach(*world, world->RandomCell());
@@ -77,6 +78,7 @@ MainWindow::MainWindow(QWidget *parent)
     ticker.setInterval(1);
     connect(&ticker, SIGNAL(timeout()), this, SLOT(Tick()));
 
+    world->interaction_type = Attack;
     qworld->Draw();
 
     world->SetupQtHook(false);

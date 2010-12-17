@@ -35,7 +35,7 @@ QWorld::QWorld(QWidget* parent) :
     world->SetSize(sz,sz);
 
     scroll_area = new QScrollArea;
-    energy = new MatrixView(5, false, false);
+    energy = new MatrixView(6, false, false);
     energy->matrix = &world->energy;
 
     draw_type = DrawAction;
