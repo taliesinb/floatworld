@@ -11,6 +11,7 @@ RegisterVar(Creat, weights);
 RegisterVar(Creat, state);
 RegisterVar(Creat, action);
 RegisterVar(Creat, age);
+RegisterVar(Creat, last_orient);
 RegisterVar(Creat, orient);
 RegisterVar(Creat, alive);
 RegisterVar(Creat, energy);

@@ -191,6 +191,7 @@ void MainWindow::on_actionStep_triggered()
     human_readable = true;
     world_cache.push_back(str.str());
     qworld->Step();    
+    qworld->SetDrawFraction(1.0);
 }
 
 void MainWindow::on_actionStepBack_triggered()
@@ -198,10 +199,14 @@ void MainWindow::on_actionStepBack_triggered()
     if (world_cache.size()) {
         istringstream s(world_cache.back());
         human_readable = false;
+        int id = qworld->selected_occupant ? qworld->selected_occupant->id : -1;
         s >> *qworld->world;
         human_readable = true;
         world_cache.pop_back();
         world->UpdateQtHook();
+        if (id > 0)
+            qworld->SelectOccupant(qworld->world->LookupOccupantByID(id));
+        qworld->SetDrawFraction(1.0);
         qworld->Draw();
     }
 }
