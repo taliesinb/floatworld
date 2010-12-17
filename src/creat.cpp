@@ -389,6 +389,9 @@ void Creat::Step()
     state(extinputs + 2) = (float(age) - (grid->max_age / 2)) / grid->max_age;
     state(extinputs + 3) = RandFloat(-1.0, 1.0);
 
+    for (int k = 0; k < inputs; k++)
+        state2(k) = state(k);
+
     for (int iter = 0; iter < grid->neural_net_iterations; iter++)
     {
         // CALCULATE BRAIN STEP
