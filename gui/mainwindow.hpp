@@ -5,6 +5,8 @@
 #include <QtGui/QGraphicsView>
 #include <QTimer>
 #include <QElapsedTimer>
+#include <QMap>
+#include <QString>
 
 #include "../src/world.hpp"
 #include "../src/shape.hpp"
@@ -32,6 +34,7 @@ public:
     QActionGroup speed_group;
     std::list<std::string> world_cache;
     Occupant* selected_object;
+    QMap<QString, Occupant*> prototypes;
 
     MainWindow(QWidget *parent = 0);
     void SetSpeed(float speed);

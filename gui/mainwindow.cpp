@@ -148,11 +148,13 @@ MainWindow::MainWindow(QWidget *parent)
 void MainWindow::ObjectSelected(QString s)
 {
     if (selected_object)
-    {
         selected_object->DeleteQtHook();
-        delete selected_object;
-    }
-    selected_object = dynamic_cast<Occupant*>(Class::MakeNew(s.toAscii()));
+
+    if (prototypes.contains(s))
+        selected_object = prototypes[s];
+    else
+        selected_object = prototypes[s] = dynamic_cast<Occupant*>(Class::MakeNew(s.toAscii()));
+
     selected_object->SetupQtHook(true);
     objectPanel->setLayout(selected_object->panel);
 }
