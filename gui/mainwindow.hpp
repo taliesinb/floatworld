@@ -31,6 +31,7 @@ public:
     World* world;
     QActionGroup speed_group;
     std::list<std::string> world_cache;
+    Occupant* selected_object;
 
     MainWindow(QWidget *parent = 0);
     void SetSpeed(float speed);
@@ -52,6 +53,8 @@ private slots:
     void on_actionLoad_triggered();
     void on_actionZoomIn_triggered();
     void on_actionZoomOut_triggered();
+
+    void ObjectSelected(QString);
 
     void Tick();
 

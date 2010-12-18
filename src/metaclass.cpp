@@ -192,6 +192,7 @@ Class::Class(const char* _name, const char* _pname, ObjectMaker func)
       nvars(0),
       nqvars(0)
 {
+    abstract = (func == NULL);
     metaclasses[nmetaclasses] = this;
     nmetaclasses++;
 }

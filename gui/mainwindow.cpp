@@ -12,7 +12,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
     adam(Creat::hidden + Creat::outputs, Creat::neurons),
     speed(0), stepper(0), last_stepper(0), block_draw(false),
-    speed_group(this)
+    speed_group(this), selected_object(NULL)
 {
     setupUi(this);
 
@@ -115,7 +115,45 @@ MainWindow::MainWindow(QWidget *parent)
         }
     }
     qworld->Draw();
-    repaint();
+
+    std::list<Class*> objects;
+    for (int i = 0; i < Class::nmetaclasses; i++)
+    {
+        Class* c = Class::metaclasses[i];
+        if (c->abstract) continue;
+        for (Class* p = c; p; p = Class::Lookup(p->pname))
+        {
+            if (strcmp(p->name, "Block") == 0)
+            {
+                objects.push_back(c);
+                break;
+            }
+            if (strcmp(p->name, "Shape") == 0)
+            {
+                objects.push_back(c);
+                break;
+            }
+        }
+    }
+    for_iterate(it2, objects)
+    {
+        const char* name = (*it2)->name;
+        objectComboBox->addItem(name);
+    }
+    connect(objectComboBox, SIGNAL(activated(QString)), this, SLOT(ObjectSelected(QString)));
+    update();
+}
+
+void MainWindow::ObjectSelected(QString s)
+{
+    if (selected_object)
+    {
+        selected_object->DeleteQtHook();
+        delete selected_object;
+    }
+    selected_object = dynamic_cast<Occupant*>(Class::MakeNew(s.toAscii()));
+    selected_object->SetupQtHook(true);
+    objectPanel->setLayout(selected_object->panel);
 }
 
 void MainWindow::speed_trigger(QAction* action)

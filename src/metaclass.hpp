@@ -111,6 +111,7 @@ public:
     static Object* MakeNew(const char* name);
     static Object* Create(std::istream& is);
     
+    bool abstract;
     const char* name;
     const char* pname;
     ObjectMaker maker;
