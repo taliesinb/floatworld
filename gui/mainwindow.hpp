@@ -55,6 +55,7 @@ private slots:
     void on_actionZoomOut_triggered();
 
     void ObjectSelected(QString);
+    void CreateObjectAt(Pos pos);
 
     void Tick();
 

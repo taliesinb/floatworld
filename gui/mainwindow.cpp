@@ -141,6 +141,7 @@ MainWindow::MainWindow(QWidget *parent)
         objectComboBox->addItem(name);
     }
     connect(objectComboBox, SIGNAL(activated(QString)), this, SLOT(ObjectSelected(QString)));
+    connect(qworld, SIGNAL(CellClicked(Pos)), this, SLOT(CreateObjectAt(Pos)));
     update();
 }
 
@@ -154,6 +155,19 @@ void MainWindow::ObjectSelected(QString s)
     selected_object = dynamic_cast<Occupant*>(Class::MakeNew(s.toAscii()));
     selected_object->SetupQtHook(true);
     objectPanel->setLayout(selected_object->panel);
+}
+
+void MainWindow::CreateObjectAt(Pos pos)
+{
+    if (selected_object && !world->OccupantAt(pos))
+    {
+        stringstream s;
+        s << *selected_object;
+        Occupant *occ = dynamic_cast<Occupant*>(Class::Create(s));
+        occ->Attach(*world, pos);
+        occ->AssignID();
+    }
+    qworld->Draw();
 }
 
 void MainWindow::speed_trigger(QAction* action)

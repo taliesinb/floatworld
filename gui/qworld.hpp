@@ -62,6 +62,7 @@ public slots:
 
 signals:
     void OccupantSelected(Occupant*);
+    void CellClicked(Pos pos);
 };
 
 #endif // QWORLD_HPP

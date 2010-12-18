@@ -102,7 +102,10 @@ void QWorld::SelectAtPos(Pos pos)
         if (min_d < 3)
             SelectOccupant(occ);
         else
-            world->energy(pos) += 5;
+        {
+            UnselectOccupant();
+            CellClicked(pos);
+        }
     }
 
     Draw();
