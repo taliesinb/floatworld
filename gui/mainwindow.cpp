@@ -153,9 +153,10 @@ void MainWindow::ObjectSelected(QString s)
     if (prototypes.contains(s))
         selected_object = prototypes[s];
     else
+    {
         selected_object = prototypes[s] = dynamic_cast<Occupant*>(Class::MakeNew(s.toAscii()));
-
-    selected_object->SetupQtHook(true);
+        selected_object->SetupQtHook(true);
+    }
     objectPanel->setLayout(selected_object->panel);
 }
 

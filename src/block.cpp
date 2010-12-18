@@ -140,6 +140,7 @@ void SkinnerBlock::Update()
 PhasedSkinnerBlock::PhasedSkinnerBlock()
 {
     period = 8;
+    phase = false;
 }
 
 void PhasedSkinnerBlock::Update()

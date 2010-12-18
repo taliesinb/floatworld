@@ -113,7 +113,10 @@ void QWorld::SelectAtPos(Pos pos)
 
 void QWorld::UnselectOccupant()
 {
+    Occupant* occ = selected_occupant;
     selected_occupant = NULL;
+    if (occ)
+        occ->DeleteQtHook();
     Draw();
 }
 
@@ -312,7 +315,7 @@ void QWorld::keyReleaseEvent(QKeyEvent* event)
 void QWorld::SelectOccupant(Occupant *occ)
 {
     if (selected_occupant && occ != selected_occupant)
-        selected_occupant->DeleteQtHook();
+        UnselectOccupant();
 
     if (occ && occ != selected_occupant)
     {
