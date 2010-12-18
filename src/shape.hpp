@@ -51,19 +51,16 @@ class GaussianCircle : public Circle
     void DrawStochastic(Matrix& m, int n);
 };
 
-/*
 class Annalus : public Shape
 {
   public:
 
     float radius1;
     float radius2;
-    float angle1;
-    float angle2;
     
     Annalus();
     
-    int Area();
+    float Area();
     void DrawFull(Matrix& m);
     void DrawStochastic(Matrix& m, int n);
 };
@@ -78,9 +75,9 @@ class Rectangle : public Shape
 
     Rectangle();
 
-    int Area();
+    float Area();
     void DrawFull(Matrix& m);
     void DrawStochastic(Matrix& m, int n);
 };
-*/
+
 #endif
