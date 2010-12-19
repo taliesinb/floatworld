@@ -127,6 +127,7 @@
    <addaction name="actionStep"/>
    <addaction name="actionIndividualStep"/>
    <addaction name="actionPrevOccupant"/>
+   <addaction name="actionDeleteSelected"/>
    <addaction name="actionNextOccupant"/>
    <addaction name="separator"/>
    <addaction name="actionZoomOut"/>
@@ -520,6 +521,18 @@
    </property>
    <property name="text">
     <string>Clear world</string>
+   </property>
+  </action>
+  <action name="actionDeleteSelected">
+   <property name="icon">
+    <iconset resource="floatworld.qrc">
+     <normaloff>:/icons/trash.png</normaloff>:/icons/trash.png</iconset>
+   </property>
+   <property name="text">
+    <string>Delete selected</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Backspace</string>
    </property>
   </action>
  </widget>

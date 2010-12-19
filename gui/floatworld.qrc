@@ -51,5 +51,6 @@
         <file>icons/save-as.png</file>
         <file>icons/zoom-in.png</file>
         <file>icons/zoom-out.png</file>
+        <file>icons/trash.png</file>
     </qresource>
 </RCC>

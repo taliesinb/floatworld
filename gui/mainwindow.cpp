@@ -161,10 +161,9 @@ void MainWindow::ObjectSelected(QString s)
     if (prototypes.contains(s))
         selected_object = prototypes[s];
     else
-    {
         selected_object = prototypes[s] = dynamic_cast<Occupant*>(Class::MakeNew(s.toAscii()));
-        selected_object->SetupQtHook(true);
-    }
+
+    selected_object->SetupQtHook(true);
     objectPanel->setLayout(selected_object->panel);
 }
 
@@ -306,6 +305,13 @@ void MainWindow::on_actionClearAll_triggered()
 {
     while (world->occupant_list.size())
         world->occupant_list.front()->Remove();
+    qworld->Draw();
+}
+
+void MainWindow::on_actionDeleteSelected_triggered()
+{
+    if (qworld->selected_occupant)
+        qworld->selected_occupant->Remove();
     qworld->Draw();
 }
 

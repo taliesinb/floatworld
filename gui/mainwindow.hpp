@@ -49,6 +49,7 @@ private slots:
     void on_actionPrevOccupant_triggered();
     void on_actionClearCreats_triggered();
     void on_actionClearAll_triggered();
+    void on_actionDeleteSelected_triggered();
 
     void ff_pressed();
     void ff_released();
