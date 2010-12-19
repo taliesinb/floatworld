@@ -64,12 +64,13 @@
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
-     <string>Grid</string>
+     <string>World</string>
     </property>
     <addaction name="actionNew"/>
     <addaction name="actionSave"/>
     <addaction name="actionLoad"/>
-    <addaction name="actionClose"/>
+    <addaction name="actionClearCreats"/>
+    <addaction name="actionClearAll"/>
    </widget>
    <widget class="QMenu" name="menuOccupant">
     <property name="title">
@@ -79,8 +80,23 @@
     <addaction name="actionPrevOccupant"/>
     <addaction name="actionIndividualStep"/>
    </widget>
+   <widget class="QMenu" name="menuSimulation">
+    <property name="title">
+     <string>Simulation</string>
+    </property>
+    <addaction name="actionStop"/>
+    <addaction name="actionPlaySlowest"/>
+    <addaction name="actionPlaySlow"/>
+    <addaction name="actionPlayNormal"/>
+    <addaction name="actionPlayFast"/>
+    <addaction name="actionPlayFastest"/>
+    <addaction name="separator"/>
+    <addaction name="actionStepBack"/>
+    <addaction name="actionStep"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuOccupant"/>
+   <addaction name="menuSimulation"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <property name="movable">
@@ -97,7 +113,7 @@
    </attribute>
    <addaction name="actionLoad"/>
    <addaction name="actionSave"/>
-   <addaction name="actionClearCreats"/>
+   <addaction name="actionClearAll"/>
    <addaction name="separator"/>
    <addaction name="actionStop"/>
    <addaction name="actionPlaySlowest"/>
@@ -231,7 +247,7 @@
     <string>Play at about 10 updates a second</string>
    </property>
    <property name="shortcut">
-    <string>Space</string>
+    <string>Ctrl+3</string>
    </property>
   </action>
   <action name="actionStop">
@@ -264,7 +280,7 @@
     <string>Step</string>
    </property>
    <property name="shortcut">
-    <string>Return</string>
+    <string>Space</string>
    </property>
    <property name="visible">
     <bool>true</bool>
@@ -322,6 +338,9 @@
    <property name="toolTip">
     <string>Play at high speed</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+4</string>
+   </property>
   </action>
   <action name="actionIndividualStep">
    <property name="icon">
@@ -329,7 +348,7 @@
      <normaloff>:/icons/right-stop-1.png</normaloff>:/icons/right-stop-1.png</iconset>
    </property>
    <property name="text">
-    <string>Step Selected</string>
+    <string>Step occupant</string>
    </property>
    <property name="toolTip">
     <string>Individual Step</string>
@@ -349,6 +368,9 @@
    <property name="text">
     <string>Next occupant</string>
    </property>
+   <property name="toolTip">
+    <string>Select next</string>
+   </property>
    <property name="shortcut">
     <string>&gt;</string>
    </property>
@@ -362,7 +384,7 @@
     <string>Prev occupant</string>
    </property>
    <property name="toolTip">
-    <string>Previous occupant</string>
+    <string>Select previous</string>
    </property>
    <property name="shortcut">
     <string>&lt;</string>
@@ -382,6 +404,9 @@
    <property name="toolTip">
     <string>Play at about 5 updates a second</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+2</string>
+   </property>
   </action>
   <action name="actionPlaySlowest">
    <property name="checkable">
@@ -397,6 +422,9 @@
    <property name="toolTip">
     <string>Play at about 1 update per second</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+1</string>
+   </property>
   </action>
   <action name="actionPlayFastest">
    <property name="checkable">
@@ -411,6 +439,9 @@
    </property>
    <property name="toolTip">
     <string>Play at maximum speed</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+5</string>
    </property>
   </action>
   <action name="actionFF">
@@ -464,7 +495,7 @@
   <action name="actionClearCreats">
    <property name="icon">
     <iconset resource="floatworld.qrc">
-     <normaloff>:/icons/danger.png</normaloff>:/icons/danger.png</iconset>
+     <normaloff>:/icons/clear.png</normaloff>:/icons/clear.png</iconset>
    </property>
    <property name="text">
     <string>Clear creatures</string>
@@ -477,6 +508,18 @@
    </property>
    <property name="text">
     <string>Step back</string>
+   </property>
+   <property name="shortcut">
+    <string>Backspace</string>
+   </property>
+  </action>
+  <action name="actionClearAll">
+   <property name="icon">
+    <iconset resource="floatworld.qrc">
+     <normaloff>:/icons/danger.png</normaloff>:/icons/danger.png</iconset>
+   </property>
+   <property name="text">
+    <string>Clear world</string>
    </property>
   </action>
  </widget>

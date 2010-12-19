@@ -135,20 +135,28 @@ MainWindow::MainWindow(QWidget *parent)
             }
         }
     }
+    objectComboBox->addItem("None");
     for_iterate(it2, objects)
     {
         const char* name = (*it2)->name;
         objectComboBox->addItem(name);
     }
+    objectComboBox->setCurrentIndex(0);
     connect(objectComboBox, SIGNAL(activated(QString)), this, SLOT(ObjectSelected(QString)));
     connect(qworld, SIGNAL(CellClicked(Pos)), this, SLOT(CreateObjectAt(Pos)));
     update();
 }
 
 void MainWindow::ObjectSelected(QString s)
-{
+{   
     if (selected_object)
         selected_object->DeleteQtHook();
+
+    if (s == "None")
+    {
+        selected_object = NULL;
+        return;
+    }
 
     if (prototypes.contains(s))
         selected_object = prototypes[s];
@@ -291,6 +299,13 @@ void MainWindow::on_actionClearCreats_triggered()
         Creat* creat = dynamic_cast<Creat*>(*it++);
         if (creat) creat->Remove();
     }
+    qworld->Draw();
+}
+
+void MainWindow::on_actionClearAll_triggered()
+{
+    while (world->occupant_list.size())
+        world->occupant_list.front()->Remove();
     qworld->Draw();
 }
 

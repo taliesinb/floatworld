@@ -57,6 +57,7 @@ public slots:
     void SelectAtPos(Pos pos);
     void UnselectOccupant();
     void UpdateOccupant();
+    void SelectedOccupantRemoved();
     void OnChildPaint(QPainter&);
     void RecenterZoom();
 

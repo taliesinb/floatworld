@@ -51,7 +51,7 @@ RegisterBinding(World, interaction_type, "interaction", "None\nPenalty\nAttack\n
 RegisterBinding(World, max_age, "maximum age", 0, 1000);
 RegisterBinding(World, mutation_prob, "mutation probability", 0, 1, 0.02);
 RegisterBinding(World, initial_energy, "initial energy", -50, 50);
-RegisterBinding(World, enable_respawn, "enable respawning");
+RegisterBinding(World, enable_respawn, "auto respawn");
 RegisterBinding(World, initial_mutations, "respawn diversity", 0, 20);
 RegisterBinding(World, enable_mutation, "enable mutation");
 //RegisterBinding(World, mutation_color_drift, "plumage drift", BoolHook());

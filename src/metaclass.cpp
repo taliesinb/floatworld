@@ -147,15 +147,14 @@ void Object::UpdateQtHook()
 }
 
 void Object::DeleteQtHook()
-{    
-    if (panel) {
-        QLayoutItem *child;
-        while ((child = panel->takeAt(0)) != 0) {
-                child->widget()->deleteLater();
-                //delete child;
-        }
-        delete panel;
-    }
+{
+    if (!panel) return;
+
+    QLayoutItem *child;
+    while (child = panel->takeAt(0))
+        child->widget()->deleteLater();
+
+    delete panel;
     panel = NULL;
 }
 

@@ -84,28 +84,11 @@ void QWorld::SelectAtPos(Pos pos)
 
     if (occ)
     {
+        UnselectOccupant();
         SelectOccupant(occ);
-    } else
-    {
-        float min_d = 10000;
-        Occupant* occ = NULL;
-        for_iterate(it, world->occupant_list)
-        {
-            Occupant* o = *it;
-            float d = (o->pos - pos).Mag();
-            if (d < min_d)
-            {
-                min_d = d;
-                occ = o;
-            }
-        }
-        if (min_d < 3)
-            SelectOccupant(occ);
-        else
-        {
-            UnselectOccupant();
-            CellClicked(pos);
-        }
+    } else {
+        UnselectOccupant();
+        CellClicked(pos);
     }
 
     Draw();
@@ -117,6 +100,12 @@ void QWorld::UnselectOccupant()
     selected_occupant = NULL;
     if (occ)
         occ->DeleteQtHook();
+    Draw();
+}
+
+void QWorld::SelectedOccupantRemoved()
+{
+    selected_occupant = NULL;
     Draw();
 }
 
@@ -329,7 +318,7 @@ void QWorld::SelectOccupant(Occupant *occ)
         connect(hm, SIGNAL(value_changed()), this,
                 SLOT(Draw()));
         connect(hm, SIGNAL(being_removed()), this,
-                SLOT(UnselectOccupant()));
+                SLOT(SelectedOccupantRemoved()));
         OccupantSelected(occ);
     }
 }
