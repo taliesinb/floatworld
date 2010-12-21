@@ -17,6 +17,7 @@ enum InteractionMode
     Zombie,
     Parasitism,
     Predation,
+    Shoving,
     MutualCooperation,
     AltruisticCooperation,
     GeneExchange,

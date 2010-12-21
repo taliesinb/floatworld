@@ -266,6 +266,22 @@ void Creat::Interaction(Creat& other)
             other.TransferEnergy(*this, 200);
             break;
 
+        case Shoving: {
+            Pos pos2 = grid->Wrap(other.pos + Pos(orient));
+            Creat* third = grid->CreatAt(pos2);
+            if (third)
+            {
+                int _orient = other.orient;
+                other.orient = orient;
+                other.Interaction(*third);
+                other.orient = _orient;
+            }
+            if (!grid->OccupantAt(pos2))
+            {
+                other.Move(pos2);
+            }
+        } break;
+
         case MutualCooperation:
             energy += 30;
             other.energy += 30;

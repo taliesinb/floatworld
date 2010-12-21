@@ -48,7 +48,7 @@ RegisterVar(World, jump_range)
 
 RegisterBinding(World, timestep, "timestep");
 RegisterBinding(World, num_creats, "population");
-RegisterBinding(World, interaction_type, "interaction", "none\npenalty\nattack\nzombify\nparasitism\npredation\nmutualism\naltruism\nDNA blend\nDNA push\nDNA pull\nDNA marry");
+RegisterBinding(World, interaction_type, "interaction", "none\npenalty\nattack\nzombify\nparasitism\npredation\nshoving\nmutualism\naltruism\nDNA blend\nDNA push\nDNA pull\nDNA marry");
 RegisterBinding(World, max_age, "maximum age", 0, 1000);
 RegisterBinding(World, mutation_prob, "mutation probability", 0, 1, 0.02);
 RegisterBinding(World, initial_energy, "initial energy", -50, 50);

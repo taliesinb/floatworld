@@ -36,7 +36,7 @@ MainWindow::MainWindow(QWidget *parent)
     };
     int offset = Creat::num_inputs;
     adam(breed - offset, energy) = 0.75;
-    adam(move - offset, cons) = 1.01;
+    adam(move - offset, cons) = 1.1;
     adam(left - offset, random) = 1.5;
 
     world->max_age = 50;
@@ -47,7 +47,7 @@ MainWindow::MainWindow(QWidget *parent)
         c->Attach(*world, world->RandomCell());
         c->AssignID();
         c->radius = RandInt(5,17);
-        c->threshold = 2 + max(25 - (c->radius - 5) * (c->radius - 5) / 2, 0);
+        c->threshold = 2 + max(25 - (c->radius - 5) * (c->radius - 5) / 3, 0);
         c->energy = 2;
         c->p_jump = 0.01;
         //c->ratio = 0.2;
