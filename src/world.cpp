@@ -59,9 +59,9 @@ RegisterBinding(World, enable_mutation, "enable mutation");
 RegisterBinding(World, neural_net_iterations, "neural iterations", 1, 10);
 RegisterBinding(World, energy_decay_rate, "energy decay rate", 0, 0.5, 0.01);
 RegisterBinding(World, path_energy, "energy wake", -20, 20);
-RegisterBinding(World, action_cost[ActionReproduce], "birth cost", 50, 200);
-RegisterBinding(World, action_cost[ActionNothing], "metabolism", 50, 200);
-RegisterBinding(World, action_cost[ActionForward], "move cost", 50, 200);
+RegisterArrayBinding(World, action_cost, ActionReproduce, "birth cost", 50, 200, 5);
+RegisterArrayBinding(World, action_cost, ActionNone,    "metabolism", -10, 10, 0.25);
+RegisterArrayBinding(World, action_cost, ActionForward, "move cost", -10, 10, 0.25);
 RegisterBinding(World, jump_range, "jump range", 0, 10);
 
 RegisterVar(World, occupant_list)

@@ -212,6 +212,7 @@ void QWorld::OnChildPaint(QPainter& painter)
             case DrawEnergy: {
                     float stage = float(creat->energy) / world->action_cost[ActionReproduce];
                     int value = 240;
+                    if (stage < 0) stage = 0;
                     if (stage < 0.4) { value *= (0.5 + stage / 0.8); stage = 0.4; }
                     int hue = 255 * (0.75 + stage * 0.4);
                     if (hue > 350) hue = 350;
