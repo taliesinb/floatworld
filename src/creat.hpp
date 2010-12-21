@@ -75,6 +75,7 @@ public:
     Creat();
     Creat(const Creat& c);
     void Reset();
+    void Die();
 
     // LINEAGE HANDLING
     std::list<LineageNode> ReconstructLineage();

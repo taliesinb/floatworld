@@ -228,12 +228,13 @@ void QWorld::OnChildPaint(QPainter& painter)
                     switch (creat->action)
                     {
                     case ActionNone: color.setRgb(100, 100, 100); break;
-                    case ActionForward: color.setRgb(50, 50, 200); break;
-                    case ActionLeft: color.setRgb(50, 120, 200); break;
+                    case ActionForward: color.setRgb(50, 50, 240); break;
+                    case ActionLeft: color.setRgb(50, 120, 180); break;
                     case ActionRight: color.setRgb(120, 50, 200); break;
                     case ActionReproduce: color.setRgb(0, 255, 0); break;
                     }
                     if (creat->interacted) color.setRgb(255, 150, 0);
+                    if (!creat->alive) color.setRgb(255,0,0);
                 } break;
             }
             if (poly)

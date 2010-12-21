@@ -122,6 +122,10 @@ void Creat::Reset()
     desirer_id = -1;
 }
 
+void Creat::Die()
+{
+    alive = false;
+}
 
 void Creat::AddToLineage(Pos w)
 {
@@ -406,7 +410,7 @@ void Creat::CheckSanity(const char* str)
 
 void Creat::Step()
 {
-    assert(alive);
+    if (!alive) { Remove(); return; }
   
     // SETUP EXTERNAL INPUTS
     state(off_ext_inputs + 0) = grid->EnergyKernel(pos, orient) / 20.0;
@@ -474,7 +478,7 @@ void Creat::Step()
     interacted = false;
     if (energy > 0) (this->*(grid->action_lookup[action]))();
 
-    if (energy < 0 || age > grid->max_age) Remove();
+    if (energy < 0 || age > grid->max_age) Die();
 }
 
 void Creat::__Remove()
