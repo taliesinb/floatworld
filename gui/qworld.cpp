@@ -24,6 +24,7 @@ RegisterBinding(QWorld, draw_creats, "draw creats");
 RegisterBinding(QWorld, draw_energy, "draw energy");
 RegisterBinding(QWorld, draw_blocks, "draw blocks");
 RegisterBinding(QWorld, draw_block_colors, "color blocks");
+RegisterBinding(QWorld, draw_hue_multiplier, "hue multiplier", 0.1, 10.0, 0.1);
 
 int sz = 120;
 
@@ -39,6 +40,7 @@ QWorld::QWorld(QWidget* parent) :
     energy->matrix = &world->energy;
 
     draw_type = DrawAction;
+    draw_hue_multiplier = 1.0;
     draw_creats = true;
     draw_blocks = true;
     draw_energy = true;
@@ -205,9 +207,9 @@ void QWorld::OnChildPaint(QPainter& painter)
             case DrawAge: {
                     float stage = float(creat->age) / world->max_age;
                     int hue = 255 * (0.4 * (1 - stage));
-                    if (hue > 255) hue = 255;
                     if (hue < 0) hue = 0;
                     color.setHsv(hue, 240, 240);
+                    if (!creat->alive) color.setRgb(255,255,255);
                 } break;
             case DrawEnergy: {
                     float stage = float(creat->energy) / world->action_cost[ActionReproduce];
@@ -219,8 +221,8 @@ void QWorld::OnChildPaint(QPainter& painter)
                     color.setHsv(hue, 240, value);
                 } break;
             case DrawColor: {
-                    int hue = int(255 * 255 + creat->marker * 255) % 255;
-                    if (hue > 255) hue = 255;
+                    int hue = int(360 * 100 + (draw_hue_multiplier * creat->marker) * 360) % 360;
+                    if (hue > 360) hue = 360;
                     if (hue < 0) hue = 0;
                     color.setHsv(hue, 220, 220);
                 } break;

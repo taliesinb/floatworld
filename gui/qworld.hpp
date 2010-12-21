@@ -29,6 +29,7 @@ public:
         DrawColor
     };
     int draw_type;
+    float draw_hue_multiplier;
     bool draw_creats;
     bool draw_blocks;
     bool draw_energy;
