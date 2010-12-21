@@ -26,7 +26,9 @@ public:
         DrawAction,
         DrawAge,
         DrawEnergy,
-        DrawColor
+        DrawColor,
+        DrawNumberOfChildren,
+        DrawNumberOfInteractions
     };
     int draw_type;
     float draw_hue_multiplier;

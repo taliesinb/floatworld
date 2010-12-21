@@ -19,7 +19,7 @@ RegisterVar(QGrid, draw_blocks);
 RegisterVar(QGrid, draw_energy);
 */
 RegisterClass(QWorld, None);
-RegisterBinding(QWorld, draw_type, "color by", "Action\nAge\nEnergy\nPlumage");
+RegisterBinding(QWorld, draw_type, "color by", "action\nage\nenergy\nplumage\n# children\n# interacts");
 RegisterBinding(QWorld, draw_creats, "draw creats");
 RegisterBinding(QWorld, draw_energy, "draw energy");
 RegisterBinding(QWorld, draw_blocks, "draw blocks");
@@ -237,6 +237,12 @@ void QWorld::OnChildPaint(QPainter& painter)
                     }
                     if (creat->interacted) color.setRgb(255, 150, 0);
                     if (!creat->alive) color.setRgb(255,0,0);
+                } break;
+            case DrawNumberOfChildren: {
+                    color.setHsv(creat->children * 60, 220, 200);
+                } break;
+            case DrawNumberOfInteractions: {
+                    color.setHsv(creat->interaction_count * 60, 220, 200);
                 } break;
             }
             if (poly)
