@@ -139,13 +139,21 @@ class Registrator
     Registrator(Class& metaclass, const char* label, HookFactory factory);
 };   
 
+<<<<<<< Updated upstream
 #define RegisterBinding(CLASS, NAME, LABEL, ...)                                \
     QWidget* CLASS##NAME##Factory(Object* obj) {                                \
     Binding*     h = Binding::New(dynamic_cast<CLASS*>(obj)->NAME, ##__VA_ARGS__);  \
-    return h->AsWidget(); }                                                     \
-    Registrator CLASS##NAME##BindingRegistrator(CLASS##MetaClass,               \
-    LABEL, &CLASS##NAME##Factory);
+=======
+#define JoinMacro(A,B) A ## B
+#define RegisterBinding(CLASS, NAME, LABEL, ...) RegisterBinding2(JoinMacro(CLASS, __LINE__), CLASS, NAME, LABEL, ##__VA_ARGS__)
 
+#define RegisterBinding2(UNIQ, CLASS, NAME, LABEL, ...)                          \
+QWidget* Factory##UNIQ(Object* obj) {                                           \
+    Binding* h = Binding::New(dynamic_cast<CLASS*>(obj)->NAME, ##__VA_ARGS__);  \
+>>>>>>> Stashed changes
+    return h->AsWidget(); }                                                     \
+    Registrator Register##UNIQ(CLASS##MetaClass,                                \
+    LABEL, &Factory##UNIQ);
 
 #define RegisterClass(CLASS, PARENT)                                \
     Object* CLASS##Factory() { return new CLASS; }                  \

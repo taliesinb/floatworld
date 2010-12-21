@@ -91,6 +91,7 @@ public:
     float action_cost[16];
     CreatFunc action_lookup[16];
     int initial_energy;
+    int birth_cost;
     int initial_marker;
     int initial_mutations;
     Matrix* initial_brain;

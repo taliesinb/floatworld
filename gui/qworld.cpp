@@ -204,16 +204,18 @@ void QWorld::OnChildPaint(QPainter& painter)
             switch (draw_type) {
             case DrawAge: {
                     float stage = float(creat->age) / world->max_age;
-                    int hue = 255 * (0.3 * (1 - stage));
+                    int hue = 255 * (0.4 * (1 - stage));
                     if (hue > 255) hue = 255;
                     if (hue < 0) hue = 0;
                     color.setHsv(hue, 240, 240);
                 } break;
             case DrawEnergy: {
-                    float stage = float(creat->energy) / 100;
+                    float stage = float(creat->energy) / world->action_cost[ActionReproduce];
+                    int value = 240;
+                    if (stage < 0.4) { value *= (0.5 + stage / 0.8); stage = 0.4; }
                     int hue = 255 * (0.75 + stage * 0.4);
                     if (hue > 350) hue = 350;
-                    color.setHsv(hue, 240, 240);
+                    color.setHsv(hue, 240, value);
                 } break;
             case DrawColor: {
                     int hue = int(255 * 255 + creat->marker * 255) % 255;
