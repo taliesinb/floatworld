@@ -35,9 +35,9 @@ MainWindow::MainWindow(QWidget *parent)
         breed,
     };
     int offset = Creat::num_inputs;
-    adam(breed - offset, energy) = 1.0;
-    adam(move - offset, cons) = 0.81;
-    adam(left - offset, random) = 1.05;
+    adam(breed - offset, energy) = 0.75;
+    adam(move - offset, cons) = 1.01;
+    adam(left - offset, random) = 1.5;
 
     world->max_age = 50;
 

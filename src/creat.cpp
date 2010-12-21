@@ -180,7 +180,7 @@ void Creat::Reproduce()
     child.CopyBrain(*this);
     child.MutateBrain();
 
-    float excess = state(num_inputs + num_hidden + ActionReproduce - 1) - 0.8;
+    float excess = state(num_inputs + num_hidden + ActionReproduce - 1) - 1.0;
     if (excess > 0) TransferEnergy(child, excess * 50);
 
     children++;
@@ -192,7 +192,7 @@ void Creat::MoveForward()
     Pos front;
     if (int jump = grid->jump_range)
     {
-        float excess = ClipFloat((state(num_inputs + num_hidden + ActionForward - 1) - 1) * 2 * jump, 0, jump);
+        float excess = ClipFloat((state(num_inputs + num_hidden + ActionForward - 1) - 1.2) * 2 * jump, 0, jump);
         int dist = round(excess);
         energy -= dist;
         front = grid->Wrap(pos + Pos(orient) * (1 + dist));
@@ -452,8 +452,8 @@ void Creat::Step()
 
     // CALCULATE ACTION
     action = ActionNone;
-    float maxaction = 0.8;
-    float* output = &state(num_inputs + num_hidden);
+    float maxaction = 1.0;
+    float* output = &state(off_outputs);
     for (int i = 0; i < NumberActions-1; i++)
     {
         float f = output[i];
