@@ -60,6 +60,7 @@ public:
     int orient;
     int last_orient;
     int interaction_count;
+    int children;
     bool alive;
     bool interacted;
     float energy;

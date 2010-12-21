@@ -16,6 +16,7 @@ RegisterVar(Creat, orient);
 RegisterVar(Creat, alive);
 RegisterVar(Creat, energy);
 RegisterVar(Creat, marker);
+RegisterVar(Creat, children);
 
 const char* neuron_labels = "energy in front\n"
 "energy on left\n"
@@ -50,6 +51,7 @@ const char* outputs = "hidden 1\n"
 RegisterBinding(Creat, energy, "energy", 0, 500, 1);
 RegisterBinding(Creat, age, "age", 0, 1000);
 RegisterBinding(Creat, interaction_count, "interacts");
+RegisterBinding(Creat, children, "children");
 RegisterBinding(Creat, action, "action", "None\nForward\nLeft\nRight\nReproduce");
 RegisterBinding(Creat, state, "neurons", 7, true, neuron_labels, "");
 RegisterBinding(Creat, weights, "weights", 7, false, outputs, neuron_labels);
@@ -105,6 +107,7 @@ void Creat::Reset()
     state.SetZero();
     age = 0;
     orient = 0;
+    children = 0;
     last_orient = 0;
     interacted = false;
     interaction_count = 0;
@@ -180,6 +183,7 @@ void Creat::Reproduce()
     float excess = state(inputs + hidden + ActionReproduce - 1) - 0.8;
     if (excess > 0) TransferEnergy(child, excess * 50);
 
+    children++;
     grid->births++;
 }
 
@@ -198,12 +202,11 @@ void Creat::MoveForward()
 
     if (Occupant* other = grid->SolidOccupantAt(front))
     {
+        interacted = true;
         other->Interact(*this);
         interaction_count++;
-        interacted = true;
     } else
     {
-        interacted = false;
         float de = grid->energy(pos);
         energy += de;
         grid->energy(pos) = grid->path_energy;
@@ -475,6 +478,7 @@ void Creat::Step()
     grid->total_steps++;
 
     // PERFORM ACTION
+    interacted = false;
     if (energy > 0) (this->*(grid->action_lookup[action]))();
 
     if (energy < 0 || age > grid->max_age) Remove();

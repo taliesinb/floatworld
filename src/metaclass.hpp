@@ -141,7 +141,7 @@ class Registrator
 
 #define RegisterBinding(CLASS, NAME, LABEL, ...)                                \
     QWidget* CLASS##NAME##Factory(Object* obj) {                                \
-    Binding* h = Binding::New(dynamic_cast<CLASS*>(obj)->NAME, ##__VA_ARGS__);  \
+    Binding*     h = Binding::New(dynamic_cast<CLASS*>(obj)->NAME, ##__VA_ARGS__);  \
     return h->AsWidget(); }                                                     \
     Registrator CLASS##NAME##BindingRegistrator(CLASS##MetaClass,               \
     LABEL, &CLASS##NAME##Factory);
