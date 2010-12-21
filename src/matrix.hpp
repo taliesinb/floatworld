@@ -46,15 +46,15 @@ public:
     void Apply(float f(float));
     void Apply(double f(double));
   
-    const float& GetW(int r, int c) const { return data[Mod(r,rows) * cols + Mod(c,cols)]; }
-    float& GetW(int r, int c) { return data[Mod(r,rows) * cols + Mod(c,cols)]; }
+    inline const float& GetW(int r, int c) const { return data[Mod(r,rows) * cols + Mod(c,cols)]; }
+    inline float& GetW(int r, int c) { return data[Mod(r,rows) * cols + Mod(c,cols)]; }
       
-    float& operator()(Pos p) { return data[p.row * cols + p.col]; }
-    const float& operator()(Pos p) const { return data[p.row * cols + p.col]; }
-    float& operator()(int r, int c=0) { return data[r * cols + c]; }
-    const float& operator()(int r, int c=0) const { return data[r * cols + c]; }
-    const float* operator[](int row) const { return &data[row * cols]; }
-    float* operator[](int row) { return &data[row * cols]; }
+    inline float& operator()(Pos p) { return data[p.row * cols + p.col]; }
+    inline const float& operator()(Pos p) const { return data[p.row * cols + p.col]; }
+    inline float& operator()(int r, int c=0) { return data[r * cols + c]; }
+    inline const float& operator()(int r, int c=0) const { return data[r * cols + c]; }
+    inline const float* operator[](int row) const { return &data[row * cols]; }
+    inline float* operator[](int row) { return &data[row * cols]; }
 
     void operator=(const Matrix& m);
     void operator=(float c);

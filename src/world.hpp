@@ -121,7 +121,7 @@ public:
     void SetSize(int rws, int cls);
 
     // Low-level position
-    Pos Wrap(Pos pos) { return pos.Wrap(rows, cols); }
+    inline Pos Wrap(Pos pos) { return pos.Wrap(rows, cols); }
     Pos RandomCell();
     Pos EmptyCell();
     Pos FairCell();

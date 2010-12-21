@@ -9,9 +9,6 @@ OBJECTS_DIR = build
 DESTDIR = build
 FORMS += gui/mainwindow.ui
 RESOURCES += gui/floatworld.qrc
-QMAKE_CFLAGS+=-pg
-QMAKE_CXXFLAGS+=-pg
-QMAKE_LFLAGS+=-pg
 
 OTHER_FILES += \
     README.markdown \

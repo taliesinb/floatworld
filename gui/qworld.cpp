@@ -364,7 +364,7 @@ void QWorld::Draw()
 
 void QWorld::SelectNextOccupant(bool forward)
 {
-    Pos p = energy->highlighted.Wrap(world->rows, world->cols);
+    Pos p = world->Wrap(energy->highlighted);
     int sz = world->rows * world->cols;
     int start = p.row * world->cols + p.col;
     int index = start;

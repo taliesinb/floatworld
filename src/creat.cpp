@@ -82,9 +82,9 @@ void Creat::Setup()
 }
 
 Creat::Creat()
-    : weights(hidden + outputs, neurons),
-      state(neurons, 1),
-      state2(neurons, 1)
+    : weights(num_hidden + num_outputs, num_neurons),
+      state(num_neurons, 1),
+      state2(num_neurons, 1)
 {
     Reset();
     signature = 1;
@@ -164,8 +164,8 @@ list<LineageNode> Creat::ReconstructLineage()
 Pos Creat::SelectRandomWeight()
 {
     int j, k;
-    j = RandInt(Creat::hidden + Creat::outputs - 1);
-    k = RandInt(Creat::neurons-1);
+    j = RandInt(Creat::num_hidden + Creat::num_outputs - 1);
+    k = RandInt(Creat::num_neurons-1);
     return Pos(j,k);
 }
 
@@ -180,7 +180,7 @@ void Creat::Reproduce()
     child.CopyBrain(*this);
     child.MutateBrain();
 
-    float excess = state(inputs + hidden + ActionReproduce - 1) - 0.8;
+    float excess = state(num_inputs + num_hidden + ActionReproduce - 1) - 0.8;
     if (excess > 0) TransferEnergy(child, excess * 50);
 
     children++;
@@ -192,7 +192,7 @@ void Creat::MoveForward()
     Pos front;
     if (int jump = grid->jump_range)
     {
-        float excess = ClipFloat((state(inputs + hidden + ActionForward - 1) - 1) * 2 * jump, 0, jump);
+        float excess = ClipFloat((state(num_inputs + num_hidden + ActionForward - 1) - 1) * 2 * jump, 0, jump);
         int dist = round(excess);
         energy -= dist;
         front = grid->Wrap(pos + Pos(orient) * (1 + dist));
@@ -330,7 +330,7 @@ void Creat::Update()
 // TODO: Update for new weight matrix
 void Creat::CheckSanity(const char* str)
 {
-    for (int i = 0; i < Creat::neurons; i++)
+    for (int i = 0; i < Creat::num_neurons; i++)
     {
         float val = state(i);
         if (val != val)
@@ -340,9 +340,9 @@ void Creat::CheckSanity(const char* str)
         }
     }
 
-    for (int i = 0; i < Creat::neurons; i++)
+    for (int i = 0; i < Creat::num_neurons; i++)
     {
-        for (int j = 0; j < Creat::neurons; j++)
+        for (int j = 0; j < Creat::num_neurons; j++)
         {
             float val = weights(i,j);
             if (val != val)
@@ -396,9 +396,9 @@ void Creat::CheckSanity(const char* str)
     cout << "CONTEXT: " << str << endl;
     cout << "Creat printout:" << endl;
     cout << "State2 contents:" << state2 << endl;
-    cout << "Creat::inputs = " << Creat::inputs << endl;
-    cout << "Creat::inputs + Creat::hidden = " << Creat::inputs + Creat::hidden << endl;
-    cout << "Creat::neurons = " << Creat::neurons << endl;
+    cout << "Creat::inputs = " << Creat::num_inputs << endl;
+    cout << "Creat::inputs + Creat::hidden = " << Creat::num_inputs + Creat::num_hidden << endl;
+    cout << "Creat::neurons = " << Creat::num_neurons << endl;
 
     cout << *this << endl;
     throw "invalid creat";
@@ -409,49 +409,42 @@ void Creat::Step()
     assert(alive);
   
     // SETUP EXTERNAL INPUTS
-    state(0) = grid->EnergyKernel(pos, orient) / 20.0;
-    state(1) = grid->EnergyKernel(pos, orient - 1) / 20.0;
-    state(2) = grid->EnergyKernel(pos, orient + 1) / 20.0;
-    state(3) = grid->CreatKernel(pos, orient);
-    state(4) = grid->CreatKernel(pos, orient - 1);
-    state(5) = grid->CreatKernel(pos, orient + 1);
-    state(6) = grid->DirKernel(pos, orient);
-    state(7) = grid->DirKernel(pos, orient + 1);
+    state(off_ext_inputs + 0) = grid->EnergyKernel(pos, orient) / 20.0;
+    state(off_ext_inputs + 1) = grid->EnergyKernel(pos, orient - 1) / 20.0;
+    state(off_ext_inputs + 2) = grid->EnergyKernel(pos, orient + 1) / 20.0;
+    state(off_ext_inputs + 3) = grid->CreatKernel(pos, orient);
+    state(off_ext_inputs + 4) = grid->CreatKernel(pos, orient - 1);
+    state(off_ext_inputs + 5) = grid->CreatKernel(pos, orient + 1);
+    state(off_ext_inputs + 6) = grid->DirKernel(pos, orient);
+    state(off_ext_inputs + 7) = grid->DirKernel(pos, orient + 1);
 
     // SETUP INTERNAL INPUTS
-    state(extinputs + 0) = 1.0;
-    state(extinputs + 1) = (energy - 50.) / 50.;
-    state(extinputs + 2) = (float(age) - (grid->max_age / 2)) / grid->max_age;
-    state(extinputs + 3) = RandFloat(-1.0, 1.0);
+    state(off_int_inputs + 0) = 1.0;
+    state(off_int_inputs + 1) = (2.0 * energy / grid->action_cost[ActionReproduce]) - 1.0;
+    state(off_int_inputs + 2) = (2.0 * age / grid->max_age) - 1.0;
+    state(off_int_inputs + 3) = RandFloat(-1.0, 1.0);
 
-    for (int k = 0; k < inputs; k++)
+    for (int k = off_ext_inputs; k < off_ext_inputs + num_inputs; k++)
         state2(k) = state(k);
 
     for (int iter = 0; iter < grid->neural_net_iterations; iter++)
     {
-        // CALCULATE BRAIN STEP
-        // only clumns 0 through input+hidden are used
-        // only rows from inputs from 0 through neu
-        for  (int j = 0; j < Creat::hidden; j++)
+        // update the hiddens from the inputs and the old hiddens
+        for  (int j = 0; j < num_hidden; j++)
         {
             float v = 0;
-            for (int k = 0; k < Creat::inputs + Creat::hidden; k++)
-                v += weights.data[j * Creat::neurons + k] * state.data[k];
-            state2.data[Creat::inputs + j] = v;
+            for (int k = 0; k < num_inputs + num_hidden; k++)
+                v += weights.data[j * num_neurons + k] * state.data[k];
+            state2.data[off_hidden + j] = tanh(v);
         }
 
-        for (int i = 0; i < hidden; i++)
-        {
-            float& h = state2(inputs + i);
-            h = tanh(h);
-        }
-
-        for  (int j = Creat::hidden; j < Creat::hidden + Creat::outputs; j++)
+        // update the outputs from everyone
+        for  (int j = 0; j < Creat::num_outputs; j++)
         {
             float v = 0;
-            for (int k = 0; k < Creat::inputs + Creat::hidden; k++)
-                v += weights.data[j * Creat::neurons + k] * state.data[k];
-            state2.data[Creat::inputs + j] = v;
+            for (int k = 0; k < off_outputs; k++)
+                v += weights.data[(j + num_hidden) * num_neurons + k] * state.data[k];
+            state2.data[off_outputs + j] = v;
         }
         SwapContents(state, state2);
     }
@@ -460,7 +453,7 @@ void Creat::Step()
     // CALCULATE ACTION
     action = ActionNone;
     float maxaction = 0.8;
-    float* output = &state(inputs + hidden);
+    float* output = &state(num_inputs + num_hidden);
     for (int i = 0; i < NumberActions-1; i++)
     {
         float f = output[i];
@@ -527,8 +520,7 @@ void Creat::ChooseMate(Creat* other)
 
 Pos Creat::Front(int offset)
 {
-    Pos front = pos + Pos(orient + offset);
-    return front.Wrap(grid->rows, grid->cols);
+    return grid->Wrap(pos + Pos(orient + offset));
 }
 
 Creat* Creat::Peer(int id)

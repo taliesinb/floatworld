@@ -10,7 +10,7 @@ using namespace std;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
-    adam(Creat::hidden + Creat::outputs, Creat::neurons),
+    adam(Creat::num_hidden + Creat::num_outputs, Creat::num_neurons),
     speed(0), stepper(0), last_stepper(0), block_draw(false),
     speed_group(this), selected_object(NULL)
 {
@@ -29,12 +29,12 @@ MainWindow::MainWindow(QWidget *parent)
     enum {
         energyF = 0, energyL, energyR, creatF, creatL, creatR, dirA, dirB,
         cons, energy, age, random,
-        move = Creat::inputs + Creat::hidden,
+        move = Creat::num_inputs + Creat::num_hidden,
         left,
         right,
         breed,
     };
-    int offset = Creat::inputs;
+    int offset = Creat::num_inputs;
     adam(breed - offset, energy) = 1.0;
     adam(move - offset, cons) = 0.81;
     adam(left - offset, random) = 1.05;

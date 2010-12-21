@@ -36,12 +36,17 @@ public:
 class Creat : public Occupant
 {
 public:
-    static const int extinputs = 8;
-    static const int intinputs = 4;
-    static const int inputs = extinputs + intinputs;
-    static const int hidden = 4;
-    static const int outputs = 4;
-    static const int neurons = inputs + hidden + outputs;
+    static const int num_ext_inputs = 8;
+    static const int num_int_inputs = 4;
+    static const int num_inputs = num_ext_inputs + num_int_inputs;
+    static const int num_hidden = 4;
+    static const int num_outputs = 4;
+    static const int num_neurons = num_inputs + num_hidden + num_outputs;
+
+    static const int off_ext_inputs = 0;
+    static const int off_int_inputs = num_ext_inputs;
+    static const int off_hidden = num_inputs;
+    static const int off_outputs = off_hidden + num_hidden;
 
     static int global_id;
 
