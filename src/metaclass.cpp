@@ -160,7 +160,6 @@ void Object::DeleteQtHook()
 
 void Object::HookWasChanged()
 {
-    cout << GetClass().name << endl;
 }
 
 Class& Object::GetClass()

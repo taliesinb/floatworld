@@ -469,6 +469,8 @@ void Creat::Update()
 {
     if (!alive) { Remove(); return; }
 
+    last_orient = orient;
+
     // SETUP EXTERNAL INPUTS
     state(off_ext_inputs + 0) = grid->EnergyKernel(pos, orient) / 20.0;
     state(off_ext_inputs + 1) = grid->EnergyKernel(pos, orient - 1) / 20.0;
