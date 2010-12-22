@@ -388,6 +388,25 @@ void Creat::UpdateBrain()
     }
 }
 
+void Creat::UpdateInputs()
+{
+    // SETUP EXTERNAL INPUTS
+    state(off_ext_inputs + 0) = grid->EnergyKernel(pos, orient) / 20.0;
+    state(off_ext_inputs + 1) = grid->EnergyKernel(pos, orient - 1) / 20.0;
+    state(off_ext_inputs + 2) = grid->EnergyKernel(pos, orient + 1) / 20.0;
+    state(off_ext_inputs + 3) = grid->CreatKernel(pos, orient);
+    state(off_ext_inputs + 4) = grid->CreatKernel(pos, orient - 1);
+    state(off_ext_inputs + 5) = grid->CreatKernel(pos, orient + 1);
+    state(off_ext_inputs + 6) = grid->DirKernel(pos, orient);
+    state(off_ext_inputs + 7) = grid->DirKernel(pos, orient + 1);
+
+    // SETUP INTERNAL INPUTS
+    state(off_int_inputs + 0) = 1.0;
+    state(off_int_inputs + 1) = (2.0 * energy / grid->action_cost[ActionReproduce]) - 1.0;
+    state(off_int_inputs + 2) = (2.0 * age / grid->max_age) - 1.0;
+    state(off_int_inputs + 3) = RandFloat(-1.0, 1.0);
+}
+
 // TODO: Update for new weight matrix
 void Creat::CheckSanity(const char* str)
 {
@@ -471,22 +490,7 @@ void Creat::Update()
 
     last_orient = orient;
 
-    // SETUP EXTERNAL INPUTS
-    state(off_ext_inputs + 0) = grid->EnergyKernel(pos, orient) / 20.0;
-    state(off_ext_inputs + 1) = grid->EnergyKernel(pos, orient - 1) / 20.0;
-    state(off_ext_inputs + 2) = grid->EnergyKernel(pos, orient + 1) / 20.0;
-    state(off_ext_inputs + 3) = grid->CreatKernel(pos, orient);
-    state(off_ext_inputs + 4) = grid->CreatKernel(pos, orient - 1);
-    state(off_ext_inputs + 5) = grid->CreatKernel(pos, orient + 1);
-    state(off_ext_inputs + 6) = grid->DirKernel(pos, orient);
-    state(off_ext_inputs + 7) = grid->DirKernel(pos, orient + 1);
-
-    // SETUP INTERNAL INPUTS
-    state(off_int_inputs + 0) = 1.0;
-    state(off_int_inputs + 1) = (2.0 * energy / grid->action_cost[ActionReproduce]) - 1.0;
-    state(off_int_inputs + 2) = (2.0 * age / grid->max_age) - 1.0;
-    state(off_int_inputs + 3) = RandFloat(-1.0, 1.0);
-
+    UpdateInputs();
     UpdateBrain();
 
     // CALCULATE ACTION COST

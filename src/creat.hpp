@@ -93,6 +93,7 @@ public:
     void CheckSanity(const char* str);
     void Update();
     void UpdateBrain();
+    void UpdateInputs();
     void DoNothing();
     void MoveForward();
     void TurnLeft();

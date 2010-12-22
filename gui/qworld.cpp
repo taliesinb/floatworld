@@ -307,6 +307,7 @@ void QWorld::keyReleaseEvent(QKeyEvent* event)
         world->occupant_list.push_back(creat);
     }
     (creat->*(world->action_lookup[creat->action]))();
+    creat->UpdateInputs();
     creat->UpdateBrain();
     creat->UpdateQtHook();
 
