@@ -91,6 +91,7 @@ ActiveTrap::ActiveTrap()
 void ActiveTrap::Update()
 {
     Pos new_pos;
+    if (grid->timestep % 3 != 0) return;
     for (int dir = 0; dir < 4; dir++)
     {
         new_pos = grid->Wrap(pos + Pos(dir));
@@ -103,11 +104,8 @@ void ActiveTrap::Update()
         }
     }
     draw_filled = false;
-    if (grid->timestep % 3 == 0)
-    {
-        new_pos = grid->Wrap(pos + Pos(RandInt(0,3)));
-        if (!grid->OccupantAt(new_pos)) Move(new_pos);
-    }
+    new_pos = grid->Wrap(pos + Pos(RandInt(0,3)));
+    if (!grid->OccupantAt(new_pos)) Move(new_pos);
 }
 
 SkinnerBlock::SkinnerBlock()

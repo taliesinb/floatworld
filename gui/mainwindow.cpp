@@ -163,7 +163,7 @@ void MainWindow::ObjectSelected(QString s)
     else
         selected_object = prototypes[s] = dynamic_cast<Occupant*>(Class::MakeNew(s.toAscii()));
 
-    selected_object->SetupQtHook(true);
+    selected_object->SetupQtHook(false);
     objectPanel->setLayout(selected_object->panel);
 }
 
@@ -353,6 +353,15 @@ void MainWindow::on_actionZoomOut_triggered()
 {
     int z = qworld->CurrentZoom() - 1;
     qworld->SetZoom(z < 2 ? 2 : z);
+}
+
+void MainWindow::on_scatterButton_pressed()
+{
+    int num = scatterNumberBox->value();
+    for (int i = 0; i < num; i++)
+    {
+        CreateObjectAt(world->RandomCell());
+    }
 }
 
 void MainWindow::DisplayInspector(Occupant *occ)
