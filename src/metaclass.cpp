@@ -151,11 +151,16 @@ void Object::DeleteQtHook()
     if (!panel) return;
 
     QLayoutItem *child;
-    while (child = panel->takeAt(0))
+    while ((child = panel->takeAt(0)))
         child->widget()->deleteLater();
 
     delete panel;
     panel = NULL;
+}
+
+void Object::HookWasChanged()
+{
+    cout << GetClass().name << endl;
 }
 
 Class& Object::GetClass()

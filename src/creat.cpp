@@ -127,6 +127,12 @@ void Creat::Die()
     alive = false;
 }
 
+void Creat::HookWasChanged()
+{
+    UpdateBrain();
+    UpdateQtHook();
+}
+
 void Creat::AddToLineage(Pos w)
 {
     LineageNode* node = new LineageNode(lineage);
@@ -341,10 +347,45 @@ void Creat::MutateBrain()
     }
 }
 
-void Creat::Update()
+void Creat::UpdateBrain()
 {
-    last_orient = orient;
-    Step();
+    for (int k = off_ext_inputs; k < off_ext_inputs + num_inputs; k++)
+        state2(k) = state(k);
+
+    for (int iter = 0; iter < grid->neural_net_iterations; iter++)
+    {
+        // update the hiddens from the inputs and the old hiddens
+        for  (int j = 0; j < num_hidden; j++)
+        {
+            float v = 0;
+            for (int k = 0; k < num_inputs + num_hidden; k++)
+                v += weights.data[j * num_neurons + k] * state.data[k];
+            state2.data[off_hidden + j] = tanh(v);
+        }
+
+        // update the outputs from everyone
+        for  (int j = 0; j < Creat::num_outputs; j++)
+        {
+            float v = 0;
+            for (int k = 0; k < off_outputs; k++)
+                v += weights.data[(j + num_hidden) * num_neurons + k] * state.data[k];
+            state2.data[off_outputs + j] = v;
+        }
+        SwapContents(state, state2);
+    }
+
+    // CALCULATE ACTION
+    action = ActionNone;
+    float maxaction = 1.0;
+    float* output = &state(off_outputs);
+    for (int i = 0; i < NumberActions-1; i++)
+    {
+        float f = output[i];
+        if (f >= maxaction) {
+            maxaction = f;
+            action = i + 1;
+        }
+    }
 }
 
 // TODO: Update for new weight matrix
@@ -424,10 +465,10 @@ void Creat::CheckSanity(const char* str)
     throw "invalid creat";
 }
 
-void Creat::Step()
+void Creat::Update()
 {
     if (!alive) { Remove(); return; }
-  
+
     // SETUP EXTERNAL INPUTS
     state(off_ext_inputs + 0) = grid->EnergyKernel(pos, orient) / 20.0;
     state(off_ext_inputs + 1) = grid->EnergyKernel(pos, orient - 1) / 20.0;
@@ -444,44 +485,7 @@ void Creat::Step()
     state(off_int_inputs + 2) = (2.0 * age / grid->max_age) - 1.0;
     state(off_int_inputs + 3) = RandFloat(-1.0, 1.0);
 
-    for (int k = off_ext_inputs; k < off_ext_inputs + num_inputs; k++)
-        state2(k) = state(k);
-
-    for (int iter = 0; iter < grid->neural_net_iterations; iter++)
-    {
-        // update the hiddens from the inputs and the old hiddens
-        for  (int j = 0; j < num_hidden; j++)
-        {
-            float v = 0;
-            for (int k = 0; k < num_inputs + num_hidden; k++)
-                v += weights.data[j * num_neurons + k] * state.data[k];
-            state2.data[off_hidden + j] = tanh(v);
-        }
-
-        // update the outputs from everyone
-        for  (int j = 0; j < Creat::num_outputs; j++)
-        {
-            float v = 0;
-            for (int k = 0; k < off_outputs; k++)
-                v += weights.data[(j + num_hidden) * num_neurons + k] * state.data[k];
-            state2.data[off_outputs + j] = v;
-        }
-        SwapContents(state, state2);
-    }
-    //CheckSanity("After update");
-
-    // CALCULATE ACTION
-    action = ActionNone;
-    float maxaction = 1.0;
-    float* output = &state(off_outputs);
-    for (int i = 0; i < NumberActions-1; i++)
-    {
-        float f = output[i];
-        if (f >= maxaction) {
-            maxaction = f;
-            action = i + 1;
-        }
-    }
+    UpdateBrain();
 
     // CALCULATE ACTION COST
     energy -= grid->action_cost[action];

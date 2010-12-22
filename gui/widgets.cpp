@@ -219,12 +219,26 @@ MatrixWidget::MatrixWidget(int size, bool flip, QString rlabels, QString clabels
     row_labels = rlabels.split("\n");
     col_labels = clabels.split("\n");
     connect(this, SIGNAL(ClickedCell(Pos)), this, SLOT(ShowTooltip(Pos)));
-    setMouseTracking(true);
+    setMouseTracking(false);
 }
 
 void MatrixWidget::mouseMoveEvent(QMouseEvent *event)
 {
+    setFocus();
     mousePressEvent(event);
+}
+
+void MatrixWidget::keyPressEvent(QKeyEvent *event)
+{
+    int key = event->key();
+    if      (key == Qt::Key_Up)
+        matrix->operator ()(highlighted) += 0.25;
+    else if (key == Qt::Key_Down)
+        matrix->operator ()(highlighted) -= 0.25;
+    else return;
+
+    ClickedCell(draw_flipped ? highlighted.Transpose() : highlighted);
+    update();
 }
 
 void MatrixWidget::OnSetPointer()
@@ -282,6 +296,7 @@ void BindingsPanel::child_changed()
          dynamic_cast<Binding*>(*it)->Synchronize(false);
     }
     value_changed();
+    object->HookWasChanged();
 }
 
 void BindingsPanel::UpdateChildren()

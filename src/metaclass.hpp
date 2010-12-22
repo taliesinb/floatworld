@@ -30,7 +30,8 @@ public:
     BindingsPanel* SetupQtHook(bool title);
     void UpdateQtHook();
     void DeleteQtHook();
-    void SignalQtHook();
+    virtual void HookWasChanged();
+
     const char* Name();
 };
 

@@ -108,9 +108,11 @@ public:
     virtual void OnSetPointer();
     virtual void Synchronize(bool inbound);
     void mouseMoveEvent(QMouseEvent *event);
+    void keyPressEvent(QKeyEvent *event);
 
 private slots:
     void ShowTooltip(Pos p);
+
 };
 
 class BindingsPanel : public QFormLayout

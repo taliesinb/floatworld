@@ -77,6 +77,9 @@ public:
     void Reset();
     void Die();
 
+    // OBJECT CODE
+    void HookWasChanged();
+
     // LINEAGE HANDLING
     std::list<LineageNode> ReconstructLineage();
     void AddToLineage(Pos w);
@@ -89,7 +92,7 @@ public:
     // UPDATE AND ACTION CODE
     void CheckSanity(const char* str);
     void Update();
-    void Step();
+    void UpdateBrain();
     void DoNothing();
     void MoveForward();
     void TurnLeft();
