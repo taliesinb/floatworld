@@ -79,7 +79,7 @@ StaticTrap::StaticTrap()
 
 void StaticTrap::Interact(Creat &c)
 {
-    c.energy = -100; // guarentee death
+    c.alive = false;
 }
 
 ActiveTrap::ActiveTrap()
@@ -96,7 +96,7 @@ void ActiveTrap::Update()
         new_pos = grid->Wrap(pos + Pos(dir));
         if (Creat* creat = grid->CreatAt(new_pos))
         {
-            creat->Remove();
+            creat->alive = false;
             Move(new_pos);
             draw_filled = true;
             return;

@@ -56,7 +56,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     world->energy_decay_rate = 0.08;
     world->enable_respawn = true;
-    world->mutation_prob = 0.1;
+    world->mutation_prob = 0.2;
     world->path_energy = 0;
 
     world->AddCreats(300, true);

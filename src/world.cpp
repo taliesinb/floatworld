@@ -123,7 +123,7 @@ World::World()
     initial_marker = 0.0;
     initial_mutations = 5;
     record_lineages = false;
-    neural_net_iterations = 5;
+    neural_net_iterations = 4;
 
     accuracy = 10;
     timestep = 0;
