@@ -367,6 +367,16 @@ float World::DirKernel(Pos pos, int dir)
 static inline float Kernel2(Occupant* occ)
 { return occ ? occ->signature : 0; }
 
+float World::EnergyAt(Pos pos)
+{
+    return energy(pos);
+}
+
+float World::ColorAt(Pos pos)
+{
+    Occupant* occ = OccupantAt(pos);
+    return occ ? occ->signature : 0;
+}
 
 float World::CreatKernel(Pos pos, int dir)
 {
@@ -706,7 +716,7 @@ RegisterBinding(Occupant, signature, "color", -5.0, 5.0, 0.25);
 RegisterBinding(Occupant, solid, "solid");
 
 Occupant::Occupant()
-  : next(NULL), grid(NULL), pos(0,0), signature(0), id(-1), solid(true)
+  : next(NULL), world(NULL), pos(0,0), signature(0), id(-1), solid(true)
 {
 }
 
@@ -726,14 +736,14 @@ void Occupant::__Remove()
 
 void Occupant::AssignID()
 {
-    assert(grid);
-    id = grid->next_id++;
-    grid->occupant_list.push_back(this);
+    assert(world);
+    id = world->next_id++;
+    world->occupant_list.push_back(this);
 }
 
 void Occupant::Attach(World& g, Pos p)
 {
-    grid = &g;
+    world = &g;
     Move(p);
     last_pos = p;
 }
@@ -747,7 +757,7 @@ void Occupant::Update()
 void Occupant::Remove()
 {
     RemoveFromLL();
-    grid->occupant_list.remove(this);
+    world->occupant_list.remove(this);
     DeleteQtHook();
     __Remove();
 }
@@ -755,7 +765,7 @@ void Occupant::Remove()
 // remove an occupant but only from the internal LL
 void Occupant::RemoveFromLL()
 {
-    Occupant** cell = &(grid->OccupantAt(pos));
+    Occupant** cell = &(world->OccupantAt(pos));
     while (*cell)
     {
         if (*cell == this)
@@ -773,14 +783,14 @@ void Occupant::Move(Pos pos2)
 {
     RemoveFromLL();
     pos = pos2;
-    Occupant*& cell = grid->OccupantAt(pos);
+    Occupant*& cell = world->OccupantAt(pos);
     next = cell;
     cell = this;
 }
 
 void Occupant::MoveRandom()
 {
-    Move(grid->RandomCell());
+    Move(world->RandomCell());
 }
 
 std::ostream& operator<<(std::ostream& s, Occupant*& o)

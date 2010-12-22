@@ -40,7 +40,7 @@ class Occupant : public Object
     Occupant();
 
     Occupant* next; // next occupant on this grid position
-    World* grid;
+    World* world;
     Pos pos;
     Pos last_pos;
     float signature;
@@ -154,6 +154,8 @@ public:
     Matrix Evolve(int steps);
 
     // Creature vision functions
+    float EnergyAt(Pos pos);
+    float ColorAt(Pos pos);
     float CreatKernel(Pos pos, int dir);
     float EnergyKernel(Pos pos, int dir);
     float DirKernel(Pos pos, int dir);

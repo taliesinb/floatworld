@@ -40,17 +40,17 @@ Block::Block()
 
 void Block::Update()
 {
-    grid->energy(pos) = 0;
+    world->energy(pos) = 0;
 }
 
 void PushableBlock::Interact(Creat& c)
 {
-    Pos p = grid->Wrap(pos + Pos(c.orient));
-    Occupant* occ = grid->OccupantAt(p);
+    Pos p = world->Wrap(pos + Pos(c.orient));
+    Occupant* occ = world->OccupantAt(p);
   
     if (dynamic_cast<PushableBlock*>(occ)) occ->Interact(c);
 
-    if (grid->OccupantAt(p) == NULL)
+    if (world->OccupantAt(p) == NULL)
     {
         Move(p);
         WasPushed(c);
@@ -91,11 +91,11 @@ ActiveTrap::ActiveTrap()
 void ActiveTrap::Update()
 {
     Pos new_pos;
-    if (grid->timestep % 3 != 0) return;
+    if (world->timestep % 3 != 0) return;
     for (int dir = 0; dir < 4; dir++)
     {
-        new_pos = grid->Wrap(pos + Pos(dir));
-        if (Creat* creat = grid->CreatAt(new_pos))
+        new_pos = world->Wrap(pos + Pos(dir));
+        if (Creat* creat = world->CreatAt(new_pos))
         {
             creat->alive = false;
             Move(new_pos);
@@ -104,8 +104,8 @@ void ActiveTrap::Update()
         }
     }
     draw_filled = false;
-    new_pos = grid->Wrap(pos + Pos(RandInt(0,3)));
-    if (!grid->OccupantAt(new_pos)) Move(new_pos);
+    new_pos = world->Wrap(pos + Pos(RandInt(0,3)));
+    if (!world->OccupantAt(new_pos)) Move(new_pos);
 }
 
 SkinnerBlock::SkinnerBlock()
@@ -126,7 +126,7 @@ void SkinnerBlock::Interact(Creat&)
         spot.pos = pos;
         spot.radius = radius;
         spot.energy = reward;
-        spot.Draw(grid->energy);
+        spot.Draw(world->energy);
     }
 }
 
@@ -135,7 +135,7 @@ void SkinnerBlock::Update()
 {
     draw_filled = (touch_count < _touch_count);
     _touch_count = touch_count;
-    grid->energy(pos) = 0;
+    world->energy(pos) = 0;
 }
 
 PhasedSkinnerBlock::PhasedSkinnerBlock()
@@ -148,7 +148,7 @@ void PhasedSkinnerBlock::Update()
 {
     SkinnerBlock::Update();
 
-    phase = ((grid->timestep + pos.row + pos.col) / period) % 2;
+    phase = ((world->timestep + pos.row + pos.col) / period) % 2;
   
     signature = phase ? -1.0 : -2.0;
     draw_hue = phase ? 0.1 : 0.4;

@@ -115,8 +115,8 @@ void Creat::Reset()
     for (int k = 0; k < 64; k++) { fingerprint <<= 1; fingerprint |= RandBit(); }
     action = ActionNone;
     alive = false;
-    marker = grid ? grid->initial_marker : 0;
-    energy = grid ? grid->initial_energy : 0;
+    marker = world ? world->initial_marker : 0;
+    energy = world ? world->initial_energy : 0;
     lineage = NULL;
     desired_id = -1;
     desirer_id = -1;
@@ -136,7 +136,7 @@ void Creat::HookWasChanged()
 void Creat::AddToLineage(Pos w)
 {
     LineageNode* node = new LineageNode(lineage);
-    node->timestep = grid->timestep;
+    node->timestep = world->timestep;
     node->value = weights(w);
     node->pos = w;
     lineage = node;
@@ -183,10 +183,10 @@ void Creat::Reproduce()
 {
     Pos front = Front();
 
-    if (grid->OccupantAt(front))
+    if (world->OccupantAt(front))
         return;
   
-    Creat& child = grid->_AddCreat(front, Mod(orient,4));
+    Creat& child = world->_AddCreat(front, Mod(orient,4));
     child.CopyBrain(*this);
     child.MutateBrain();
 
@@ -194,32 +194,32 @@ void Creat::Reproduce()
     if (excess > 0) TransferEnergy(child, excess * 50);
 
     children++;
-    grid->births++;
+    world->births++;
 }
 
 void Creat::MoveForward()
 { 
     Pos front;
-    if (int jump = grid->jump_range)
+    if (int jump = world->jump_range)
     {
         float excess = ClipFloat((state(num_inputs + num_hidden + ActionForward - 1) - 1.2) * 2 * jump, 0, jump);
         int dist = round(excess);
         energy -= dist;
-        front = grid->Wrap(pos + Pos(orient) * (1 + dist));
+        front = world->Wrap(pos + Pos(orient) * (1 + dist));
     } else {
         front = Front();
     }
 
-    if (Occupant* other = grid->SolidOccupantAt(front))
+    if (Occupant* other = world->SolidOccupantAt(front))
     {
         interacted = true;
         other->Interact(*this);
         interaction_count++;
     } else
     {
-        float de = grid->energy(pos);
+        float de = world->energy(pos);
         energy += de;
-        grid->energy(pos) = grid->path_energy;
+        world->energy(pos) = world->path_energy;
         Move(front);
     }
 }
@@ -245,7 +245,7 @@ void Creat::Interact(Creat& creat)
 
 void Creat::Interaction(Creat& other)
 {
-    switch (grid->interaction_type)
+    switch (world->interaction_type)
     {
         case NoInteraction:
             break;
@@ -273,8 +273,8 @@ void Creat::Interaction(Creat& other)
             break;
 
         case Shoving: {
-            Pos pos2 = grid->Wrap(other.pos + Pos(orient));
-            Creat* third = grid->CreatAt(pos2);
+            Pos pos2 = world->Wrap(other.pos + Pos(orient));
+            Creat* third = world->CreatAt(pos2);
             if (third)
             {
                 int _orient = other.orient;
@@ -282,7 +282,7 @@ void Creat::Interaction(Creat& other)
                 other.Interaction(*third);
                 other.orient = _orient;
             }
-            if (!grid->OccupantAt(pos2))
+            if (!world->OccupantAt(pos2))
             {
                 other.Move(pos2);
             }
@@ -323,23 +323,23 @@ void Creat::Interaction(Creat& other)
 
 void Creat::MutateBrain()
 {
-    if (!grid->enable_mutation) return;
+    if (!world->enable_mutation) return;
 
     int count = 0;
     bool mutated = false;
-    while (RandBool(grid->mutation_prob) && count++ < 10)
+    while (RandBool(world->mutation_prob) && count++ < 10)
     {
         mutated = true;
 
         Pos w = SelectRandomWeight();
-        weights(w) += RandGauss(0, grid->mutation_sd);
+        weights(w) += RandGauss(0, world->mutation_sd);
 
-        if (grid->record_lineages) AddToLineage(w);
+        if (world->record_lineages) AddToLineage(w);
     }
 
     if (mutated)
     {
-        if (grid->mutation_color_drift)
+        if (world->mutation_color_drift)
             marker += RandSign() * RandGauss(0.05, 0.03);
 
         fingerprint <<= 1;
@@ -352,7 +352,7 @@ void Creat::UpdateBrain()
     for (int k = off_ext_inputs; k < off_ext_inputs + num_inputs; k++)
         state2(k) = state(k);
 
-    for (int iter = 0; iter < grid->neural_net_iterations; iter++)
+    for (int iter = 0; iter < world->neural_net_iterations; iter++)
     {
         // update the hiddens from the inputs and the old hiddens
         for  (int j = 0; j < num_hidden; j++)
@@ -391,19 +391,19 @@ void Creat::UpdateBrain()
 void Creat::UpdateInputs()
 {
     // SETUP EXTERNAL INPUTS
-    state(off_ext_inputs + 0) = grid->EnergyKernel(pos, orient) / 20.0;
-    state(off_ext_inputs + 1) = grid->EnergyKernel(pos, orient - 1) / 20.0;
-    state(off_ext_inputs + 2) = grid->EnergyKernel(pos, orient + 1) / 20.0;
-    state(off_ext_inputs + 3) = grid->CreatKernel(pos, orient);
-    state(off_ext_inputs + 4) = grid->CreatKernel(pos, orient - 1);
-    state(off_ext_inputs + 5) = grid->CreatKernel(pos, orient + 1);
-    state(off_ext_inputs + 6) = grid->DirKernel(pos, orient);
-    state(off_ext_inputs + 7) = grid->DirKernel(pos, orient + 1);
+    state(off_ext_inputs + 0) = world->EnergyAt(Front( 0, 2));
+    state(off_ext_inputs + 1) = world->EnergyAt(Front(-1, 2));
+    state(off_ext_inputs + 2) = world->EnergyAt(Front(+1, 2));
+    state(off_ext_inputs + 3) = world->ColorAt(Front( 0,  1));
+    state(off_ext_inputs + 4) = world->ColorAt(Front(-1,  1));
+    state(off_ext_inputs + 5) = world->ColorAt(Front(+1,  1));
+    state(off_ext_inputs + 6) = world->DirKernel(pos, orient);
+    state(off_ext_inputs + 7) = world->DirKernel(pos, orient + 1);
 
     // SETUP INTERNAL INPUTS
     state(off_int_inputs + 0) = 1.0;
-    state(off_int_inputs + 1) = (2.0 * energy / grid->action_cost[ActionReproduce]) - 1.0;
-    state(off_int_inputs + 2) = (2.0 * age / grid->max_age) - 1.0;
+    state(off_int_inputs + 1) = (2.0 * energy / world->action_cost[ActionReproduce]) - 1.0;
+    state(off_int_inputs + 2) = (2.0 * age / world->max_age) - 1.0;
     state(off_int_inputs + 3) = RandFloat(-1.0, 1.0);
 }
 
@@ -433,8 +433,8 @@ void Creat::CheckSanity(const char* str)
         }
     }
 
-    if (pos.row < 0 || pos.row >= grid->rows ||
-        pos.col < 0 || pos.col >= grid->cols)
+    if (pos.row < 0 || pos.row >= world->rows ||
+        pos.col < 0 || pos.col >= world->cols)
     {
         cout << "ERROR: Position " << pos << " of creat " << id << " is invalid." << endl;
         goto error;
@@ -452,14 +452,14 @@ void Creat::CheckSanity(const char* str)
         goto error;
     }
 
-    if (grid->LookupOccupantByID(id) != this)
+    if (world->LookupOccupantByID(id) != this)
     {
         cout << "ERROR: Wrong occupant found with id: " << id << endl;
         goto error;
     }
 
     {
-        Occupant* occ = grid->OccupantAt(pos);
+        Occupant* occ = world->OccupantAt(pos);
         while (occ)
         {
             if (occ == this) goto found;
@@ -494,24 +494,24 @@ void Creat::Update()
     UpdateBrain();
 
     // CALCULATE ACTION COST
-    energy -= grid->action_cost[action];
+    energy -= world->action_cost[action];
 
     // UPDATE AGE
     age++;
-    grid->total_steps++;
+    world->total_steps++;
 
     // PERFORM ACTION
     interacted = false;
-    if (energy > 0) (this->*(grid->action_lookup[action]))();
+    if (energy > 0) (this->*(world->action_lookup[action]))();
 
-    if (energy < 0 || age > grid->max_age) Die();
+    if (energy < 0 || age > world->max_age) Die();
 }
 
 void Creat::__Remove()
 {
     alive = false;
-    grid->num_creats--;
-    grid->graveyard.push_front(this);
+    world->num_creats--;
+    world->graveyard.push_front(this);
     if (lineage) lineage->Decrement();
     if (desired_id >= 0) if (Creat* peer = Peer(desired_id)) peer->desirer_id = -1;
     if (desirer_id >= 0) if (Creat* peer = Peer(desirer_id)) peer->desired_id = -1;
@@ -548,14 +548,14 @@ void Creat::ChooseMate(Creat* other)
     desired_id = other ? other->id : -1;
 }
 
-Pos Creat::Front(int offset)
+Pos Creat::Front(int offset, int dist)
 {
-    return grid->Wrap(pos + Pos(orient + offset));
+    return world->Wrap(pos + Pos(orient + offset) * dist);
 }
 
 Creat* Creat::Peer(int id)
 {
-    return (id < 0) ? NULL : dynamic_cast<Creat*>(grid->LookupOccupantByID(id));
+    return (id < 0) ? NULL : dynamic_cast<Creat*>(world->LookupOccupantByID(id));
 }
 
 float Creat::Complexity()

@@ -87,7 +87,7 @@ public:
     // OCCUPANT CODE
     void __Remove();
     void Interact(Creat& o);
-    Pos Front(int offset=0);
+    Pos Front(int offset=0, int dist=1);
     
     // UPDATE AND ACTION CODE
     void CheckSanity(const char* str);

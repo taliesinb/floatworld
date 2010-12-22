@@ -51,7 +51,7 @@ void Shape::Draw(Matrix& m)
 
 void Shape::Update()
 {
-    Draw(grid->energy);
+    Draw(world->energy);
     if (RandBool(p_jump))
         MoveRandom();
 }
