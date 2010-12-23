@@ -288,6 +288,25 @@ void Creat::Interaction(Creat& other)
             }
         } break;
 
+    case CongaLine: {
+            Pos new_pos = other.Front();
+            int new_orient = orient;
+            int limit = 0;
+            Creat* leader = world->CreatAt(new_pos);
+            while (leader && limit++ < 20)
+            {
+                new_orient = leader->orient;
+                new_pos = leader->Front();
+                leader = world->CreatAt(new_pos);
+            }
+            if (!world->OccupantAt(new_pos) && limit < 20)
+            {
+                orient = new_orient;
+                Move(new_pos);
+            }
+
+        } break;
+
         case MutualCooperation:
             energy += 30;
             other.energy += 30;

@@ -18,6 +18,7 @@ enum InteractionMode
     Parasitism,
     Predation,
     Shoving,
+    CongaLine,
     MutualCooperation,
     AltruisticCooperation,
     GeneExchange,
