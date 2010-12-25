@@ -23,7 +23,6 @@ public:
     int Len() const;
   
     void Set(const float* x);
-    void SetRandom(float min, float max);
     void SetBetween(int r, int c, int dr, int dc, int n, float constant = 0);
     void SetSubMatrix(int r1, int c1, int r2, int c2, float value);
     void SetConstant(float con);

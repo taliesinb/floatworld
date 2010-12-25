@@ -104,7 +104,7 @@ void ActiveTrap::Update()
         }
     }
     draw_filled = false;
-    new_pos = world->Wrap(pos + Pos(RandInt(0,3)));
+    new_pos = world->Wrap(pos + Pos(rng.Integer(4)));
     if (!world->OccupantAt(new_pos)) Move(new_pos);
 }
 

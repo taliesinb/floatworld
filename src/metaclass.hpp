@@ -1,7 +1,9 @@
 #ifndef METACLASS_HPP
 #define METACLASS_HPP
 
+#include "misc.hpp"
 #include "binding.hpp"
+#include "rng.hpp"
 
 #include <iostream>
 #include <list>
@@ -18,6 +20,9 @@ class BindingsPanel;
 
 class Object
 {
+protected:
+    RNG rng;
+
 public:
     BindingsPanel* panel;
 
@@ -31,6 +36,8 @@ public:
     void UpdateQtHook();
     void DeleteQtHook();
     virtual void HookWasChanged();
+
+    unsigned int RandomInteger();
 
     const char* Name();
 };

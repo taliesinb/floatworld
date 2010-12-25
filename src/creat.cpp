@@ -112,7 +112,7 @@ void Creat::Reset()
     interacted = false;
     interaction_count = 0;
     fingerprint = 0;
-    for (int k = 0; k < 64; k++) { fingerprint <<= 1; fingerprint |= RandBit(); }
+    for (int k = 0; k < 64; k++) { fingerprint <<= 1; fingerprint |= rng.Bit(); }
     action = ActionNone;
     alive = false;
     marker = world ? world->initial_marker : 0;
@@ -174,8 +174,8 @@ list<LineageNode> Creat::ReconstructLineage()
 Pos Creat::SelectRandomWeight()
 {
     int j, k;
-    j = RandInt(Creat::num_hidden + Creat::num_outputs - 1);
-    k = RandInt(Creat::num_neurons-1);
+    j = rng.Integer(Creat::num_hidden + Creat::num_outputs - 1);
+    k = rng.Integer(Creat::num_neurons-1);
     return Pos(j,k);
 }
 
@@ -202,7 +202,7 @@ void Creat::MoveForward()
     Pos front;
     if (int jump = world->jump_range)
     {
-        float excess = ClipFloat((state(num_inputs + num_hidden + ActionForward - 1) - 1.2) * 2 * jump, 0, jump);
+        float excess = qBound(0.0, (state(num_inputs + num_hidden + ActionForward - 1) - 1.2) * 2 * jump, double(jump));
         int dist = round(excess);
         energy -= dist;
         front = world->Wrap(pos + Pos(orient) * (1 + dist));
@@ -232,7 +232,7 @@ void Creat::TransferEnergy(Creat& other, float de)
 {
     if (de < 0) other.TransferEnergy(*this, -de);
     else {
-        de = Min(energy, de);
+        de = qMin(energy, de);
         energy -= de;
         other.energy += de * 0.75;
     }
@@ -265,7 +265,7 @@ void Creat::Interaction(Creat& other)
             break;
       
         case Parasitism:
-            other.TransferEnergy(*this, RandFloat(30,60));
+            other.TransferEnergy(*this, rng.Float(30,60));
             break;
 
         case Predation:
@@ -346,12 +346,12 @@ void Creat::MutateBrain()
 
     int count = 0;
     bool mutated = false;
-    while (RandBool(world->mutation_prob) && count++ < 10)
+    while (rng.Bool(world->mutation_prob) && count++ < 10)
     {
         mutated = true;
 
         Pos w = SelectRandomWeight();
-        weights(w) += RandGauss(0, world->mutation_sd);
+        weights(w) += rng.Gaussian(0, world->mutation_sd);
 
         if (world->record_lineages) AddToLineage(w);
     }
@@ -359,10 +359,10 @@ void Creat::MutateBrain()
     if (mutated)
     {
         if (world->mutation_color_drift)
-            marker += RandSign() * RandGauss(0.05, 0.03);
+            marker += rng.Sign() * rng.Gaussian(0.05, 0.03);
 
         fingerprint <<= 1;
-        fingerprint |= RandBit();
+        fingerprint |= rng.Bit();
     }
 }
 
@@ -423,7 +423,7 @@ void Creat::UpdateInputs()
     state(off_int_inputs + 0) = 1.0;
     state(off_int_inputs + 1) = (2.0 * energy / world->action_cost[ActionReproduce]) - 1.0;
     state(off_int_inputs + 2) = (2.0 * age / world->max_age) - 1.0;
-    state(off_int_inputs + 3) = RandFloat(-1.0, 1.0);
+    state(off_int_inputs + 3) = rng.Float(-1.0, 1.0);
 }
 
 // TODO: Update for new weight matrix
@@ -613,15 +613,8 @@ vector<Matrix> ReconstructBrains(list<LineageNode>& lineage, Matrix& initial, in
     return brains;
 }
 
-
-void ShuffleBrains(Matrix& a, Matrix& b)
-{
-    for (int i = 0; i < a.Len(); i++)
-        if (RandBit()) Swap(a.data[i], b.data[i]);
-}
-
 void Creat::BlendBrain(Creat& other)
 {
     for (int i = 0; i < weights.Len(); i++)
-        if (RandBit()) weights.data[i] = other.weights.data[i];
+        if (rng.Bit()) weights.data[i] = other.weights.data[i];
 }

@@ -54,11 +54,6 @@ void Matrix::Set(const float* x)
     memcpy(data, x, cols * rows * sizeof(float));
 }
 
-void Matrix::SetRandom(float min, float max)
-{
-    for (int i = 0; i < cols * rows; i++) data[i] = RandFloat(min, max);
-}
-
 void Matrix::SetBetween(int r, int c, int dr, int dc, int n, float value)
 {
     if (n == -1) n = 1e8;
@@ -351,8 +346,6 @@ istream& operator>>(istream& is, Matrix& m)
 
         unsigned int cols = static_cast<unsigned int>(entries.front().size());
         unsigned int rows = static_cast<unsigned int>(entries.size());
-        for_iterate(r, entries)
-                assert (cols == r->size());
 
         m.Resize(rows, cols);
         int i = 0;
