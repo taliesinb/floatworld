@@ -34,9 +34,6 @@
         <file>icons/copy.png</file>
         <file>icons/clear.png</file>
         <file>icons/right-stop-1.png</file>
-        <file>icons/right-eighth.png</file>
-        <file>icons/right-quarter.png</file>
-        <file>icons/right-half.png</file>
         <file>icons/play-6.png</file>
         <file>icons/play-5.png</file>
         <file>icons/play-4.png</file>
@@ -52,5 +49,10 @@
         <file>icons/zoom-in.png</file>
         <file>icons/zoom-out.png</file>
         <file>icons/trash.png</file>
+        <file>icons/paste.png</file>
+        <file>icons/page-previous.png</file>
+        <file>icons/page-next.png</file>
+        <file>icons/shred.png</file>
+        <file>icons/paperclip.png</file>
     </qresource>
 </RCC>
