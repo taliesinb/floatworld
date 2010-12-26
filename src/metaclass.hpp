@@ -6,7 +6,7 @@
 #include "rng.hpp"
 
 #include <iostream>
-#include <list>
+#include <QLinkedList>
 
 static const char* whitespace = "\t";
 
@@ -46,13 +46,13 @@ std::ostream& operator<<(std::ostream& os, Object& c);
 std::istream& operator>>(std::istream& os, Object& c);
 
 template<class T>
-std::ostream& operator<<(std::ostream& os, std::list<T>& lst)
+std::ostream& operator<<(std::ostream& os, QLinkedList<T>& lst)
 {
+    typename QLinkedList<T>::iterator i = lst.begin();
     if (human_readable)
     {
         os << "[";
         int count = 0;
-        typename std::list<T>::iterator i = lst.begin();
         while (i != lst.end())
         {
             if (count++) os << ", ";
@@ -61,7 +61,6 @@ std::ostream& operator<<(std::ostream& os, std::list<T>& lst)
         os << "]";
     } else {
         os << lst.size() << " ";
-        typename std::list<T>::iterator i = lst.begin();
         while (i != lst.end())
         {
             os << *i++ << " ";
@@ -71,7 +70,7 @@ std::ostream& operator<<(std::ostream& os, std::list<T>& lst)
 }
 
 template<class T>
-std::istream& operator>>(std::istream& is, std::list<T>& lst)
+std::istream& operator>>(std::istream& is, QLinkedList<T>& lst)
 {
     if (human_readable)
     {

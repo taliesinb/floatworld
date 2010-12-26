@@ -4,7 +4,7 @@
 #include "pos.hpp"
 #include <math.h>
 #include <iostream>
-#include <vector>
+#include <QLinkedList>
 
 
 class Matrix {

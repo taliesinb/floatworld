@@ -54,11 +54,13 @@ class Occupant : public Object
     virtual void __Remove();
     void AssignID();
 
-    void Attach(World& grid, Pos pos);
+    void Attach(Occupant* grid, Pos pos);
     void Remove();
     void RemoveFromLL();
     void Move(Pos p);
     void MoveRandom();
+
+    friend class World;
 };
 
 std::ostream& operator<<(std::ostream& s, Occupant*& o);
@@ -71,8 +73,8 @@ class World : public Object
 {
 public:      
     
-    std::list<Occupant*> occupant_list;
-    std::list<Creat*> graveyard;
+    QLinkedList<Occupant*> occupant_list;
+    QLinkedList<Creat*> graveyard;
 
     Matrix energy;
     float energy_decay_rate;
@@ -132,6 +134,8 @@ public:
     Creat& AddCreatAt(Pos pos, int orient=0);
     void AddCreats(int number, bool fairly);
     void RemoveOccupants();
+    void AssignID(Occupant* occ);
+    void Attach(Occupant* occ, Pos p);
 
     Occupant* SolidOccupantAt(Pos pos);
     Creat* CreatAt(Pos pos);

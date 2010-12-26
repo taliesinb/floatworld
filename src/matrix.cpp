@@ -341,7 +341,7 @@ istream& operator>>(istream& is, Matrix& m)
 {
     if (human_readable)
     {
-        list<list<double> > entries;
+        QLinkedList<QLinkedList<double> > entries;
         is >> entries;
 
         unsigned int cols = static_cast<unsigned int>(entries.front().size());
@@ -349,14 +349,11 @@ istream& operator>>(istream& is, Matrix& m)
 
         m.Resize(rows, cols);
         int i = 0;
-        for_iterate(row, entries)
-        {
-            list<double>& r = *row;
-            for_iterate(col, r)
-            {
-                m.data[i++] = *col;
-            }
-        }
+
+        foreach(QLinkedList<double> row, entries)
+            foreach(double col, row)
+                m.data[i++] = col;
+
     } else {
         int r, c;
         is >> r >> c;

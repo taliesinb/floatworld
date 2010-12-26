@@ -52,7 +52,7 @@ void Shape::Draw(Matrix& m)
 void Shape::Update()
 {
     Draw(world->energy);
-    if (RandBool(p_jump))
+    if (rng.Bool(p_jump))
         MoveRandom();
 }
 
@@ -84,8 +84,8 @@ void Circle::DrawStochastic(Matrix& m, int n)
     {
         int r, c;
         do {
-            r = RandInt(-radius, radius);
-            c = RandInt(-radius, radius);
+            r = rng.Integer(-radius, radius);
+            c = rng.Integer(-radius, radius);
         } while (r * r + c * c > r2);
         Inject(m, r, c, de);
     }
@@ -238,8 +238,8 @@ void GaussianCircle::DrawStochastic(Matrix& m, int n)
   for (int t = 0; t < n; t++)
   {
     do {
-      r = RandInt(-radius, radius);
-      c = RandInt(-radius, radius);
+      r = rng.Integer(-radius, radius);
+      c = rng.Integer(-radius, radius);
       d = r * r + c * c;
     } while (d >= r2);
     Inject(m, r, c, de * exp(3*-d/r2));

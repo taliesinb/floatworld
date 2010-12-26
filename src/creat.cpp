@@ -319,7 +319,7 @@ void Creat::Interaction(Creat& other)
 
         case GeneExchange: 
             energy -= 10;
-            if (energy > 0) ShuffleBrains(weights, other.weights);
+            if (energy > 0) ShuffleBrain(other);
             break;
 
         case GeneGive:
@@ -560,6 +560,22 @@ void Creat::CopyBrain(Creat& parent)
     if (desired_id >= 0) BlendBrain(*Peer(desired_id));
 }
 
+void Creat::BlendBrain(Creat& other)
+{
+    for (int i = 0; i < weights.Len(); i++)
+        if (rng.Bit()) weights.data[i] = other.weights.data[i];
+}
+
+void Creat::ShuffleBrain(Creat& other)
+{
+    for (int i = 0; i < weights.Len(); i++)
+        if (rng.Bit()) {
+        float t = weights.data[i];
+        other.weights.data[i] = weights.data[i];
+        weights.data[i] = t;
+    }
+}
+
 void Creat::ChooseMate(Creat* other)
 {
     if (desired_id >= 0) if (Creat* peer = Peer(desired_id)) peer->desirer_id = -1;
@@ -580,41 +596,4 @@ Creat* Creat::Peer(int id)
 float Creat::Complexity()
 {
     return weights.GetHammingNorm();
-}
-
-vector<Matrix> ReconstructBrains(list<LineageNode>& lineage, Matrix& initial, int T)
-{
-    vector<Matrix> brains;
-    Matrix brain = initial;
-
-    int next = T;
-    list<LineageNode>::iterator it = lineage.begin();
-
-    while (it != lineage.end())
-    {
-        if (T == 0) brains.push_back(brain);
-        else
-        { 
-            while ((it->timestep+1) >= next)
-            {
-                next += T;
-                brains.push_back(brain);
-            }
-        }
-        int time = it->timestep;
-        while (time == it->timestep && it != lineage.end())
-        {
-            brain(it->pos) = it->value;
-            it++;
-        } 
-    }
-    brains.push_back(brain);
-
-    return brains;
-}
-
-void Creat::BlendBrain(Creat& other)
-{
-    for (int i = 0; i < weights.Len(); i++)
-        if (rng.Bit()) weights.data[i] = other.weights.data[i];
 }

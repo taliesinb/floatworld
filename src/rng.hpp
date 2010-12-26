@@ -1,6 +1,8 @@
 #ifndef RNG_HPP
 #define RNG_HPP
 
+#include "pos.hpp"
+
 // Simple multiply-with-carry RNG, basically straight from wikipedia
 
 class RNG
@@ -22,12 +24,16 @@ public:
     bool Bool();
     bool Bool(float prob);
 
+    Pos Position(int rows, int cols);
+    int Dir();
     int Bit();
     int Bit(float prob);
 
     int Sign();
 
     RNG();
+
+    void Seed(int i);
 };
 
 

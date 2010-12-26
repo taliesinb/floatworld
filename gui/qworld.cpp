@@ -176,10 +176,8 @@ void QWorld::OnChildPaint(QPainter& painter)
     painter.translate(energy->border, energy->border);
     painter.scale(scale, scale);
 
-    for_iterate(it, world->occupant_list)
+    foreach(Occupant* occ, world->occupant_list)
     {
-        Occupant* occ = *it;
-
         if (!occ->solid) continue;
 
         Pos pos2 = occ->pos;
@@ -300,7 +298,7 @@ void QWorld::keyReleaseEvent(QKeyEvent* event)
     creat->last_pos = creat->pos;
     creat->last_orient = creat->orient;
 
-    if (update_rest) world->occupant_list.remove(creat);
+    if (update_rest) world->occupant_list.removeAll(creat);
     if (update_rest)
     {
         Step();

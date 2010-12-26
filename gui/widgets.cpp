@@ -291,9 +291,9 @@ BindingsPanel::~BindingsPanel()
 
 void BindingsPanel::child_changed()
 {
-    for_iterate(it, widgets)
+    foreach(QWidget* w, widgets)
     {
-         dynamic_cast<Binding*>(*it)->Synchronize(false);
+         dynamic_cast<Binding*>(w)->Synchronize(false);
     }
     value_changed();
     object->HookWasChanged();
@@ -301,9 +301,8 @@ void BindingsPanel::child_changed()
 
 void BindingsPanel::UpdateChildren()
 {
-    for_iterate(it, widgets)
+    foreach(QWidget* w, widgets)
     {
-        QWidget* w = *it;
         w->blockSignals(true);
         dynamic_cast<Binding*>(w)->Synchronize(true);
         w->blockSignals(false);
@@ -324,6 +323,7 @@ void BindingsPanel::ConstructChildren()
         QWidget* widget = (*mclass->factories[i])(object);
         const char* sig = dynamic_cast<Binding*>(widget)->changesignal;
         if (sig) QObject::connect(widget, sig, this, SLOT(child_changed()));
+        cout << "CONNECTING " << mclass->labels[i] << endl;
         addRow(mclass->labels[i], widget);
         widgets.push_back(widget);
     }

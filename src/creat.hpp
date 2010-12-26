@@ -102,6 +102,7 @@ public:
     void MutateBrain();
     void CopyBrain(Creat& parent);
     void BlendBrain(Creat& other);
+    void ShuffleBrain(Creat& other);
     Pos SelectRandomWeight();
 
     // INTERACTION CODE
@@ -113,8 +114,5 @@ public:
 
     Creat* Peer(int id);
 };
-
-std::vector<Matrix> ReconstructBrains(std::list<LineageNode>& lineage, Matrix& initial, int T=0);
-void ShuffleBrains(Matrix& a, Matrix& b);
 
 #endif

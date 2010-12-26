@@ -44,9 +44,9 @@ MainWindow::MainWindow(QWidget *parent)
     for (int i = 0; i < 15; i++)
     {
         Circle* c = new Circle;
-        c->Attach(*world, world->RandomCell());
-        c->AssignID();
-        c->radius = RandInt(5,17);
+        world->Attach(c, world->RandomCell());
+        world->AssignID(c);
+        c->radius = rng.Integer(5,17);
         c->threshold = 2 + max(25 - (c->radius - 5) * (c->radius - 5) / 3, 0);
         c->energy = 2;
         c->p_jump = 0.01;
@@ -64,15 +64,15 @@ MainWindow::MainWindow(QWidget *parent)
     for (int k = 0; k < 0; k++)
     {
         Occupant* block = new SkinnerBlock();
-        block->Attach(*world, world->RandomCell());
-        block->AssignID();
+        world->Attach(block, world->RandomCell());
+        world->AssignID(block);
     }
 
     for (int k = 0; k < 0; k++)
     {
         Occupant* block = new ActiveTrap();
-        block->Attach(*world, world->RandomCell());
-        block->AssignID();
+        world->Attach(block, world->RandomCell());
+        world->AssignID(block);
     }
 
     ticker.setInterval(1);
@@ -104,9 +104,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     // hunt out the fast forward button and hack some callbacks onto it
     QList<QWidget*> list = actionFF->associatedWidgets();
-    for_iterate(it, list)
+    foreach(QWidget* w, list)
     {
-        QToolButton* button = dynamic_cast<QToolButton*>(*it);
+        QToolButton* button = dynamic_cast<QToolButton*>(w);
         if (button)
         {
             connect(button, SIGNAL(pressed()), this, SLOT(ff_pressed()));
@@ -136,9 +136,9 @@ MainWindow::MainWindow(QWidget *parent)
         }
     }
     objectComboBox->addItem("None");
-    for_iterate(it2, objects)
+    foreach(Class* c, objects)
     {
-        const char* name = (*it2)->name;
+        const char* name = c->name;
         objectComboBox->addItem(name);
     }
     objectComboBox->setCurrentIndex(0);
@@ -174,8 +174,8 @@ void MainWindow::CreateObjectAt(Pos pos)
         stringstream s;
         s << *selected_object;
         Occupant *occ = dynamic_cast<Occupant*>(Class::Create(s));
-        occ->Attach(*world, pos);
-        occ->AssignID();
+        world->Attach(occ, pos);
+        world->AssignID(occ);
     }
     qworld->Draw();
 }
@@ -292,7 +292,7 @@ void MainWindow::on_actionNextOccupant_triggered()
 
 void MainWindow::on_actionClearCreats_triggered()
 {
-    std::list<Occupant*>::iterator it = world->occupant_list.begin();
+    QLinkedList<Occupant*>::iterator it = world->occupant_list.begin();
     while (it != world->occupant_list.end())
     {
         Creat* creat = dynamic_cast<Creat*>(*it++);

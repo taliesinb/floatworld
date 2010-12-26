@@ -68,7 +68,7 @@ RegisterVar(World, occupant_list)
 
 void write_grid_occupant_order(World* g, std::ostream& s)
 {
-    std::list<int> order;
+    QLinkedList<int> order;
     for (int i = 0; i < g->rows * g->cols; i++)
     {
         Occupant* occ = g->occupant_grid[i];
@@ -82,17 +82,16 @@ void write_grid_occupant_order(World* g, std::ostream& s)
 }
 void read_grid_occupant_order(World* g, std::istream& s)
 {
-    std::list<int> order;
+    QLinkedList<int> order;
     s >> order;
-    for_iterate(it, order)
+    foreach(int id, order)
     {
-        int id = *it;
         Occupant* occ = g->LookupOccupantByID(id);
         if (!occ) {
             cerr << "Failed to find occupant by id " << id << endl;
             assert(occ);
         } else {
-            occ->Attach(*g, occ->pos);
+            g->Attach(occ, occ->pos);
             occ->id = id;
         }
     }
@@ -157,12 +156,13 @@ void World::SetSize(int rs, int cs)
     for (int i = 0; i < rows * cols; i++)
         occupant_grid[i] = NULL;
 
-    for_iterate(creat, graveyard)
-        delete *creat;
+    foreach(Creat* creat, graveyard)
+        delete creat;
 
     graveyard.clear();
-    for_iterate(occ, occupant_list)
-        delete *occ;
+
+    foreach(Occupant* occ, occupant_list)
+        delete occ;
 
     occupant_list.clear();
 }
@@ -184,7 +184,7 @@ void World::SetupActions()
 
 Pos World::RandomCell()
 {
-    return Pos(RandInt(rows-1), RandInt(cols-1));
+    return rng.Position(rows, cols);
 }
 
 Pos World::EmptyCell()
@@ -213,7 +213,7 @@ void World::AddCreats(int number, bool fairly)
     mutation_prob = 0.5;
     for (int i = 0; i < number; i++)
     {
-        Creat& c = AddCreatAt(fairly ? FairCell() : EmptyCell(), RandInt(3));
+        Creat& c = AddCreatAt(fairly ? FairCell() : EmptyCell(), rng .Integer(3));
         for (int i = 0; i < initial_mutations; i++) c.MutateBrain();
     }
     mutation_prob = mp;
@@ -241,8 +241,8 @@ Creat& World::_AddCreat(Pos pos, int orient)
         fresh = new Creat;
     }
 
-    fresh->Attach(*this, pos);
-    fresh->AssignID();
+    Attach(fresh, pos);
+    AssignID(fresh);
     fresh->Reset();
     fresh->orient = orient;
     fresh->last_orient = orient;
@@ -284,9 +284,9 @@ Creat* World::CreatAt(Pos pos)
 
 Occupant* World::LookupOccupantByID(int search_id)
 {
-    for_iterate(it, occupant_list)
+    foreach(Occupant* occ, occupant_list)
     {
-        if ((*it)->id == search_id) return *it;
+        if (occ->id == search_id) return occ;
     }
     return NULL;
 }
@@ -297,9 +297,9 @@ Creat* World::FindCreat(int marker)
   
     Creat* found = NULL;
     float max = 0;
-    for_iterate(it, occupant_list)
+    foreach(Occupant* occ, occupant_list)
     {
-        if (Creat* creat = dynamic_cast<Creat*>(*it))
+        if (Creat* creat = dynamic_cast<Creat*>(occ))
         {
             if (creat->energy > max && (!marker || (creat->marker == marker)))
             {
@@ -470,9 +470,9 @@ void World::Report()
 {
     float avg_complexity = 0;
 
-    for_iterate(it, occupant_list)
+    foreach(Occupant* occ, occupant_list)
     {
-        if (Creat* creat = dynamic_cast<Creat*>(*it))
+        if (Creat* creat = dynamic_cast<Creat*>(occ))
         {
             avg_complexity += creat->Complexity();
         }
@@ -497,12 +497,12 @@ void World::ColorClusters()
 
        Chop off fingerprints until 90% fall into 4 groups.
     */
-
-    std::vector<unsigned long int> fingerprints;
-    for_iterate(it, occupant_list)
+/*
+    QLinkedList<unsigned long int> fingerprints;
+    foreach(Occupant* occ, occupant_list)
     {
-        Creat* creat= dynamic_cast<Creat*>(*it);
-        if (creat) fingerprints.push_back(creat->fingerprint);
+        if (Creat* creat = dynamic_cast<Creat*>(occ))
+            fingerprints.push_back(creat->fingerprint);
     }
 
     int chop;
@@ -510,19 +510,15 @@ void World::ColorClusters()
     for (chop = 0; chop < 64; chop++)
     {
         counts.clear();
-        for_iterate(it, fingerprints)
+        foreach(unsigned long int f, fingerprints)
         {
-            unsigned long int f = *it;
             f >>= chop;
             counts[f] = counts[f] + 1;
         }
 
         std::vector<int> freqs;
-        for_iterate(it2, counts)
-        {
-            //cout << "fingerprint " << (*it2).first << " has count " << (*it2).second << endl;
-            freqs.push_back((*it2).second);
-        }
+        foreach(int c, counts)
+            freqs.push_back(c);
 
         sort(freqs.rbegin(), freqs.rend());
 
@@ -559,29 +555,23 @@ void World::ColorClusters()
     }
 
     cout << "done" << endl;
+    */
 }
 
 typedef void (Creat::*CreatFunc)();
 
 void World::Step()
 {
-    list<Occupant*>::iterator it;
-
-    it = occupant_list.begin();
-    while (it != occupant_list.end())
-    {
-        Occupant* occ = *it++;
+    foreach(Occupant* occ, occupant_list)
         occ->last_pos = occ->pos;
-    }
 
-    it = occupant_list.begin();
-    while (it != occupant_list.end())
+    QMutableLinkedListIterator<Occupant*> i(occupant_list);
+    while (i.hasNext())
     {
-        Occupant* occ = *it++;
+        Occupant* occ = i.next();
         occ->Update();
         if (hooks_enabled) occ->UpdateQtHook();
     }
-
 
     if (energy_decay_rate != 0.0) energy *= (1.0 - energy_decay_rate);
 
@@ -641,13 +631,9 @@ float World::CompeteScore(Matrix& a, Matrix& b)
 int World::CountCreatsByMarker(int marker)
 {
   int n = 0;
-  for_iterate(it, occupant_list)
-  {
-      if (Creat* creat = dynamic_cast<Creat*>(*it))
-      {
+  foreach(Occupant* occ, occupant_list)
+      if (Creat* creat = dynamic_cast<Creat*>(occ))
           if (creat->marker == marker) n++;
-      }
-  }
   return n;
 }
 
@@ -734,20 +720,6 @@ void Occupant::__Remove()
 
 }
 
-void Occupant::AssignID()
-{
-    assert(world);
-    id = world->next_id++;
-    world->occupant_list.push_back(this);
-}
-
-void Occupant::Attach(World& g, Pos p)
-{
-    world = &g;
-    Move(p);
-    last_pos = p;
-}
-
 void Occupant::Update()
 {
 
@@ -757,7 +729,7 @@ void Occupant::Update()
 void Occupant::Remove()
 {
     RemoveFromLL();
-    world->occupant_list.remove(this);
+    world->occupant_list.removeAll(this);
     DeleteQtHook();
     __Remove();
 }
@@ -803,5 +775,19 @@ std::istream& operator>>(std::istream& s, Occupant*& o)
 {
     o = dynamic_cast<Occupant*>(Class::Create(s));
     return s;
+}
+
+void World::AssignID(Occupant* occ)
+{
+    occ->id = next_id++;
+    occupant_list.push_back(occ);
+}
+
+void World::Attach(Occupant* occ, Pos p)
+{
+    occ->world = this;
+    occ->rng.Seed(rng.Integer(65536));
+    occ->Move(p);
+    occ->last_pos = p;
 }
 

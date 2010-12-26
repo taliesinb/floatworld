@@ -7,11 +7,17 @@ RNG::RNG() : _w(1), _z(1)
 {
 }
 
+void RNG::Seed(int seed)
+{
+    _w = seed * 5 + 1;
+    _z = seed * 7 + 2;
+}
+
 int RNG::Integer(int n)
 {
     _z = 36969 * (_z & 65535) + (_z >> 16);
     _w = 18000 * (_w & 65535) + (_w >> 16);
-    return ((_z << 16) + _w) % n;
+    return ((_z << 16) + _w) % (n + 1);
 }
 
 int RNG::Integer(int a, int b)
@@ -20,7 +26,7 @@ int RNG::Integer(int a, int b)
 }
 
 float RNG::Float() {
-    return float(Integer() % PRECISION) / PRECISION;
+    return float(Integer(PRECISION) % PRECISION) / PRECISION;
 }
 
 float RNG::Float(float max)
@@ -33,15 +39,10 @@ float RNG::Float(float a, float b)
     return a + Float(b - a);
 }
 
-bool RNG::Bool(float p)
-{
-    return Float() < p;
-}
-
 float RNG::Gaussian()
 {
     float x = 0;
-    for (int i = 0; i < GAUSS_ITERS * GAUSS_ITERS; i++) x += RandFloat();
+    for (int i = 0; i < GAUSS_ITERS * GAUSS_ITERS; i++) x += Float();
     return 3.4739 * (x - (GAUSS_ITERS * GAUSS_ITERS) / 2.0) / GAUSS_ITERS;
 }
 
@@ -52,7 +53,17 @@ float RNG::Gaussian(float mean, float sd)
 
 int RNG::Bit()
 {
-    return RandInt(1);
+    return Integer(1);
+}
+
+Pos RNG::Position(int rows, int cols)
+{
+    return Pos(Integer(rows-1), Integer(cols-1));
+}
+
+int RNG::Dir()
+{
+    return Integer(3);
 }
 
 int RNG::Bit(float prob)
@@ -62,12 +73,17 @@ int RNG::Bit(float prob)
 
 bool RNG::Bool()
 {
-    return RandInt(1) == 0;
+    return Integer(1) == 0;
 }
 
 bool RNG::Bool(float prob)
 {
     return (Float() < prob);
+}
+
+int RNG::Sign()
+{
+    return Bit() * 2 - 1;
 }
 
 

@@ -35,6 +35,7 @@ public:
     std::list<std::string> world_cache;
     Occupant* selected_object;
     QMap<QString, Occupant*> prototypes;
+    RNG rng;
 
     MainWindow(QWidget *parent = 0);
     void SetSpeed(float speed);
