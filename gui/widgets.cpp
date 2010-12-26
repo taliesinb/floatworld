@@ -323,7 +323,6 @@ void BindingsPanel::ConstructChildren()
         QWidget* widget = (*mclass->factories[i])(object);
         const char* sig = dynamic_cast<Binding*>(widget)->changesignal;
         if (sig) QObject::connect(widget, sig, this, SLOT(child_changed()));
-        cout << "CONNECTING " << mclass->labels[i] << endl;
         addRow(mclass->labels[i], widget);
         widgets.push_back(widget);
     }
