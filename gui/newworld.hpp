@@ -35,14 +35,16 @@ public:
     ~NewWorldDialog();
     Occupant* selected_object;
 
+    ObjectListItem* CurrentItem();
+
 private:
     Ui::NewWorldDialog *ui;
 
 public slots:
     void AddObject();
     void RemoveObject();
-    void SetObjectNumber(QListWidgetItem*);
     void SelectObject(QListWidgetItem*);
+    void SetObjectNumber(int num);
 };
 
 #endif // NEWWORLD_HPP

@@ -55,14 +55,15 @@ NewWorldDialog::NewWorldDialog(QWidget *parent) :
     foreach(Class* c, objects)
     {
         const char* name = c->name;
-        ui->objectComboBox->addItem(name);
+        ui->prototypeList->addItem(name);
     }
-    ui->objectComboBox->setCurrentIndex(0);
+    ui->prototypeList->setCurrentRow(0);
 
     connect(ui->addObject, SIGNAL(released()), this, SLOT(AddObject()));
     connect(ui->removeObject, SIGNAL(released()), this, SLOT(RemoveObject()));
     connect(ui->objectTable, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)), this, SLOT(SelectObject(QListWidgetItem*)));
     connect(ui->objectTable, SIGNAL(activated(QModelIndex)), this, SLOT(SetObjectNumber(QListWidgetItem*)));
+    connect(ui->numberBox, SIGNAL(valueChanged(int)), this, SLOT(SetObjectNumber(int)));
 }
 
 NewWorldDialog::~NewWorldDialog()
@@ -73,11 +74,12 @@ NewWorldDialog::~NewWorldDialog()
 void NewWorldDialog::AddObject()
 {
     QListWidget& list = *ui->objectTable;
-    QString type = ui->objectComboBox->currentText();
+    QString type = ui->prototypeList->currentItem()->text();
 
     QListWidgetItem* item = new ObjectListItem(Class::Lookup(type.toAscii()));
     list.addItem(item);
     list.setCurrentItem(item);
+    ui->numberBox->setValue(1);
 }
 
 void NewWorldDialog::RemoveObject()
@@ -88,12 +90,6 @@ void NewWorldDialog::RemoveObject()
     {
         selected_object = NULL;
     }
-}
-
-void NewWorldDialog::SetObjectNumber(QListWidgetItem *item)
-{
-    dynamic_cast<ObjectListItem*>(item)->SetNumber(19);
-    std::cout << "SET" << std::endl;
 }
 
 void NewWorldDialog::SelectObject(QListWidgetItem* _item)
@@ -108,4 +104,17 @@ void NewWorldDialog::SelectObject(QListWidgetItem* _item)
 
     selected_object->SetupQtHook(true);
     ui->objectPanel->setLayout(selected_object->panel);
+
+    SetObjectNumber(item->number);
+}
+
+ObjectListItem* NewWorldDialog::CurrentItem()
+{
+    return dynamic_cast<ObjectListItem*>(ui->objectTable->currentItem());
+}
+
+void NewWorldDialog::SetObjectNumber(int number)
+{
+    if (ObjectListItem* item = CurrentItem())
+        item->SetNumber(number);
 }
