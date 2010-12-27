@@ -62,7 +62,6 @@ NewWorldDialog::NewWorldDialog(QWidget *parent) :
     connect(ui->addObject, SIGNAL(released()), this, SLOT(AddObject()));
     connect(ui->removeObject, SIGNAL(released()), this, SLOT(RemoveObject()));
     connect(ui->objectTable, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)), this, SLOT(SelectObject(QListWidgetItem*)));
-    connect(ui->objectTable, SIGNAL(activated(QModelIndex)), this, SLOT(SetObjectNumber(QListWidgetItem*)));
     connect(ui->numberBox, SIGNAL(valueChanged(int)), this, SLOT(SetObjectNumber(int)));
 }
 
@@ -76,10 +75,10 @@ void NewWorldDialog::AddObject()
     QListWidget& list = *ui->objectTable;
     QString type = ui->prototypeList->currentItem()->text();
 
-    QListWidgetItem* item = new ObjectListItem(Class::Lookup(type.toAscii()));
+    ObjectListItem* item = new ObjectListItem(Class::Lookup(type.toAscii()));
+    item->SetNumber(ui->numberBox->value());
     list.addItem(item);
     list.setCurrentItem(item);
-    ui->numberBox->setValue(1);
 }
 
 void NewWorldDialog::RemoveObject()
