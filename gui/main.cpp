@@ -9,10 +9,8 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     NewWorldDialog dialog;
-    dialog.show();
-
-    //MainWindow win;
-    //win.show();
+    dialog.exec();
 
     return a.exec();
 }
+

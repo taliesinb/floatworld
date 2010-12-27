@@ -77,10 +77,6 @@ void LineageNode::Decrement()
     if (refs <= 0) delete this;
 }
 
-void Creat::Setup()
-{
-}
-
 Creat::Creat()
     : weights(num_hidden + num_outputs, num_neurons),
       state(num_neurons, 1),

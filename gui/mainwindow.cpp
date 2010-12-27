@@ -11,7 +11,6 @@ using namespace std;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
-    adam(Creat::num_hidden + Creat::num_outputs, Creat::num_neurons),
     speed(0), stepper(0), last_stepper(0), block_draw(false),
     speed_group(this), selected_object(NULL)
 {
@@ -19,68 +18,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     world = qworld->world;
 
-    // setup creatures
-    Creat::Setup();
-
-    world->interaction_type = Penalty;
-
-    // setup adam:
-    world->initial_brain = &adam;
-    adam.SetZero();
-    enum {
-        energyF = 0, energyL, energyR, creatF, creatL, creatR, dirA, dirB,
-        cons, energy, age, random,
-        move = Creat::num_inputs + Creat::num_hidden,
-        left,
-        right,
-        breed,
-    };
-    int offset = Creat::num_inputs;
-    adam(breed - offset, energy) = 0.75;
-    adam(move - offset, cons) = 1.1;
-    adam(left - offset, random) = 1.5;
-
-    world->max_age = 50;
-
-    for (int i = 0; i < 15; i++)
-    {
-        Circle* c = new Circle;
-        world->Attach(c, world->RandomCell());
-        world->AssignID(c);
-        c->radius = rng.Integer(5,17);
-        c->threshold = 2 + max(25 - (c->radius - 5) * (c->radius - 5) / 3, 0);
-        c->energy = 2;
-        c->p_jump = 0.01;
-        //c->ratio = 0.2;
-        for (int k = 0; k < 10; k++) c->Update();
-    }
-
-    world->energy_decay_rate = 0.08;
-    world->enable_respawn = true;
-    world->mutation_prob = 0.2;
-    world->path_energy = 0;
-
-    world->AddCreats(300, true);
-
-    for (int k = 0; k < 0; k++)
-    {
-        Occupant* block = new SkinnerBlock();
-        world->Attach(block, world->RandomCell());
-        world->AssignID(block);
-    }
-
-    for (int k = 0; k < 0; k++)
-    {
-        Occupant* block = new ActiveTrap();
-        world->Attach(block, world->RandomCell());
-        world->AssignID(block);
-    }
-
     ticker.setInterval(1);
     connect(&ticker, SIGNAL(timeout()), this, SLOT(Tick()));
-
-    world->interaction_type = Attack;
-    qworld->Draw();
 
     world->SetupQtHook(false);
     gridBox->setLayout(world->panel);
@@ -100,9 +39,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(qworld, SIGNAL(OccupantSelected(Occupant*)), this, SLOT(DisplayInspector(Occupant*)));
 
-    qworld->setMaximumSize(qworld->sizeHint());
-    resize(5000,5000); // force a resize to the maximum size
-
     // hunt out the fast forward button and hack some callbacks onto it
     QList<QWidget*> list = actionFF->associatedWidgets();
     foreach(QWidget* w, list)
@@ -115,7 +51,6 @@ MainWindow::MainWindow(QWidget *parent)
             button->setAutoRepeat(false);
         }
     }
-    qworld->Draw();
 
     QList<Class*> objects;
     for (int i = 0; i < Class::nmetaclasses; i++)
@@ -319,7 +254,11 @@ void MainWindow::on_actionDeleteSelected_triggered()
 void MainWindow::on_actionNew_triggered()
 {
     NewWorldDialog* dialog = new NewWorldDialog(this);
-    dialog->exec();
+    if (dialog->exec() == QDialog::Accepted)
+    {
+        this->deleteLater();
+
+    }
 }
 
 void MainWindow::on_actionSave_triggered()

@@ -50,8 +50,6 @@ public:
 
     static int global_id;
 
-    static void Setup();
-
     int desired_id;
     int desirer_id;
     LineageNode* lineage;

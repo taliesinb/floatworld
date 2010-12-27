@@ -26,14 +26,11 @@ RegisterBinding(QWorld, draw_blocks, "draw blocks");
 RegisterBinding(QWorld, draw_block_colors, "color blocks");
 RegisterBinding(QWorld, draw_hue_multiplier, "hue multiplier", 0.1, 10.0, 0.1);
 
-int sz = 120;
-
 QWorld::QWorld(QWidget* parent) :
         QWidget(parent),
         selected_occupant(NULL)
 {
     world = new World();
-    world->SetSize(sz,sz);
 
     scroll_area = new QScrollArea;
     energy = new MatrixView(6, false, false);
@@ -67,6 +64,12 @@ QWorld::QWorld(QWidget* parent) :
     connect(energy, SIGNAL(OverPaint(QPainter&)), this, SLOT(OnChildPaint(QPainter&)));
     connect(energy, SIGNAL(ClickedCell(Pos)), this, SLOT(SelectAtPos(Pos)));
     connect(energy, SIGNAL(WasResized()), this, SLOT(RecenterZoom()));
+}
+
+void QWorld::SetSize(int rows, int cols)
+{
+    world->SetSize(rows, cols);
+    setMaximumSize(sizeHint());
 }
 
 std::ostream& operator<<(std::ostream& s, QSize size)

@@ -40,6 +40,7 @@ public:
 public:
     World* world;
     QWorld(QWidget* parent = NULL);
+    void SetSize(int rows, int  cols);
 
     Occupant* selected_occupant;
     void SelectOccupant(Occupant* occ);

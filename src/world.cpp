@@ -113,8 +113,9 @@ World::World()
     mutation_color_drift = true;
     mutation_prob = 0.0;
     mutation_sd = 3.0;
+    mutation_prob = 0.24;
 
-    max_age = 100;
+    max_age = 50;
     total_steps = 0;
     next_id = 0;
 

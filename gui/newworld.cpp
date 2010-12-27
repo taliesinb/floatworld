@@ -1,6 +1,8 @@
 #include "newworld.hpp"
 #include "widgets.hpp"
+#include "mainwindow.hpp"
 #include "ui_newworld.h"
+#include <sstream>
 
 ObjectListItem::ObjectListItem(Class* mc)
 {
@@ -17,8 +19,8 @@ ObjectListItem::~ObjectListItem()
 
 void ObjectListItem::SetNumber(int num)
 {
-    UpdateLabel();
     number = num;
+    UpdateLabel();
 }
 
 void ObjectListItem::UpdateLabel()
@@ -59,10 +61,32 @@ NewWorldDialog::NewWorldDialog(QWidget *parent) :
     }
     ui->prototypeList->setCurrentRow(0);
 
+    Creat* creat = new Creat();
+
+    enum {
+        energyF = 0, energyL, energyR, creatF, creatL, creatR, dirA, dirB,
+        cons, energy, age, random,
+        move = Creat::num_inputs + Creat::num_hidden,
+        left,
+        right,
+        breed,
+    };
+    int offset = Creat::num_inputs;
+
+    creat->weights(breed - offset, energy) = 0.75;
+    creat->weights(move - offset, cons) = 1.1;
+    creat->weights(left - offset, random) = 1.5;
+
+    ObjectListItem* adam = new ObjectListItem(Class::Lookup("Creat"));
+    adam->prototype = creat;
+    adam->SetNumber(40);
+    ui->objectTable->addItem(adam);
+
     connect(ui->addObject, SIGNAL(released()), this, SLOT(AddObject()));
     connect(ui->removeObject, SIGNAL(released()), this, SLOT(RemoveObject()));
     connect(ui->objectTable, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)), this, SLOT(SelectObject(QListWidgetItem*)));
     connect(ui->numberBox, SIGNAL(valueChanged(int)), this, SLOT(SetObjectNumber(int)));
+    connect(this, SIGNAL(accepted()), SLOT(CreateWorld()));
 }
 
 NewWorldDialog::~NewWorldDialog()
@@ -84,6 +108,7 @@ void NewWorldDialog::AddObject()
 void NewWorldDialog::RemoveObject()
 {
     QListWidget& list = *ui->objectTable;
+    if (list.currentRow() == 0) return;
     delete list.takeItem(list.currentRow());
     if (list.count() == 0)
     {
@@ -104,7 +129,7 @@ void NewWorldDialog::SelectObject(QListWidgetItem* _item)
     selected_object->SetupQtHook(true);
     ui->objectPanel->setLayout(selected_object->panel);
 
-    SetObjectNumber(item->number);
+    ui->numberBox->setValue(item->number);
 }
 
 ObjectListItem* NewWorldDialog::CurrentItem()
@@ -116,4 +141,45 @@ void NewWorldDialog::SetObjectNumber(int number)
 {
     if (ObjectListItem* item = CurrentItem())
         item->SetNumber(number);
+}
+
+void NewWorldDialog::CreateWorld()
+{
+    MainWindow* mw = new MainWindow();
+
+    int rows, cols;
+    if (ui->radioSmallSize->isChecked()) rows = cols = 50;
+    if (ui->radioMediumSize->isChecked()) rows = cols = 100;
+    if (ui->radioLargeSize->isChecked()) rows = cols = 150;
+    if (ui->radioCustomSize->isChecked()) {
+        rows = ui->rowsBox->value();
+        cols = ui->columnsBox->value();
+    }
+
+    mw->qworld->SetSize(rows, cols);
+
+    ObjectListItem* item;
+    for(int i = 0; i < ui->objectTable->count(); i++)
+    {
+        item = dynamic_cast<ObjectListItem*>(ui->objectTable->item(i));
+        if (Creat* creat = dynamic_cast<Creat*>(item->prototype))
+        {
+            mw->world->initial_brain = &creat->weights;
+            mw->world->AddCreats(item->number, true);
+        } else {
+            std::stringstream s;
+            s << *item->prototype;
+            for(int i = 0; i < item->number; i++)
+            {
+                std::stringstream s2(s.str());
+                Occupant *occ = dynamic_cast<Occupant*>(Class::Create(s2));
+                mw->world->Attach(occ, mw->world->RandomCell());
+                mw->world->AssignID(occ);
+            }
+        }
+    }
+
+    mw->resize(5000,5000); // force a resize to the maximum size
+    mw->qworld->Draw();
+    mw->show();
 }

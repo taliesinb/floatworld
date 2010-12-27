@@ -45,6 +45,8 @@ public slots:
     void RemoveObject();
     void SelectObject(QListWidgetItem*);
     void SetObjectNumber(int num);
+
+    void CreateWorld();
 };
 
 #endif // NEWWORLD_HPP
