@@ -1,4 +1,5 @@
 #include "mainwindow.hpp"
+#include "newworld.hpp"
 
 #include <sstream>
 #include <fstream>
@@ -116,7 +117,7 @@ MainWindow::MainWindow(QWidget *parent)
     }
     qworld->Draw();
 
-    std::list<Class*> objects;
+    QList<Class*> objects;
     for (int i = 0; i < Class::nmetaclasses; i++)
     {
         Class* c = Class::metaclasses[i];
@@ -313,6 +314,12 @@ void MainWindow::on_actionDeleteSelected_triggered()
     if (qworld->selected_occupant)
         qworld->selected_occupant->Remove();
     qworld->Draw();
+}
+
+void MainWindow::on_actionNew_triggered()
+{
+    NewWorldDialog* dialog = new NewWorldDialog(this);
+    dialog->exec();
 }
 
 void MainWindow::on_actionSave_triggered()

@@ -55,6 +55,7 @@ private slots:
     void ff_pressed();
     void ff_released();
 
+    void on_actionNew_triggered();
     void on_actionSave_triggered();
     void on_actionLoad_triggered();
     void on_actionZoomIn_triggered();
