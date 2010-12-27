@@ -120,7 +120,7 @@ void Object::Reset()
 
 BindingsPanel* Object::SetupQtHook(bool title)
 {
-    assert (panel == NULL);
+    if (panel) return panel;
     panel = new BindingsPanel(&GetClass(), this);
     if (title)
     {

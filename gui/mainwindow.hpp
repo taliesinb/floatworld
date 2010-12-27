@@ -15,8 +15,7 @@
 #include "ui_mainwindow.h"
 #include "widgets.hpp"
 
-#include <list>
-#include <string>
+class World;
 
 class MainWindow : public QMainWindow, public Ui::MainWindow
 {
@@ -32,12 +31,12 @@ public:
     bool block_draw;
     World* world;
     QActionGroup speed_group;
-    std::list<std::string> world_cache;
+    QList<QString> world_cache;
     Occupant* selected_object;
     QMap<QString, Occupant*> prototypes;
     RNG rng;
 
-    MainWindow(QWidget *parent = 0);
+    MainWindow();
     void SetSpeed(float speed);
 
 private slots:

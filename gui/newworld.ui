@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>822</width>
-    <height>507</height>
+    <height>657</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -144,7 +144,25 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QListWidget" name="prototypeList"/>
+        <widget class="QListWidget" name="prototypeList">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>200</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>14</pointsize>
+          </font>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>
@@ -199,6 +217,19 @@
             <number>200</number>
            </property>
           </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
          </item>
          <item>
           <widget class="QToolButton" name="copyObject">
@@ -276,7 +307,7 @@
       <widget class="QFrame" name="objectPanel">
        <property name="minimumSize">
         <size>
-         <width>250</width>
+         <width>280</width>
          <height>0</height>
         </size>
        </property>

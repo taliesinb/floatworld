@@ -367,7 +367,8 @@ void Creat::UpdateBrain()
     for (int k = off_ext_inputs; k < off_ext_inputs + num_inputs; k++)
         state2(k) = state(k);
 
-    for (int iter = 0; iter < world->neural_net_iterations; iter++)
+    int iters = world ? world->neural_net_iterations : 1;
+    for (int iter = 0; iter < iters; iter++)
     {
         // update the hiddens from the inputs and the old hiddens
         for  (int j = 0; j < num_hidden; j++)

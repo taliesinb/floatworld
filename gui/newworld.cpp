@@ -9,7 +9,7 @@ ObjectListItem::ObjectListItem(Class* mc)
     number = 1;
     mclass = mc;
     UpdateLabel();
-    prototype = dynamic_cast<Occupant*>(mc->maker());
+    prototype = mc->maker();
 }
 
 ObjectListItem::~ObjectListItem()
@@ -25,7 +25,10 @@ void ObjectListItem::SetNumber(int num)
 
 void ObjectListItem::UpdateLabel()
 {
-    setText(QString("%1 x %2").arg(number).arg(mclass->name));
+    if (number == 0)
+        setText(mclass->name);
+    else
+        setText(QString("%1 x %2").arg(number).arg(mclass->name));
 }
 
 NewWorldDialog::NewWorldDialog(QWidget *parent) :
@@ -76,6 +79,15 @@ NewWorldDialog::NewWorldDialog(QWidget *parent) :
     creat->weights(breed - offset, energy) = 0.75;
     creat->weights(move - offset, cons) = 1.1;
     creat->weights(left - offset, random) = 1.5;
+
+    ObjectListItem* world = new ObjectListItem(Class::Lookup("World"));
+    dynamic_cast<World*>(world->prototype)->SetSize(10,10);
+    world->SetNumber(0);
+    ui->objectTable->addItem(world);
+
+    ObjectListItem* circle = new ObjectListItem(Class::Lookup("Circle"));
+    circle->SetNumber(10);
+    ui->objectTable->addItem(circle);
 
     ObjectListItem* adam = new ObjectListItem(Class::Lookup("Creat"));
     adam->prototype = creat;
@@ -129,7 +141,8 @@ void NewWorldDialog::SelectObject(QListWidgetItem* _item)
     selected_object->SetupQtHook(true);
     ui->objectPanel->setLayout(selected_object->panel);
 
-    ui->numberBox->setValue(item->number);
+    if (item->number)
+        ui->numberBox->setValue(item->number);
 }
 
 ObjectListItem* NewWorldDialog::CurrentItem()
@@ -139,13 +152,21 @@ ObjectListItem* NewWorldDialog::CurrentItem()
 
 void NewWorldDialog::SetObjectNumber(int number)
 {
-    if (ObjectListItem* item = CurrentItem())
+    ObjectListItem* item = CurrentItem();
+    if (item && ui->objectTable->currentRow())
         item->SetNumber(number);
 }
 
 void NewWorldDialog::CreateWorld()
 {
     MainWindow* mw = new MainWindow();
+
+    World* w = dynamic_cast<World*>(dynamic_cast<ObjectListItem*>(ui->objectTable->item(0))->prototype);
+    {
+        std::stringstream s2;
+        s2 << *w;
+        s2 >> *mw->world;
+    }
 
     int rows, cols;
     if (ui->radioSmallSize->isChecked()) rows = cols = 50;
@@ -175,8 +196,11 @@ void NewWorldDialog::CreateWorld()
                 Occupant *occ = dynamic_cast<Occupant*>(Class::Create(s2));
                 mw->world->Attach(occ, mw->world->RandomCell());
                 mw->world->AssignID(occ);
+                if (Shape* shape = dynamic_cast<Shape*>(occ))
+                    for (int j = 0; j < 10; j++) shape->Draw(mw->world->energy);
             }
         }
+
     }
 
     mw->resize(5000,5000); // force a resize to the maximum size

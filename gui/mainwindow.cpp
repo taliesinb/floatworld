@@ -7,11 +7,8 @@
 #include <QToolButton>
 #include <QWidget>
 
-using namespace std;
-
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent),
-    speed(0), stepper(0), last_stepper(0), block_draw(false),
+MainWindow::MainWindow()
+    : speed(0), stepper(0), last_stepper(0), block_draw(false),
     speed_group(this), selected_object(NULL)
 {
     setupUi(this);
@@ -107,7 +104,7 @@ void MainWindow::CreateObjectAt(Pos pos)
 {
     if (selected_object && !world->OccupantAt(pos))
     {
-        stringstream s;
+        std::stringstream s;
         s << *selected_object;
         Occupant *occ = dynamic_cast<Occupant*>(Class::Create(s));
         world->Attach(occ, pos);
@@ -185,11 +182,12 @@ void MainWindow::ff_released()
 }
 void MainWindow::on_actionStep_triggered()
 {
-    ostringstream str;
+    std::ostringstream str;
     human_readable = false;
     str << *qworld->world;
     human_readable = true;
-    world_cache.push_back(str.str());
+    QString string = str.str().c_str();
+    world_cache.push_back(string);
     qworld->Step();    
     qworld->SetDrawFraction(1.0);
 }
@@ -197,7 +195,8 @@ void MainWindow::on_actionStep_triggered()
 void MainWindow::on_actionStepBack_triggered()
 {
     if (world_cache.size()) {
-        istringstream s(world_cache.back());
+        const char* str = world_cache.back().toAscii();
+        std::istringstream s(str);
         human_readable = false;
         int id = qworld->selected_occupant ? qworld->selected_occupant->id : -1;
         s >> *qworld->world;
@@ -257,7 +256,6 @@ void MainWindow::on_actionNew_triggered()
     if (dialog->exec() == QDialog::Accepted)
     {
         this->deleteLater();
-
     }
 }
 
@@ -267,9 +265,9 @@ void MainWindow::on_actionSave_triggered()
     "Save World as", QDir::homePath(), tr("Floatworlds (*.fw)"));
     if (fileName.size() > 0)
     {
-        ofstream f;
+        std::ofstream f;
         f.open(fileName.toUtf8());
-        f << *qworld->world << endl;
+        f << *qworld->world << std::endl;
         f.close();
     }
 }
@@ -281,7 +279,7 @@ void MainWindow::on_actionLoad_triggered()
 
     if (fileName.size() > 0)
     {
-        ifstream f;
+        std::ifstream f;
         f.open(fileName.toUtf8());
         f >> *qworld->world;
         f.close();

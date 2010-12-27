@@ -16,7 +16,7 @@ class ObjectListItem : public QListWidgetItem
 {
 public:
     int number;
-    Occupant* prototype;
+    Object* prototype;
     Class* mclass;
 
     ObjectListItem(Class* mc);
@@ -33,7 +33,7 @@ class NewWorldDialog : public QDialog
 public:
     explicit NewWorldDialog(QWidget *parent = 0);
     ~NewWorldDialog();
-    Occupant* selected_object;
+    Object* selected_object;
 
     ObjectListItem* CurrentItem();
 
