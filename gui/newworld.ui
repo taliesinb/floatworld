@@ -178,9 +178,6 @@
            <pointsize>18</pointsize>
           </font>
          </property>
-         <property name="alternatingRowColors">
-          <bool>true</bool>
-         </property>
          <property name="spacing">
           <number>2</number>
          </property>

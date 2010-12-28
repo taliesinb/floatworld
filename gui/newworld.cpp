@@ -42,6 +42,7 @@ NewWorldDialog::NewWorldDialog(QWidget *parent) :
     {
         Class* c = Class::metaclasses[i];
         if (c->abstract) continue;
+        std::cout << "Consdering class " << c->name << std::endl;
         for (Class* p = c; p; p = Class::Lookup(p->pname))
         {
             if (strcmp(p->name, "Block") == 0)
@@ -88,6 +89,8 @@ NewWorldDialog::NewWorldDialog(QWidget *parent) :
     adam->SetNumber(40);
     ui->objectTable->addItem(adam);
 
+    ui->objectTable->setDragDropMode(QAbstractItemView::InternalMove);
+
     connect(ui->copyObject, SIGNAL(released()), this, SLOT(CopyObject()));
     connect(ui->addObject, SIGNAL(released()), this, SLOT(AddObject()));
     connect(ui->removeObject, SIGNAL(released()), this, SLOT(RemoveObject()));
@@ -115,12 +118,11 @@ void NewWorldDialog::AddObject()
 void NewWorldDialog::RemoveObject()
 {
     QListWidget& list = *ui->objectTable;
-    if (list.currentRow() == 0) return;
+    if (dynamic_cast<World*>(CurrentItem()->prototype)) return;
+
     delete list.takeItem(list.currentRow());
     if (list.count() == 0)
-    {
         selected_object = NULL;
-    }
 }
 
 void NewWorldDialog::CopyObject()
@@ -129,6 +131,7 @@ void NewWorldDialog::CopyObject()
 
     if (ObjectListItem* item = CurrentItem())
     {
+        if (dynamic_cast<World*>(item->prototype)) return;
         if (Occupant* occ = dynamic_cast<Occupant*>(item->prototype))
         {
             std::stringstream s;
@@ -168,7 +171,7 @@ ObjectListItem* NewWorldDialog::CurrentItem()
 void NewWorldDialog::SetObjectNumber(int number)
 {
     ObjectListItem* item = CurrentItem();
-    if (item && ui->objectTable->currentRow())
+    if (item && !dynamic_cast<World*>(item->prototype))
         item->SetNumber(number);
 }
 
@@ -176,11 +179,17 @@ void NewWorldDialog::CreateWorld()
 {
     MainWindow* mw = new MainWindow();
 
-    World* w = dynamic_cast<World*>(dynamic_cast<ObjectListItem*>(ui->objectTable->item(0))->prototype);
+    World* w = NULL;
+    for(int i = 0; i < ui->objectTable->count(); i++)
     {
-        std::stringstream s2;
-        s2 << *w;
-        s2 >> *mw->world;
+        w = dynamic_cast<World*>(dynamic_cast<ObjectListItem*>(ui->objectTable->item(i))->prototype);
+        if (w)
+        {
+            std::stringstream s2;
+            s2 << *w;
+            s2 >> *mw->world;
+            break;
+        }
     }
 
     int rows, cols;
