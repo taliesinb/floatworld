@@ -281,7 +281,7 @@ void MatrixWidget::ShowTooltip(Pos p)
 BindingsPanel::BindingsPanel(Class *mc, Object *obj)
     : mclass(mc), object(obj)
 {
-
+    setSpacing(5);
 }
 
 BindingsPanel::~BindingsPanel()

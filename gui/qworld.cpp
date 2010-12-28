@@ -206,7 +206,7 @@ void QWorld::OnChildPaint(QPainter& painter)
         {
             switch (draw_type) {
             case DrawAge: {
-                    float stage = float(creat->age) / world->max_age;
+                    float stage = float(creat->age) / creat->max_age;
                     int hue = 255 * (0.4 * (1 - stage));
                     if (hue < 0) hue = 0;
                     color.setHsv(hue, 240, 240);

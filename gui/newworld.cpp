@@ -38,7 +38,6 @@ NewWorldDialog::NewWorldDialog(QWidget *parent) :
     ui->setupUi(this);
     selected_object = NULL;
 
-    QList<Class*> objects;
     for (int i = 0; i < Class::nmetaclasses; i++)
     {
         Class* c = Class::metaclasses[i];
@@ -47,20 +46,15 @@ NewWorldDialog::NewWorldDialog(QWidget *parent) :
         {
             if (strcmp(p->name, "Block") == 0)
             {
-                objects.push_back(c);
+                ui->prototypeList->addItem(c->name);
                 break;
             }
             if (strcmp(p->name, "Shape") == 0)
             {
-                objects.push_back(c);
+                ui->prototypeList->addItem(c->name);
                 break;
             }
         }
-    }
-    foreach(Class* c, objects)
-    {
-        const char* name = c->name;
-        ui->prototypeList->addItem(name);
     }
     ui->prototypeList->setCurrentRow(0);
 
@@ -94,6 +88,7 @@ NewWorldDialog::NewWorldDialog(QWidget *parent) :
     adam->SetNumber(40);
     ui->objectTable->addItem(adam);
 
+    connect(ui->copyObject, SIGNAL(released()), this, SLOT(CopyObject()));
     connect(ui->addObject, SIGNAL(released()), this, SLOT(AddObject()));
     connect(ui->removeObject, SIGNAL(released()), this, SLOT(RemoveObject()));
     connect(ui->objectTable, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)), this, SLOT(SelectObject(QListWidgetItem*)));
@@ -125,6 +120,26 @@ void NewWorldDialog::RemoveObject()
     if (list.count() == 0)
     {
         selected_object = NULL;
+    }
+}
+
+void NewWorldDialog::CopyObject()
+{
+    QListWidget& list = *ui->objectTable;
+
+    if (ObjectListItem* item = CurrentItem())
+    {
+        if (Occupant* occ = dynamic_cast<Occupant*>(item->prototype))
+        {
+            std::stringstream s;
+            s << *occ;
+
+            ObjectListItem* new_item = new ObjectListItem(&occ->GetClass());
+            s >> *new_item->prototype;
+            new_item->SetNumber(ui->numberBox->value());
+            list.addItem(new_item);
+            list.setCurrentItem(new_item);
+        }
     }
 }
 

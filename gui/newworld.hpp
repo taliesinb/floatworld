@@ -45,6 +45,7 @@ public slots:
     void RemoveObject();
     void SelectObject(QListWidgetItem*);
     void SetObjectNumber(int num);
+    void CopyObject();
 
     void CreateWorld();
 };

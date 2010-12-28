@@ -240,6 +240,7 @@ void MainWindow::on_actionClearAll_triggered()
 {
     while (world->occupant_list.size())
         world->occupant_list.front()->Remove();
+    world->energy.SetZero();
     qworld->Draw();
 }
 

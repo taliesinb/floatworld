@@ -60,6 +60,7 @@ public:
     unsigned long int fingerprint;
     int action;
     int age;
+    int max_age;
     int orient;
     int last_orient;
     int interaction_count;

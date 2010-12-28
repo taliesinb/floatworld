@@ -114,7 +114,6 @@
    <addaction name="actionNew"/>
    <addaction name="actionLoad"/>
    <addaction name="actionSave"/>
-   <addaction name="actionClearAll"/>
    <addaction name="separator"/>
    <addaction name="actionStop"/>
    <addaction name="actionPlaySlowest"/>

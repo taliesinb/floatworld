@@ -11,7 +11,7 @@ RegisterVar(Creat, weights);
 RegisterVar(Creat, state);
 RegisterVar(Creat, action);
 RegisterVar(Creat, age);
-RegisterVar(Creat, last_orient);
+RegisterVar(Creat, max_age);
 RegisterVar(Creat, orient);
 RegisterVar(Creat, alive);
 RegisterVar(Creat, energy);
@@ -50,6 +50,7 @@ const char* outputs = "hidden 1\n"
 
 RegisterBinding(Creat, energy, "energy", 0, 500, 1);
 RegisterBinding(Creat, age, "age", 0, 1000);
+RegisterBinding(Creat, max_age, "max age", 0, 1000);
 RegisterBinding(Creat, interaction_count, "interacts");
 RegisterBinding(Creat, children, "children");
 RegisterBinding(Creat, action, "action", "None\nForward\nLeft\nRight\nReproduce");
@@ -102,6 +103,7 @@ void Creat::Reset()
     Occupant::Reset();
     state.SetZero();
     age = 0;
+    max_age = 50;
     orient = 0;
     children = 0;
     last_orient = 0;
@@ -419,7 +421,7 @@ void Creat::UpdateInputs()
     // SETUP INTERNAL INPUTS
     state(off_int_inputs + 0) = 1.0;
     state(off_int_inputs + 1) = (2.0 * energy / world->action_cost[ActionReproduce]) - 1.0;
-    state(off_int_inputs + 2) = (2.0 * age / world->max_age) - 1.0;
+    state(off_int_inputs + 2) = (2.0 * age / max_age) - 1.0;
     state(off_int_inputs + 3) = rng.Float(-1.0, 1.0);
 }
 
@@ -520,7 +522,7 @@ void Creat::Update()
     interacted = false;
     if (energy > 0) (this->*(world->action_lookup[action]))();
 
-    if (energy < 0 || age > world->max_age) Die();
+    if (energy < 0 || age > max_age) Die();
 }
 
 void Creat::__Remove()
@@ -551,6 +553,7 @@ void Creat::CopyBrain(Creat& parent)
     lineage = parent.lineage; if (lineage) lineage->Increment();
     //  state = parent.state;
 
+    max_age = parent.max_age;
     marker = parent.marker;
     fingerprint = parent.fingerprint;
 
