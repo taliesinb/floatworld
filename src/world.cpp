@@ -696,8 +696,8 @@ RegisterVar(Occupant, pos);
 RegisterVar(Occupant, signature);
 RegisterVar(Occupant, id);
 
-RegisterBinding(Occupant, signature, "color", -5.0, 5.0, 0.25);
 RegisterBinding(Occupant, solid, "solid");
+RegisterBinding(Occupant, signature, "color", -5.0, 5.0, 0.25);
 
 Occupant::Occupant()
   : next(NULL), world(NULL), pos(0,0), signature(0), id(-1), solid(true)

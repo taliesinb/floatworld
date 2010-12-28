@@ -359,12 +359,19 @@ void BindingsPanel::UpdateChildren()
 
 void BindingsPanel::ConstructChildren()
 {
+    int old_size = widgets.size();
     if (Class* parent = Class::Lookup(mclass->pname))
     {
         Class* temp = mclass;
         mclass = parent;
         ConstructChildren();
         mclass = temp;
+    }
+    if (widgets.size() != old_size && mclass->nqvars) {
+        QFrame* line = new QFrame();
+        line->setFrameShape(QFrame::HLine);
+        line->setFrameShadow(QFrame::Sunken);
+        addRow(line);
     }
     for (int i = 0; i < mclass->nqvars; i++)
     {

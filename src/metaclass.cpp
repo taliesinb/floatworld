@@ -135,6 +135,10 @@ BindingsPanel* Object::SetupQtHook(bool title)
         label->setFont(font);
         label->setAlignment(Qt::AlignHCenter);
         panel->addRow("type", label);
+        QFrame* line = new QFrame();
+        line->setFrameShape(QFrame::HLine);
+        line->setFrameShadow(QFrame::Sunken);
+        panel->addRow(line);
     }
     panel->ConstructChildren();
     panel->UpdateChildren();
