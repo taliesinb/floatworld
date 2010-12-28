@@ -107,7 +107,7 @@ void MainWindow::CreateObjectAt(Pos pos)
         std::stringstream s;
         s << *selected_object;
         Occupant *occ = dynamic_cast<Occupant*>(Class::Create(s));
-        world->Attach(occ, pos);
+        world->Attach(occ, pos, true);
         world->AssignID(occ);
     }
     qworld->Draw();
@@ -172,7 +172,7 @@ void MainWindow::Tick()
 
 void MainWindow::ff_pressed()
 {
-    SetSpeed(8.0);
+    SetSpeed(16.0);
 }
 
 void MainWindow::ff_released()
@@ -188,6 +188,7 @@ void MainWindow::on_actionStep_triggered()
     human_readable = true;
     QString string = str.str().c_str();
     world_cache.push_back(string);
+
     qworld->Step();    
     qworld->SetDrawFraction(1.0);
 }

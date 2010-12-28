@@ -57,6 +57,11 @@ Binding* Binding::New(Matrix& ptr, int size, bool flip, const char* rows, const 
     return (new MatrixWidget(size, flip, rows, cols))->SetPointer(&ptr);
 }
 
+Binding* Binding::New(RNG& ptr)
+{
+    return (new RNGWidget())->SetPointer(&ptr);
+}
+
 Binding* Binding::New(int& ptr)
 {
     return (new IntLabel())->SetPointer(&ptr);

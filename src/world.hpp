@@ -52,9 +52,6 @@ class Occupant : public Object
 
     virtual void Reset();
     virtual void __Remove();
-    void AssignID();
-
-    void Attach(Occupant* grid, Pos pos);
     void Remove();
     void RemoveFromLL();
     void Move(Pos p);
@@ -134,7 +131,7 @@ public:
     void AddCreats(int number, bool fairly);
     void RemoveOccupants();
     void AssignID(Occupant* occ);
-    void Attach(Occupant* occ, Pos p);
+    void Attach(Occupant* occ, Pos p, bool seed);
 
     Occupant* SolidOccupantAt(Pos pos);
     Creat* CreatAt(Pos pos);

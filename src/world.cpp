@@ -7,7 +7,7 @@
 
 using namespace std;
 
-RegisterClass(World, None)
+RegisterClass(World, Object)
 
 void write_grid_size(World* g, std::ostream& s)
 {
@@ -89,7 +89,7 @@ void read_grid_occupant_order(World* g, std::istream& s)
             cerr << "Failed to find occupant by id " << id << endl;
             assert(occ);
         } else {
-            g->Attach(occ, occ->pos);
+            g->Attach(occ, occ->pos, false);
             occ->id = id;
         }
     }
@@ -239,7 +239,7 @@ Creat& World::_AddCreat(Pos pos, int orient)
         fresh = new Creat;
     }
 
-    Attach(fresh, pos);
+    Attach(fresh, pos, true);
     AssignID(fresh);
     fresh->Reset();
     fresh->orient = orient;
@@ -691,7 +691,7 @@ Matrix World::Evolve(int steps)
     return FindDominantGenome();
 }
 
-RegisterAbstractClass(Occupant, None);
+RegisterAbstractClass(Occupant, Object);
 RegisterVar(Occupant, pos);
 RegisterVar(Occupant, signature);
 RegisterVar(Occupant, id);
@@ -781,11 +781,11 @@ void World::AssignID(Occupant* occ)
     occupant_list.push_back(occ);
 }
 
-void World::Attach(Occupant* occ, Pos p)
+void World::Attach(Occupant* occ, Pos p, bool reseed)
 {
     occ->world = this;
-    occ->rng.Seed(rng.Integer(65536));
     occ->Move(p);
     occ->last_pos = p;
+    if (reseed) occ->rng.Seed(rng.Integer(65536));
 }
 

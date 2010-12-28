@@ -14,6 +14,9 @@ bool human_readable = true;
 
 using namespace std;
 
+RegisterAbstractClass(Object, None);
+RegisterVar(Object, rng);
+
 std::istream& operator>>(std::istream& is, const char* str)
 {
     if (str == whitespace)
@@ -246,8 +249,7 @@ void Class::Read(Object* c, istream& is)
         parent->Read(c, is);
         if (human_readable) is >> whitespace >> ",";
         is >> whitespace;
-    }
-    c->Reset();
+    } else c->Reset();
     for (int i = 0; i < nvars; i++)
     {
 //        cout << "Reading \"" << varname[i] << "\", var " << i << " of " << c->Name() << endl;

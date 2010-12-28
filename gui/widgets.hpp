@@ -94,6 +94,19 @@ public:
     virtual void Synchronize(bool inbound);
 };
 
+class RNGWidget : public QLabel, public Binding
+{
+    Q_OBJECT;
+
+public:
+    RNGWidget();
+    virtual void Synchronize(bool inbound);
+    virtual void mousePressEvent(QMouseEvent *ev);
+
+signals:
+    void Randomized();
+};
+
 class MatrixWidget : public MatrixView, public Binding
 {
     Q_OBJECT

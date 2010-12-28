@@ -34,7 +34,14 @@ public:
     RNG();
 
     void Seed(int i);
+
+    friend std::ostream& operator<<(std::ostream& os, const RNG& p);
+    friend std::istream& operator>>(std::istream& is, RNG& p);
+    friend class RNGWidget;
 };
+
+std::ostream& operator<<(std::ostream& os, const RNG& p);
+std::istream& operator>>(std::istream& is, RNG& p);
 
 
 #endif // RNG_HPP

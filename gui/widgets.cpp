@@ -201,6 +201,29 @@ void EnumWidget::Synchronize(bool inbound)
     else *static_cast<int*>(ptr) = currentIndex();
 }
 
+RNGWidget::RNGWidget() : Binding(SIGNAL(Randomized()))
+{
+    QFont font;
+    font.setPointSize(12);
+    font.setFamily("Courier");
+    setFont(font);
+}
+
+void RNGWidget::mousePressEvent(QMouseEvent *ev)
+{
+    RNG* rng = static_cast<RNG*>(ptr);
+    rng->_w = (random() % 234523451);
+    rng->_z = (random() % 234523451);
+    Randomized();
+}
+
+void RNGWidget::Synchronize(bool inbound)
+{
+    RNG* rng = static_cast<RNG*>(ptr);
+    QChar z = '0';
+    setText(QString("%1\n%2").arg(rng->_w,8,16,z).arg(rng->_z,8,16,z));
+}
+
 QRgb RedBlueColorFunc(float value)
 {
     int sgn = value > 0 ? 1 : -1;

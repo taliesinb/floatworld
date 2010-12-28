@@ -79,6 +79,7 @@
     <addaction name="actionNextOccupant"/>
     <addaction name="actionPrevOccupant"/>
     <addaction name="actionIndividualStep"/>
+    <addaction name="actionDeleteSelected"/>
    </widget>
    <widget class="QMenu" name="menuSimulation">
     <property name="title">
@@ -324,7 +325,7 @@
      <normaloff>:/icons/play-2.png</normaloff>:/icons/play-2.png</iconset>
    </property>
    <property name="text">
-    <string>Play</string>
+    <string>Normal</string>
    </property>
    <property name="toolTip">
     <string>Play at about 10 updates a second</string>
@@ -431,7 +432,7 @@
      <normaloff>:/icons/right-stop-1.png</normaloff>:/icons/right-stop-1.png</iconset>
    </property>
    <property name="text">
-    <string>Step occupant</string>
+    <string>Step selected</string>
    </property>
    <property name="toolTip">
     <string>Individual Step</string>
@@ -449,7 +450,7 @@
      <normaloff>:/icons/green-right.png</normaloff>:/icons/green-right.png</iconset>
    </property>
    <property name="text">
-    <string>Next occupant</string>
+    <string>Select next</string>
    </property>
    <property name="toolTip">
     <string>Select next</string>
@@ -464,7 +465,7 @@
      <normaloff>:/icons/green-left.png</normaloff>:/icons/green-left.png</iconset>
    </property>
    <property name="text">
-    <string>Prev occupant</string>
+    <string>Select previous</string>
    </property>
    <property name="toolTip">
     <string>Select previous</string>

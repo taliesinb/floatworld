@@ -1,4 +1,5 @@
 #include "rng.hpp"
+#include "metaclass.hpp"
 
 const int PRECISION = 2 << 16;
 const int GAUSS_ITERS = 3;
@@ -11,6 +12,7 @@ void RNG::Seed(int seed)
 {
     _w = seed * 5 + 1;
     _z = seed * 7 + 2;
+    for (int k = 0; k < 10; k++) Integer(1);
 }
 
 int RNG::Integer(int n)
@@ -86,4 +88,15 @@ int RNG::Sign()
     return Bit() * 2 - 1;
 }
 
+std::ostream& operator<<(std::ostream& os, const RNG& rng)
+{
+    os << "[" << rng._w << ", " << rng._z << "]";
+    return os;
+}
+
+std::istream& operator>>(std::istream& is, RNG& rng)
+{
+    is >> "[" >> rng._w >> ", " >> rng._z >> "]";
+    return is;
+}
 

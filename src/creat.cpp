@@ -110,7 +110,6 @@ void Creat::Reset()
     interacted = false;
     interaction_count = 0;
     fingerprint = 0;
-    for (int k = 0; k < 64; k++) { fingerprint <<= 1; fingerprint |= rng.Bit(); }
     action = ActionNone;
     alive = false;
     marker = world ? world->initial_marker : 0;

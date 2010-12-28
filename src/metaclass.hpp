@@ -20,7 +20,7 @@ class BindingsPanel;
 
 class Object
 {
-protected:
+public: // not to be used by others!
     RNG rng;
 
 public:
@@ -36,8 +36,6 @@ public:
     void UpdateQtHook();
     void DeleteQtHook();
     virtual void HookWasChanged();
-
-    unsigned int RandomInteger();
 
     const char* Name();
 };

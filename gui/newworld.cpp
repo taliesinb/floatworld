@@ -42,7 +42,6 @@ NewWorldDialog::NewWorldDialog(QWidget *parent) :
     {
         Class* c = Class::metaclasses[i];
         if (c->abstract) continue;
-        std::cout << "Consdering class " << c->name << std::endl;
         for (Class* p = c; p; p = Class::Lookup(p->pname))
         {
             if (strcmp(p->name, "Block") == 0)
@@ -218,7 +217,7 @@ void NewWorldDialog::CreateWorld()
             {
                 std::stringstream s2(s.str());
                 Occupant *occ = dynamic_cast<Occupant*>(Class::Create(s2));
-                mw->world->Attach(occ, mw->world->RandomCell());
+                mw->world->Attach(occ, mw->world->RandomCell(), true);
                 mw->world->AssignID(occ);
                 if (Shape* shape = dynamic_cast<Shape*>(occ))
                     for (int j = 0; j < 10; j++) shape->Draw(mw->world->energy);

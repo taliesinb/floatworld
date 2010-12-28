@@ -12,13 +12,7 @@
 
 using namespace std;
 
-/* IGNORE FOR NOW
-RegisterVar(QGrid, draw_type);
-RegisterVar(QGrid, draw_creats);
-RegisterVar(QGrid, draw_blocks);
-RegisterVar(QGrid, draw_energy);
-*/
-RegisterClass(QWorld, None);
+RegisterClass(QWorld, Object);
 RegisterBinding(QWorld, draw_type, "color by", "action\nage\nenergy\nplumage\n# children\n# interacts");
 RegisterBinding(QWorld, draw_creats, "draw creats");
 RegisterBinding(QWorld, draw_energy, "draw energy");
@@ -68,6 +62,7 @@ QWorld::QWorld(QWidget* parent) :
 
 void QWorld::SetSize(int rows, int cols)
 {
+    if (cols < 100) energy->scale = 12;
     world->SetSize(rows, cols);
     setMaximumSize(sizeHint());
 }
@@ -118,7 +113,24 @@ void QWorld::UpdateOccupant()
 {
     if (selected_occupant)
     {
-        selected_occupant->Update();
+        SetDrawFraction(1.0);
+
+        foreach(Occupant* occ, world->occupant_list)
+            occ->last_pos = occ->pos;
+
+        QMutableLinkedListIterator<Occupant*> i(world->occupant_list);
+        while (i.hasNext())
+        {
+            Occupant* occ = i.next();
+            if (occ == selected_occupant) occ->Update();
+            else if (Creat* creat = dynamic_cast<Creat*>(occ))
+            {
+                if (!creat->alive) creat->Remove();
+                else if (creat->energy < 0) creat->alive = false;
+            }
+            occ->UpdateQtHook();
+        }
+
         Draw();
     }
 }
@@ -140,10 +152,13 @@ void setScrollBarFraction(QScrollBar* s, float frac)
 
 void QWorld::SetZoom(int scale)
 {
+    if (scale * 2 < energy->scale && scroll_area->horizontalScrollBar()->maximum() == 0) return;
+
     tmp_x = getScrollBarFraction(scroll_area->horizontalScrollBar());
     tmp_y = getScrollBarFraction(scroll_area->verticalScrollBar());
     energy->scale = scale * 2;
     energy->setMaximumSize(sizeHint());
+
     updateGeometry();
 }
 
@@ -341,6 +356,7 @@ void QWorld::SelectOccupant(Occupant *occ)
 void QWorld::Step()
 {
     world->Step();
+    world->UpdateQtHook();
     Draw();
 }
 
@@ -371,7 +387,7 @@ void QWorld::Draw()
 
     if (selected_occupant)
         energy->highlighted = selected_occupant->pos;
-    repaint();
+    update();
 }
 
 void QWorld::SelectNextOccupant(bool forward)
