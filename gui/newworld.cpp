@@ -80,7 +80,7 @@ NewWorldDialog::NewWorldDialog(QWidget *parent) :
     ui->objectTable->addItem(world);
 
     ObjectListItem* circle = new ObjectListItem(Class::Lookup("Circle"));
-    circle->SetNumber(10);
+    circle->SetNumber(5);
     ui->objectTable->addItem(circle);
 
     ObjectListItem* adam = new ObjectListItem(Class::Lookup("Creat"));

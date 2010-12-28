@@ -94,6 +94,14 @@ public:
     virtual void Synchronize(bool inbound);
 };
 
+class EnumLabel : public QLabel, public Binding
+{
+public:
+    QStringList labels;
+    EnumLabel(const char* labels);
+    virtual void Synchronize(bool inbound);
+};
+
 class RNGWidget : public QLabel, public Binding
 {
     Q_OBJECT;

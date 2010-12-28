@@ -34,7 +34,7 @@ RegisterBinding(Rectangle, length, "length", 0, 30);
 RegisterBinding(Rectangle, angle, "angle", 0, 1, 0.05);
 
 Shape::Shape()
-    : threshold(15),
+    : threshold(5),
     energy(1.0),
     ratio(1.0),
     p_jump(0.01)

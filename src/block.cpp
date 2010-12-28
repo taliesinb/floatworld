@@ -11,7 +11,7 @@ RegisterClass(RewardBlock, PushableBlock);
 RegisterVar(RewardBlock, reward);
 RegisterBinding(RewardBlock, reward, "reward", -100, 100);
 
-RegisterClass(StaticTrap, Trap);
+RegisterClass(StaticTrap, Block);
 RegisterClass(ActiveTrap, PushableBlock);
 
 RegisterClass(SkinnerBlock, Block);

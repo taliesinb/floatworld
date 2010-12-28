@@ -53,7 +53,7 @@ RegisterBinding(Creat, age, "age", 0, 1000);
 RegisterBinding(Creat, max_age, "max age", 0, 1000);
 RegisterBinding(Creat, interaction_count, "interacts");
 RegisterBinding(Creat, children, "children");
-RegisterBinding(Creat, action, "action", "None\nForward\nLeft\nRight\nReproduce");
+RegisterBinding(Creat, action, "action", "None\nForward\nLeft\nRight\nReproduce", false);
 RegisterBinding(Creat, state, "neurons", 7, true, neuron_labels, "");
 RegisterBinding(Creat, weights, "weights", 7, false, outputs, neuron_labels);
 

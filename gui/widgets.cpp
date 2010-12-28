@@ -140,6 +140,8 @@ IntLabel::IntLabel() : Binding(NULL)
     QFont font;
     font.setPointSize(10);
     setFont(font);
+    setMaximumWidth(60);
+    setMinimumHeight(20);
 }
 
 void IntLabel::Synchronize(bool inbound)
@@ -153,6 +155,7 @@ IntWidget::IntWidget(int _min, int _max) : Binding(SIGNAL(valueChanged(int)))
     QFont font;
     font.setPointSize(10);
     setFont(font);
+    setMaximumWidth(60);
 }
 
 void IntWidget::Synchronize(bool inbound)
@@ -168,6 +171,7 @@ FloatWidget::FloatWidget(float min, float max, float div) : Binding(SIGNAL(value
     QFont font;
     font.setPointSize(10);
     setFont(font);
+    setMaximumWidth(60);
 }
 
 void FloatWidget::Synchronize(bool inbound)
@@ -193,12 +197,33 @@ EnumWidget::EnumWidget(const char *labels) : Binding(SIGNAL(activated(int)))
     QFont font;
     font.setPointSize(10);
     setFont(font);
+    setMaximumWidth(100);
 }
 
 void EnumWidget::Synchronize(bool inbound)
 {
     if (inbound) setCurrentIndex(*static_cast<int*>(ptr));
     else *static_cast<int*>(ptr) = currentIndex();
+}
+
+EnumLabel::EnumLabel(const char *l) : Binding(NULL)
+{
+    setFrameStyle(QFrame::Panel | QFrame::Sunken);
+    setStyleSheet( "background-color: white" );
+
+    setMinimumHeight(20);
+
+    QString str(l);
+    labels = str.split("\n");
+    QFont font;
+    font.setPointSize(10);
+    setFont(font);
+    setMaximumWidth(150);
+}
+
+void EnumLabel::Synchronize(bool inbound)
+{
+    if (inbound) setText(labels.at(*static_cast<int*>(ptr)));
 }
 
 RNGWidget::RNGWidget() : Binding(SIGNAL(Randomized()))
@@ -304,7 +329,7 @@ void MatrixWidget::ShowTooltip(Pos p)
 BindingsPanel::BindingsPanel(Class *mc, Object *obj)
     : mclass(mc), object(obj)
 {
-    setSpacing(5);
+    setSpacing(6);
 }
 
 BindingsPanel::~BindingsPanel()

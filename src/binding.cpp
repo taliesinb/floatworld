@@ -12,6 +12,9 @@ Binding::~Binding()
 
 Binding* Binding::SetPointer(void *p)
 {
+    QWidget* w = AsWidget();
+    w->setMinimumWidth(60);
+    w->setSizeIncrement(10,5);
     ptr = p;
     OnSetPointer();
     return this;
@@ -50,6 +53,11 @@ Binding* Binding::New(bool& ptr)
 Binding* Binding::New(int& ptr, const char* str)
 {
     return (new EnumWidget(str))->SetPointer(&ptr);
+}
+
+Binding* Binding::New(int& ptr, const char* str, bool dummy)
+{
+    return (new EnumLabel(str))->SetPointer(&ptr);
 }
 
 Binding* Binding::New(Matrix& ptr, int size, bool flip, const char* rows, const char* cols)
