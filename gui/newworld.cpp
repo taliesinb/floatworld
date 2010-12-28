@@ -90,6 +90,10 @@ NewWorldDialog::NewWorldDialog(QWidget *parent) :
 
     ui->objectTable->setDragDropMode(QAbstractItemView::InternalMove);
 
+    ui->splitter->setStretchFactor(0,3);
+    ui->splitter->setStretchFactor(1,2);
+    ui->objectTable->setFocus();
+
     connect(ui->copyObject, SIGNAL(released()), this, SLOT(CopyObject()));
     connect(ui->addObject, SIGNAL(released()), this, SLOT(AddObject()));
     connect(ui->removeObject, SIGNAL(released()), this, SLOT(RemoveObject()));

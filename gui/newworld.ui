@@ -156,6 +156,12 @@
         <number>10</number>
        </property>
        <widget class="QSplitter" name="splitter">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>2</verstretch>
+         </sizepolicy>
+        </property>
         <property name="orientation">
          <enum>Qt::Vertical</enum>
         </property>
@@ -180,21 +186,39 @@
             <property name="text">
              <string>Available Objects</string>
             </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
            </widget>
           </item>
           <item>
            <widget class="QListWidget" name="prototypeList">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="font">
              <font>
               <pointsize>14</pointsize>
              </font>
+            </property>
+            <property name="dragDropMode">
+             <enum>QAbstractItemView::NoDragDrop</enum>
+            </property>
+            <property name="resizeMode">
+             <enum>QListView::Fixed</enum>
+            </property>
+            <property name="viewMode">
+             <enum>QListView::ListMode</enum>
             </property>
            </widget>
           </item>
          </layout>
         </widget>
         <widget class="QWidget" name="verticalLayoutWidget_3">
-         <layout class="QVBoxLayout" name="verticalLayout_4">
+         <layout class="QVBoxLayout" name="objectLayout">
           <property name="spacing">
            <number>3</number>
           </property>
@@ -210,6 +234,9 @@
             </property>
             <property name="text">
              <string>World Contents</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
             </property>
            </widget>
           </item>
@@ -230,30 +257,40 @@
             <property name="spacing">
              <number>4</number>
             </property>
+            <property name="topMargin">
+             <number>5</number>
+            </property>
             <item>
-             <widget class="QSpinBox" name="numberBox">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
+             <widget class="QToolButton" name="saveTemplate">
+              <property name="text">
+               <string>Save contents</string>
               </property>
-              <property name="minimumSize">
+              <property name="icon">
+               <iconset resource="floatworld.qrc">
+                <normaloff>:/icons/save.png</normaloff>:/icons/save.png</iconset>
+              </property>
+              <property name="iconSize">
                <size>
-                <width>0</width>
-                <height>25</height>
+                <width>32</width>
+                <height>32</height>
                </size>
               </property>
-              <property name="font">
-               <font>
-                <pointsize>14</pointsize>
-               </font>
+             </widget>
+            </item>
+            <item>
+             <widget class="QToolButton" name="loadTemplate">
+              <property name="text">
+               <string>Load contents</string>
               </property>
-              <property name="minimum">
-               <number>1</number>
+              <property name="icon">
+               <iconset resource="floatworld.qrc">
+                <normaloff>:/icons/open.png</normaloff>:/icons/open.png</iconset>
               </property>
-              <property name="maximum">
-               <number>200</number>
+              <property name="iconSize">
+               <size>
+                <width>32</width>
+                <height>32</height>
+               </size>
               </property>
              </widget>
             </item>
@@ -276,7 +313,7 @@
             <item>
              <widget class="QToolButton" name="copyObject">
               <property name="text">
-               <string/>
+               <string>Clone object</string>
               </property>
               <property name="icon">
                <iconset resource="floatworld.qrc">
@@ -293,7 +330,7 @@
             <item>
              <widget class="QToolButton" name="addObject">
               <property name="text">
-               <string>...</string>
+               <string>Add object</string>
               </property>
               <property name="icon">
                <iconset resource="floatworld.qrc">
@@ -310,7 +347,7 @@
             <item>
              <widget class="QToolButton" name="removeObject">
               <property name="text">
-               <string>...</string>
+               <string>Remove object</string>
               </property>
               <property name="icon">
                <iconset resource="floatworld.qrc">
@@ -325,19 +362,32 @@
              </widget>
             </item>
             <item>
-             <widget class="QToolButton" name="toolButton">
-              <property name="text">
-               <string>...</string>
+             <widget class="QSpinBox" name="numberBox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
               </property>
-              <property name="icon">
-               <iconset resource="floatworld.qrc">
-                <normaloff>:/icons/open.png</normaloff>:/icons/open.png</iconset>
-              </property>
-              <property name="iconSize">
+              <property name="minimumSize">
                <size>
-                <width>32</width>
-                <height>32</height>
+                <width>0</width>
+                <height>25</height>
                </size>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>14</pointsize>
+               </font>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>200</number>
               </property>
              </widget>
             </item>
@@ -372,6 +422,9 @@
            </property>
            <property name="text">
             <string>Object Parameters</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
            </property>
           </widget>
          </item>
@@ -429,22 +482,6 @@
  <connections>
   <connection>
    <sender>buttonBox</sender>
-   <signal>accepted()</signal>
-   <receiver>NewWorldDialog</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>157</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>buttonBox</sender>
    <signal>rejected()</signal>
    <receiver>NewWorldDialog</receiver>
    <slot>reject()</slot>
@@ -455,6 +492,22 @@
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>NewWorldDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
      <y>274</y>
     </hint>
    </hints>
