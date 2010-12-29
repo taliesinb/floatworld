@@ -31,6 +31,12 @@ RegisterVar(PhasedSkinnerBlock, phase);
 RegisterBinding(PhasedSkinnerBlock, period, "period", 1, 20);
 RegisterBinding(PhasedSkinnerBlock, phase, "phase");
 
+RegisterClass(ExplodingBlock, Block);
+RegisterVar(ExplodingBlock, radius);
+RegisterVar(ExplodingBlock, suicide);
+RegisterBinding(ExplodingBlock, radius, "radius", 1, 20);
+RegisterBinding(ExplodingBlock, suicide, "suicide");
+
 Block::Block()
 {
     draw_filled = false;
@@ -122,7 +128,7 @@ void SkinnerBlock::Interact(Creat&)
     if (touch_count++ >= threshold)
     {
         touch_count = 0;
-        Circle spot;
+        EnergyDisk spot;
         spot.pos = pos;
         spot.radius = radius;
         spot.energy = reward;
@@ -162,3 +168,19 @@ void PhasedSkinnerBlock::Interact(Creat& c)
         c.energy -= 50;
 }
 
+ExplodingBlock::ExplodingBlock()
+{
+    radius = 5;
+    suicide = false;
+}
+
+void ExplodingBlock::Interact(Creat &c)
+{
+    int r = radius * radius;
+    for (int dr = -radius; dr <= radius; dr++)
+        for (int dc = -radius; dc <= radius; dc++)
+            if (dr * dr + dc * dc < r)
+                if (Creat* victim = world->CreatAt(world->Wrap(pos + Pos(dr, dc))))
+                    if (suicide || victim != &c) victim->alive = false;
+
+}

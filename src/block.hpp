@@ -78,4 +78,15 @@ public:
     void Update();
 };
 
+class ExplodingBlock : public Block
+{
+public:
+    int radius;
+    bool suicide;
+
+    ExplodingBlock();
+
+    void Interact(Creat &c);
+};
+
 #endif

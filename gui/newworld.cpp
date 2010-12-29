@@ -105,7 +105,7 @@ void NewWorldDialog::CreateDefaultObjects()
     world->SetNumber(0);
     ui->objectTable->addItem(world);
 
-    ObjectListItem* circle = new ObjectListItem(Class::Lookup("Circle"));
+    ObjectListItem* circle = new ObjectListItem(Class::Lookup("EnergyDisk"));
     circle->SetNumber(5);
     ui->objectTable->addItem(circle);
 

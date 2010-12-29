@@ -11,27 +11,27 @@ RegisterBinding(Shape, energy, "Einc", -5,5,0.1);
 RegisterBinding(Shape, ratio,  "fill", 0,1,0.1);
 RegisterBinding(Shape, p_jump, "pjump", 0, 1, 0.001);
 
-RegisterClass(Circle, Shape);
-RegisterVar(Circle, radius);
-RegisterBinding(Circle, radius, "radius", 0, 100);
+RegisterClass(EnergyDisk, Shape);
+RegisterVar(EnergyDisk, radius);
+RegisterBinding(EnergyDisk, radius, "radius", 0, 100);
 
-RegisterClass(GaussianCircle, Circle);
+RegisterClass(EnergyGaussian, EnergyDisk);
 
-RegisterClass(Annalus, Shape);
-RegisterVar(Annalus, radius1);
-RegisterVar(Annalus, radius2);
+RegisterClass(EnergyAnnalus, Shape);
+RegisterVar(EnergyAnnalus, radius1);
+RegisterVar(EnergyAnnalus, radius2);
 
-RegisterBinding(Annalus, radius1, "inner radius", 0, 20, 1);
-RegisterBinding(Annalus, radius2, "outer radius", 0, 20, 1);
+RegisterBinding(EnergyAnnalus, radius1, "inner radius", 0, 20, 1);
+RegisterBinding(EnergyAnnalus, radius2, "outer radius", 0, 20, 1);
 
-RegisterClass(Rectangle, Shape);
-RegisterVar(Rectangle, width);
-RegisterVar(Rectangle, length);
-RegisterVar(Rectangle, angle);
+RegisterClass(EnergyRectangle, Shape);
+RegisterVar(EnergyRectangle, width);
+RegisterVar(EnergyRectangle, length);
+RegisterVar(EnergyRectangle, angle);
 
-RegisterBinding(Rectangle, width, "width", 0, 30);
-RegisterBinding(Rectangle, length, "length", 0, 30);
-RegisterBinding(Rectangle, angle, "angle", 0, 1, 0.05);
+RegisterBinding(EnergyRectangle, width, "width", 0, 30);
+RegisterBinding(EnergyRectangle, length, "length", 0, 30);
+RegisterBinding(EnergyRectangle, angle, "angle", 0, 1, 0.05);
 
 Shape::Shape()
     : threshold(5),
@@ -57,17 +57,17 @@ void Shape::Update()
         MoveRandom();
 }
 
-Circle::Circle()
+EnergyDisk::EnergyDisk()
 {
     radius = 10;
 }
 
-float Circle::Area()
+float EnergyDisk::Area()
 {
     return 3.141519 * radius * radius;
 }
 
-void Circle::DrawFull(Matrix& m)
+void EnergyDisk::DrawFull(Matrix& m)
 {
     float r2 = radius * radius;
     for (int i = -radius; i <= radius; i++)
@@ -77,7 +77,7 @@ void Circle::DrawFull(Matrix& m)
 }
 
 
-void Circle::DrawStochastic(Matrix& m, int n)
+void EnergyDisk::DrawStochastic(Matrix& m, int n)
 {
     float r2 = radius * radius;
     float de = energy / ratio;
@@ -92,19 +92,19 @@ void Circle::DrawStochastic(Matrix& m, int n)
     }
 }
 
-Annalus::Annalus()
+EnergyAnnalus::EnergyAnnalus()
     : radius1(5),
     radius2(10)
 {
 
 }
 
-float Annalus::Area()
+float EnergyAnnalus::Area()
 {
     return 3.14159 * (radius2 * radius2 - radius1 * radius1);
 }
 
-void Annalus::DrawFull(Matrix& m)
+void EnergyAnnalus::DrawFull(Matrix& m)
 {
     float ir2 = radius1 * radius1;
     float or2 = radius2 * radius2;
@@ -116,7 +116,7 @@ void Annalus::DrawFull(Matrix& m)
     }
 }
 
-void Annalus::DrawStochastic(Matrix& m, int n)
+void EnergyAnnalus::DrawStochastic(Matrix& m, int n)
 {
     float ir2 = radius1 * radius1;
     float or2 = radius2 * radius2;
@@ -133,17 +133,17 @@ void Annalus::DrawStochastic(Matrix& m, int n)
     }
 }
 
-Rectangle::Rectangle()
+EnergyRectangle::EnergyRectangle()
     : width(3), length(20), angle(0)
 {  
 }
 
-float Rectangle::Area()
+float EnergyRectangle::Area()
 {
     return length * width;
 }
 
-void Rectangle::DrawFull(Matrix& m)
+void EnergyRectangle::DrawFull(Matrix& m)
 {
     float ang = FMod(2 * angle, 1) / 2;
     bool xy = false;
@@ -184,7 +184,7 @@ void Rectangle::DrawFull(Matrix& m)
     //angle += 0.0012;
 }
 
-void Rectangle::DrawStochastic(Matrix& m, int n)
+void EnergyRectangle::DrawStochastic(Matrix& m, int n)
 {
     float de = energy / ratio;
     for (int i = 0; i < n; i++)
@@ -199,7 +199,7 @@ void Rectangle::DrawStochastic(Matrix& m, int n)
     }
 }
 
-void GaussianCircle::DrawFull(Matrix& m)
+void EnergyGaussian::DrawFull(Matrix& m)
 {
     float r2 = radius * radius;
     for (int i = -radius; i <= radius; i++)
@@ -210,7 +210,7 @@ void GaussianCircle::DrawFull(Matrix& m)
     }
 }
 
-void GaussianCircle::DrawStochastic(Matrix& m, int n)
+void EnergyGaussian::DrawStochastic(Matrix& m, int n)
 {
     float r2 = radius * radius;
     float de = energy / ratio;

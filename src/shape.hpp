@@ -30,20 +30,20 @@ class Shape : public Occupant
     virtual void DrawStochastic(Matrix& m, int n) = 0;
 };
 
-class Circle : public Shape
+class EnergyDisk : public Shape
 {
   public:
 
     int radius;
 
-    Circle();
+    EnergyDisk();
     
     float Area();
     void DrawFull(Matrix& m);
     void DrawStochastic(Matrix& m, int n);
 };
 
-class GaussianCircle : public Circle
+class EnergyGaussian : public EnergyDisk
 {
   public:
 
@@ -51,21 +51,21 @@ class GaussianCircle : public Circle
     void DrawStochastic(Matrix& m, int n);
 };
 
-class Annalus : public Shape
+class EnergyAnnalus : public Shape
 {
   public:
 
     float radius1;
     float radius2;
     
-    Annalus();
+    EnergyAnnalus();
     
     float Area();
     void DrawFull(Matrix& m);
     void DrawStochastic(Matrix& m, int n);
 };
 
-class Rectangle : public Shape
+class EnergyRectangle : public Shape
 {
   public:
 
@@ -73,7 +73,7 @@ class Rectangle : public Shape
     int length;
     float angle;
 
-    Rectangle();
+    EnergyRectangle();
 
     float Area();
     void DrawFull(Matrix& m);
