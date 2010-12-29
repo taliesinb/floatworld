@@ -640,37 +640,6 @@ void World::Reset()
     RemoveOccupants();
 }
 
-/*
-void Grid::LoadOccupant(istream& is)
-{
-    int id;
-    char name[128];
-
-    is >> id;
-    is >> name;
-
-    Occupant* occ;
-    if (id == -1)
-        occ = dynamic_cast<Occupant*>(MetaClass::MakeNew(name));
-    else
-        occ = &creats[id];
-
-    occ->grid = this;
-    occ->Read(is);
-    occ->Place();
-}
-
-
-void Grid::SaveOccupant(std::ostream& os, Occupant* occ)
-{
-    Creat* cr = dynamic_cast<Creat*>(occ);
-
-    os << (cr ? cr->id : -1) << endl
-       << occ->Name() << endl;
-
-    occ->Write(os);
-}
-*/
 Matrix World::FindDominantGenome()
 {
     enable_mutation = false;

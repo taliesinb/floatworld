@@ -2,14 +2,23 @@
 #include "widgets.hpp"
 #include "mainwindow.hpp"
 #include "ui_newworld.h"
+#include "src/metaclass.hpp"
+
+#include <fstream>
 #include <sstream>
+#include <QFileDialog>
+
+ObjectListItem::ObjectListItem()
+{
+    number = 0;
+    prototype = NULL;
+}
 
 ObjectListItem::ObjectListItem(Class* mc)
 {
     number = 1;
-    mclass = mc;
-    UpdateLabel();
     prototype = mc->maker();
+    UpdateLabel();
 }
 
 ObjectListItem::~ObjectListItem()
@@ -26,9 +35,9 @@ void ObjectListItem::SetNumber(int num)
 void ObjectListItem::UpdateLabel()
 {
     if (number == 0)
-        setText(mclass->name);
+        setText(prototype->Name());
     else
-        setText(QString("%1 x %2").arg(number).arg(mclass->name));
+        setText(QString("%1 x %2").arg(number).arg(prototype->Name()));
 }
 
 NewWorldDialog::NewWorldDialog(QWidget *parent) :
@@ -94,6 +103,8 @@ NewWorldDialog::NewWorldDialog(QWidget *parent) :
     ui->splitter->setStretchFactor(1,2);
     ui->objectTable->setFocus();
 
+    connect(ui->saveTemplate, SIGNAL(released()), this, SLOT(SaveTemplate()));
+    connect(ui->loadTemplate, SIGNAL(released()), this, SLOT(LoadTemplate()));
     connect(ui->copyObject, SIGNAL(released()), this, SLOT(CopyObject()));
     connect(ui->addObject, SIGNAL(released()), this, SLOT(AddObject()));
     connect(ui->removeObject, SIGNAL(released()), this, SLOT(RemoveObject()));
@@ -105,6 +116,70 @@ NewWorldDialog::NewWorldDialog(QWidget *parent) :
 NewWorldDialog::~NewWorldDialog()
 {
     delete ui;
+}
+
+std::ostream& operator<<(std::ostream& os, ObjectListItem* & item)
+{
+    os << item->number << ": ";
+    return os << *item->prototype;
+}
+
+std::istream& operator>>(std::istream& is, ObjectListItem* & item)
+{
+    item = new ObjectListItem;
+    is >> item->number >> ": ";
+    item->prototype = Class::Create(is);
+    return is;
+}
+
+QLinkedList<ObjectListItem*> NewWorldDialog::AllItems()
+{
+    QLinkedList<ObjectListItem*> items;
+    for (int i = 0; i < ui->objectTable->count(); i++)
+        items.push_back(dynamic_cast<ObjectListItem*>(ui->objectTable->item(i)));
+    return items;
+}
+
+void NewWorldDialog::SaveTemplate()
+{
+    std::ofstream f;
+
+    QString fileName = QFileDialog::getSaveFileName(this,\
+    "Save prototype as", QDir::homePath(), tr("Floatworld prototypes (*.proto)"));
+    if (fileName.size() <= 0) return;
+
+    f.open(fileName.toUtf8());
+
+    QLinkedList<ObjectListItem*> items = AllItems();
+    f << items;
+    f << std::endl;
+
+    f.close();
+}
+
+void NewWorldDialog::LoadTemplate()
+{
+    std::ifstream f;
+
+    ui->objectTable->clear();
+
+    QString fileName = QFileDialog::getOpenFileName(this,\
+    "Load prototype", QDir::homePath(), tr("Floatworld prototypes (*.proto)"));
+    if (fileName.size() <= 0) return;
+
+    f.open(fileName.toUtf8());
+
+    QLinkedList<ObjectListItem*> items;
+    f >> items;
+
+    selected_object = NULL;
+    foreach(ObjectListItem* item, items)
+    {
+        ui->objectTable->addItem(item);
+        item->UpdateLabel();
+    }
+
+    f.close();
 }
 
 void NewWorldDialog::AddObject()
@@ -183,9 +258,10 @@ void NewWorldDialog::CreateWorld()
     MainWindow* mw = new MainWindow();
 
     World* w = NULL;
-    for(int i = 0; i < ui->objectTable->count(); i++)
+
+    foreach(ObjectListItem* item, AllItems())
     {
-        w = dynamic_cast<World*>(dynamic_cast<ObjectListItem*>(ui->objectTable->item(i))->prototype);
+        w = dynamic_cast<World*>(item->prototype);
         if (w)
         {
             std::stringstream s2;
@@ -206,10 +282,8 @@ void NewWorldDialog::CreateWorld()
 
     mw->qworld->SetSize(rows, cols);
 
-    ObjectListItem* item;
-    for(int i = 0; i < ui->objectTable->count(); i++)
+    foreach(ObjectListItem* item, AllItems())
     {
-        item = dynamic_cast<ObjectListItem*>(ui->objectTable->item(i));
         if (Creat* creat = dynamic_cast<Creat*>(item->prototype))
         {
             mw->world->initial_brain = &creat->weights;

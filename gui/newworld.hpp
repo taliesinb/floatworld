@@ -19,12 +19,16 @@ public:
     Object* prototype;
     Class* mclass;
 
+    ObjectListItem();
     ObjectListItem(Class* mc);
     ~ObjectListItem();
 
     void UpdateLabel();
     void SetNumber(int num);
 };
+
+std::ostream& operator<<(std::ostream&, ObjectListItem*&);
+std::istream& operator>>(std::istream&, ObjectListItem*&);
 
 class NewWorldDialog : public QDialog
 {
@@ -35,6 +39,7 @@ public:
     ~NewWorldDialog();
     Object* selected_object;
 
+    QLinkedList<ObjectListItem*> AllItems();
     ObjectListItem* CurrentItem();
 
 private:
@@ -48,6 +53,8 @@ public slots:
     void CopyObject();
 
     void CreateWorld();
+    void SaveTemplate();
+    void LoadTemplate();
 };
 
 #endif // NEWWORLD_HPP
