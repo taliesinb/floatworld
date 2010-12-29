@@ -118,6 +118,7 @@
    <addaction name="actionNew"/>
    <addaction name="actionLoad"/>
    <addaction name="actionSave"/>
+   <addaction name="actionRestart"/>
    <addaction name="separator"/>
    <addaction name="actionStop"/>
    <addaction name="actionPlaySlowest"/>
@@ -619,6 +620,18 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Backspace</string>
+   </property>
+  </action>
+  <action name="actionRestart">
+   <property name="icon">
+    <iconset resource="floatworld.qrc">
+     <normaloff>:/icons/undo.png</normaloff>:/icons/undo.png</iconset>
+   </property>
+   <property name="text">
+    <string>Restart</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
    </property>
   </action>
  </widget>

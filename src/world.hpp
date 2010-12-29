@@ -83,7 +83,6 @@ public:
     int interaction_type;
 
     bool enable_mutation;
-    bool enable_respawn;
 
     int path_energy;
     bool record_lineages;

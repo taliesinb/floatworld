@@ -80,7 +80,21 @@ NewWorldDialog::NewWorldDialog(QWidget *parent) :
     connect(ui->removeObject, SIGNAL(released()), this, SLOT(RemoveObject()));
     connect(ui->objectTable, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)), this, SLOT(SelectObject(QListWidgetItem*)));
     connect(ui->numberBox, SIGNAL(valueChanged(int)), this, SLOT(SetObjectNumber(int)));
+
     connect(this, SIGNAL(accepted()), SLOT(CreateWorld()));
+}
+
+void NewWorldDialog::WorldSizeChanged()
+{
+    int rows, cols;
+    if (ui->radioSmallSize->isChecked()) rows = cols = 50;
+    if (ui->radioMediumSize->isChecked()) rows = cols = 100;
+    if (ui->radioLargeSize->isChecked()) rows = cols = 150;
+    if (ui->radioCustomSize->isChecked()) {
+        rows = ui->rowsBox->value();
+        cols = ui->columnsBox->value();
+    }
+    GetWorld()->SetSize(rows, cols);
 }
 
 void NewWorldDialog::CreateDefaultObjects()
@@ -101,9 +115,10 @@ void NewWorldDialog::CreateDefaultObjects()
     creat->weights(left - offset, random) = 1.5;
 
     ObjectListItem* world = new ObjectListItem(Class::Lookup("World"));
-    dynamic_cast<World*>(world->prototype)->SetSize(10,10);
     world->SetNumber(0);
     ui->objectTable->addItem(world);
+    ui->radioSmallSize->setChecked(true);
+    WorldSizeChanged();
 
     ObjectListItem* circle = new ObjectListItem(Class::Lookup("EnergyDisk"));
     circle->SetNumber(5);
@@ -169,11 +184,21 @@ void NewWorldDialog::LoadTemplate()
     f.close();
 }
 
+World* NewWorldDialog::GetWorld()
+{
+    foreach(ObjectListItem* item, AllItems())
+        if (World* world = dynamic_cast<World*>(item->prototype)) return world;
+    return NULL;
+}
+
 std::ostream& operator<<(std::ostream& s, NewWorldDialog* d)
 {
+    d->WorldSizeChanged();
+
     QLinkedList<ObjectListItem*> items = d->AllItems();
     s << items;
     s << std::endl;
+    return s;
 }
 
 std::istream& operator>>(std::istream& s, NewWorldDialog* d)
@@ -189,6 +214,19 @@ std::istream& operator>>(std::istream& s, NewWorldDialog* d)
         d->ui->objectTable->addItem(item);
         item->UpdateLabel();
     }
+
+    World* w = d->GetWorld();
+    int r = w->rows, c = w->cols;
+    if      (r == 50  && c == 50)  d->ui->radioSmallSize->setChecked(true);
+    else if (r == 100 && c == 100) d->ui->radioMediumSize->setChecked(true);
+    else if (r == 150 && c == 150) d->ui->radioLargeSize->setChecked(true);
+    else {
+        d->ui->radioCustomSize->setChecked(true);
+        d->ui->rowsBox->setValue(r);
+        d->ui->columnsBox->setValue(c);
+    }
+
+    return s;
 }
 
 void NewWorldDialog::AddObject()
@@ -264,6 +302,8 @@ void NewWorldDialog::SetObjectNumber(int number)
 
 void NewWorldDialog::CreateWorld()
 {
+    WorldSizeChanged();
+
     MainWindow* mw = new MainWindow();
 
     World* w = NULL;
@@ -280,16 +320,7 @@ void NewWorldDialog::CreateWorld()
         }
     }
 
-    int rows, cols;
-    if (ui->radioSmallSize->isChecked()) rows = cols = 50;
-    if (ui->radioMediumSize->isChecked()) rows = cols = 100;
-    if (ui->radioLargeSize->isChecked()) rows = cols = 150;
-    if (ui->radioCustomSize->isChecked()) {
-        rows = ui->rowsBox->value();
-        cols = ui->columnsBox->value();
-    }
-
-    mw->qworld->SetSize(rows, cols);
+    mw->qworld->SetSize(w->rows, w->cols);
 
     foreach(ObjectListItem* item, AllItems())
     {

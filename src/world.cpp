@@ -29,7 +29,6 @@ RegisterVar(World, births)
 RegisterVar(World, num_creats)
 RegisterVar(World, interaction_type)
 RegisterVar(World, enable_mutation)
-RegisterVar(World, enable_respawn)
 RegisterVar(World, path_energy)
 RegisterVar(World, birth_cost)
 RegisterVar(World, record_lineages)
@@ -50,8 +49,7 @@ RegisterBinding(World, num_creats, "population");
 RegisterBinding(World, interaction_type, "interaction", "none\npenalty\nattack\nzombify\nparasitism\npredation\nshoving\nconga\nmutualism\naltruism\nDNA blend\nDNA push\nDNA pull\nDNA marry");
 RegisterBinding(World, mutation_prob, "mutation probability", 0, 1, 0.02);
 RegisterBinding(World, initial_energy, "initial energy", -50, 50);
-RegisterBinding(World, enable_respawn, "auto respawn");
-RegisterBinding(World, initial_mutations, "respawn diversity", 0, 20);
+RegisterBinding(World, initial_mutations, "initial diversity", 0, 20);
 RegisterBinding(World, enable_mutation, "enable mutation");
 //RegisterBinding(World, mutation_color_drift, "plumage drift", BoolHook());
 RegisterBinding(World, neural_net_iterations, "neural iterations", 1, 10);
@@ -105,7 +103,6 @@ World::World()
 
     energy_decay_rate = 0.0;
     enable_mutation = true;
-    enable_respawn = false;
     path_energy = 0;
 
     mutation_color_drift = true;
@@ -572,13 +569,6 @@ void World::Step()
     }
 
     if (energy_decay_rate != 0.0) energy *= (1.0 - energy_decay_rate);
-
-    if (num_creats == 0 && enable_respawn)
-    {
-        initial_energy *= 2; // just to get them off to a good start
-        AddCreats(300, true);
-        initial_energy /= 2;
-    }
 
     timestep++;
 }

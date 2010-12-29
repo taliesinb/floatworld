@@ -384,9 +384,7 @@ QRgb WhiteBlueColorFunc(float value)
 void QWorld::Draw()
 {
     energy->color_func = draw_energy ? &WhiteBlueColorFunc : &BlackColorFunc;
-
-    if (selected_occupant)
-        energy->highlighted = selected_occupant->pos;
+    if (selected_occupant) energy->highlighted = selected_occupant->pos;
     update();
 }
 

@@ -37,10 +37,12 @@ class NewWorldDialog : public QDialog
 public:
     explicit NewWorldDialog(QWidget *parent = 0);
     ~NewWorldDialog();
+
     Object* selected_object;
 
     QLinkedList<ObjectListItem*> AllItems();
     ObjectListItem* CurrentItem();
+    World* GetWorld();
 
     void CreateDefaultObjects();
     void LoadFromStream(std::istream&);
@@ -50,6 +52,7 @@ private:
     Ui::NewWorldDialog *ui;
 
 public slots:
+    void WorldSizeChanged();
     void AddObject();
     void RemoveObject();
     void SelectObject(QListWidgetItem*);

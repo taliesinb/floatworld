@@ -131,6 +131,7 @@ void MainWindow::speed_trigger(QAction* action)
 
 void MainWindow::SetSpeed(float s)
 {
+    if (speed == s && s == 0) return; // already stopped
     if (world_cache.size()) world_cache.clear();
     if (speed == s)
         actionStop->trigger();
@@ -168,6 +169,7 @@ void MainWindow::Tick()
     qworld->SetDrawFraction(speed > 1 ? 1.0 : (stepper - floor(stepper)));
     qworld->Draw();
     world->UpdateQtHook();
+    if (world->num_creats == 0) Stop();
 }
 
 void MainWindow::ff_pressed()
@@ -180,8 +182,16 @@ void MainWindow::ff_released()
     world->UpdateQtHook();
     speed_trigger(speed_group.checkedAction());
 }
+
+void MainWindow::Stop()
+{
+    actionStop->trigger();
+}
+
 void MainWindow::on_actionStep_triggered()
 {
+    Stop();
+
     std::ostringstream str;
     human_readable = false;
     str << *qworld->world;
@@ -195,6 +205,8 @@ void MainWindow::on_actionStep_triggered()
 
 void MainWindow::on_actionStepBack_triggered()
 {
+    if (speed) return;
+
     if (world_cache.size()) {
         const char* str = world_cache.back().toAscii();
         std::istringstream s(str);
@@ -213,6 +225,7 @@ void MainWindow::on_actionStepBack_triggered()
 
 void MainWindow::on_actionIndividualStep_triggered()
 {
+    Stop();
     qworld->UpdateOccupant();
 }
 
@@ -254,6 +267,8 @@ void MainWindow::on_actionDeleteSelected_triggered()
 
 void MainWindow::on_actionNew_triggered()
 {
+    Stop();
+
     NewWorldDialog* dialog = new NewWorldDialog(this);
     const char* c = prototype.toAscii();
     std::istringstream s(c);
@@ -264,8 +279,23 @@ void MainWindow::on_actionNew_triggered()
     }
 }
 
+void MainWindow::on_actionRestart_triggered()
+{
+    Stop();
+
+    NewWorldDialog* dialog = new NewWorldDialog(this);
+    const char* c = prototype.toAscii();
+    std::istringstream s(c);
+    s >> dialog;
+    dialog->GetWorld()->rng.Seed(rand() % 65536);
+    dialog->CreateWorld();
+    this->deleteLater();
+}
+
 void MainWindow::on_actionSave_triggered()
 {
+    Stop();
+
     QString fileName = QFileDialog::getSaveFileName(this,\
     "Save World as", QDir::homePath(), tr("Floatworlds (*.fw)"));
     if (fileName.size() > 0)
@@ -279,6 +309,8 @@ void MainWindow::on_actionSave_triggered()
 
 void MainWindow::on_actionLoad_triggered()
 {
+    Stop();
+
     QString fileName = QFileDialog::getOpenFileName(this,\
     "Load World", QDir::homePath(), tr("Floatworlds (*.fw)"));
 
