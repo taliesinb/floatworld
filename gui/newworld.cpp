@@ -67,8 +67,25 @@ NewWorldDialog::NewWorldDialog(QWidget *parent) :
     }
     ui->prototypeList->setCurrentRow(0);
 
-    Creat* creat = new Creat();
+    ui->objectTable->setDragDropMode(QAbstractItemView::InternalMove);
 
+    ui->splitter->setStretchFactor(0,3);
+    ui->splitter->setStretchFactor(1,2);
+    ui->objectTable->setFocus();
+
+    connect(ui->saveTemplate, SIGNAL(released()), this, SLOT(SaveTemplate()));
+    connect(ui->loadTemplate, SIGNAL(released()), this, SLOT(LoadTemplate()));
+    connect(ui->copyObject, SIGNAL(released()), this, SLOT(CopyObject()));
+    connect(ui->addObject, SIGNAL(released()), this, SLOT(AddObject()));
+    connect(ui->removeObject, SIGNAL(released()), this, SLOT(RemoveObject()));
+    connect(ui->objectTable, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)), this, SLOT(SelectObject(QListWidgetItem*)));
+    connect(ui->numberBox, SIGNAL(valueChanged(int)), this, SLOT(SetObjectNumber(int)));
+    connect(this, SIGNAL(accepted()), SLOT(CreateWorld()));
+}
+
+void NewWorldDialog::CreateDefaultObjects()
+{
+    Creat* creat = new Creat();
     enum {
         energyF = 0, energyL, energyR, creatF, creatL, creatR, dirA, dirB,
         cons, energy, age, random,
@@ -97,20 +114,6 @@ NewWorldDialog::NewWorldDialog(QWidget *parent) :
     adam->SetNumber(40);
     ui->objectTable->addItem(adam);
 
-    ui->objectTable->setDragDropMode(QAbstractItemView::InternalMove);
-
-    ui->splitter->setStretchFactor(0,3);
-    ui->splitter->setStretchFactor(1,2);
-    ui->objectTable->setFocus();
-
-    connect(ui->saveTemplate, SIGNAL(released()), this, SLOT(SaveTemplate()));
-    connect(ui->loadTemplate, SIGNAL(released()), this, SLOT(LoadTemplate()));
-    connect(ui->copyObject, SIGNAL(released()), this, SLOT(CopyObject()));
-    connect(ui->addObject, SIGNAL(released()), this, SLOT(AddObject()));
-    connect(ui->removeObject, SIGNAL(released()), this, SLOT(RemoveObject()));
-    connect(ui->objectTable, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)), this, SLOT(SelectObject(QListWidgetItem*)));
-    connect(ui->numberBox, SIGNAL(valueChanged(int)), this, SLOT(SetObjectNumber(int)));
-    connect(this, SIGNAL(accepted()), SLOT(CreateWorld()));
 }
 
 NewWorldDialog::~NewWorldDialog()
@@ -149,11 +152,7 @@ void NewWorldDialog::SaveTemplate()
     if (fileName.size() <= 0) return;
 
     f.open(fileName.toUtf8());
-
-    QLinkedList<ObjectListItem*> items = AllItems();
-    f << items;
-    f << std::endl;
-
+    f << this;
     f.close();
 }
 
@@ -161,25 +160,35 @@ void NewWorldDialog::LoadTemplate()
 {
     std::ifstream f;
 
-    ui->objectTable->clear();
-
     QString fileName = QFileDialog::getOpenFileName(this,\
     "Load prototype", QDir::homePath(), tr("Floatworld prototypes (*.proto)"));
     if (fileName.size() <= 0) return;
 
     f.open(fileName.toUtf8());
+    f >> this;
+    f.close();
+}
+
+std::ostream& operator<<(std::ostream& s, NewWorldDialog* d)
+{
+    QLinkedList<ObjectListItem*> items = d->AllItems();
+    s << items;
+    s << std::endl;
+}
+
+std::istream& operator>>(std::istream& s, NewWorldDialog* d)
+{
+    d->ui->objectTable->clear();
 
     QLinkedList<ObjectListItem*> items;
-    f >> items;
+    s >> items;
 
-    selected_object = NULL;
+    d->selected_object = NULL;
     foreach(ObjectListItem* item, items)
     {
-        ui->objectTable->addItem(item);
+        d->ui->objectTable->addItem(item);
         item->UpdateLabel();
     }
-
-    f.close();
 }
 
 void NewWorldDialog::AddObject()
@@ -303,6 +312,10 @@ void NewWorldDialog::CreateWorld()
         }
 
     }
+
+    std::ostringstream os;
+    os << this;
+    mw->prototype = os.str().c_str();
 
     mw->resize(5000,5000); // force a resize to the maximum size
     mw->qworld->Draw();

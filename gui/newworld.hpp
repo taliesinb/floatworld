@@ -42,6 +42,10 @@ public:
     QLinkedList<ObjectListItem*> AllItems();
     ObjectListItem* CurrentItem();
 
+    void CreateDefaultObjects();
+    void LoadFromStream(std::istream&);
+    void SafeToStream(std::ostream&);
+
 private:
     Ui::NewWorldDialog *ui;
 
@@ -55,6 +59,13 @@ public slots:
     void CreateWorld();
     void SaveTemplate();
     void LoadTemplate();
+
+    friend std::ostream& operator<<(std::ostream&, NewWorldDialog*);
+    friend std::istream& operator>>(std::istream&, NewWorldDialog*);
 };
+
+std::ostream& operator<<(std::ostream&, NewWorldDialog*);
+std::istream& operator>>(std::istream&, NewWorldDialog*);
+
 
 #endif // NEWWORLD_HPP

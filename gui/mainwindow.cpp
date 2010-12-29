@@ -255,6 +255,9 @@ void MainWindow::on_actionDeleteSelected_triggered()
 void MainWindow::on_actionNew_triggered()
 {
     NewWorldDialog* dialog = new NewWorldDialog(this);
+    const char* c = prototype.toAscii();
+    std::istringstream s(c);
+    s >> dialog;
     if (dialog->exec() == QDialog::Accepted)
     {
         this->deleteLater();

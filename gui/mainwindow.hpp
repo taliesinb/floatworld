@@ -25,6 +25,7 @@ public:
     Matrix adam;
     QElapsedTimer timer;
     QTimer ticker;
+    QString prototype;
     float speed;
     float stepper;
     float last_stepper;
