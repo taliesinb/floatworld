@@ -193,54 +193,6 @@ World* NewWorldDialog::GetWorld()
     return NULL;
 }
 
-std::ostream& operator<<(std::ostream& s, NewWorldDialog* d)
-{
-    d->WorldSizeChanged();
-
-    QString str = d->ui->commentBox->toPlainText();
-    s << "\"comment\": " << str << std::endl;
-
-    QLinkedList<ObjectListItem*> items = d->AllItems();
-    s << items;
-    s << std::endl;
-    return s;
-}
-
-std::istream& operator>>(std::istream& s, NewWorldDialog* d)
-{
-    d->ui->objectTable->clear();
-    d->ui->commentBox->clear();
-
-    QString str;
-    s >> "\"comment\": " >> str >> whitespace;
-    d->ui->commentBox->setPlainText(str);
-
-    QLinkedList<ObjectListItem*> items;
-    s >> items;
-
-    d->selected_object = NULL;
-    foreach(ObjectListItem* item, items)
-    {
-        d->ui->objectTable->addItem(item);
-        item->UpdateLabel();
-    }
-
-    World* w = d->GetWorld();
-    int r = w->rows, c = w->cols;
-    if      (r == 50  && c == 50)  d->ui->radioSmallSize->setChecked(true);
-    else if (r == 100 && c == 100) d->ui->radioMediumSize->setChecked(true);
-    else if (r == 150 && c == 150) d->ui->radioLargeSize->setChecked(true);
-    else {
-        d->ui->radioCustomSize->setChecked(true);
-        d->ui->rowsBox->setValue(r);
-        d->ui->columnsBox->setValue(c);
-    }
-
-    d->ui->commentVisibleBox->setChecked(d->ui->commentBox->toPlainText().length() > 0);
-
-    return s;
-}
-
 void NewWorldDialog::AddObject()
 {
     QListWidget& list = *ui->objectTable;
@@ -318,19 +270,12 @@ void NewWorldDialog::CreateWorld()
 
     MainWindow* mw = new MainWindow();
 
-    World* w = NULL;
-
-    foreach(ObjectListItem* item, AllItems())
-    {
-        w = dynamic_cast<World*>(item->prototype);
-        if (w)
-        {
-            std::stringstream s2;
-            s2 << *w;
-            s2 >> *mw->world;
-            break;
-        }
-    }
+    World* w = GetWorld();
+    std::stringstream s2;
+    s2 << *w;
+    s2 >> *mw->world;
+    std::cout << "AFTER CONSTRUCTION:\n";
+    std::cout << *mw->world;
 
     mw->qworld->SetSize(w->rows, w->cols);
 
@@ -340,7 +285,8 @@ void NewWorldDialog::CreateWorld()
         {
             mw->world->initial_brain = &creat->weights;
             mw->world->AddCreats(item->number, true);
-        } else {
+        } else if (dynamic_cast<Occupant*>(item->prototype))
+        {
             std::stringstream s;
             s << *item->prototype;
             for(int i = 0; i < item->number; i++)
@@ -353,14 +299,66 @@ void NewWorldDialog::CreateWorld()
                     for (int j = 0; j < 10; j++) shape->Draw(mw->world->energy);
             }
         }
-
     }
 
     std::ostringstream os;
     os << this;
     mw->prototype = os.str().c_str();
 
-    mw->resize(5000,5000); // force a resize to the maximum size
+    //mw->resize(5000,5000); // force a resize to the maximum size
+    QSize sz = mw->sizeHint();
+    mw->resize(sz.width(), sz.height());
     mw->qworld->Draw();
     mw->show();
+    mw->update();
 }
+
+std::ostream& operator<<(std::ostream& s, NewWorldDialog* d)
+{
+    d->WorldSizeChanged();
+
+    QString str = d->ui->commentBox->toPlainText();
+    s << "\"comment\": " << str << std::endl;
+
+    QLinkedList<ObjectListItem*> items = d->AllItems();
+    s << items;
+    s << std::endl;
+    return s;
+}
+
+std::istream& operator>>(std::istream& s, NewWorldDialog* d)
+{
+    d->ui->objectTable->clear();
+    d->ui->commentBox->clear();
+
+    QString str;
+    s >> "\"comment\": " >> str >> whitespace;
+    d->ui->commentBox->setPlainText(str);
+
+    QLinkedList<ObjectListItem*> items;
+    s >> items;
+
+    d->selected_object = NULL;
+    foreach(ObjectListItem* item, items)
+    {
+        d->ui->objectTable->addItem(item);
+        item->UpdateLabel();
+    }
+
+    World* w = d->GetWorld();
+    int r = w->rows, c = w->cols;
+    if      (r == 50  && c == 50)  d->ui->radioSmallSize->setChecked(true);
+    else if (r == 100 && c == 100) d->ui->radioMediumSize->setChecked(true);
+    else if (r == 150 && c == 150) d->ui->radioLargeSize->setChecked(true);
+    else {
+        d->ui->radioCustomSize->setChecked(true);
+        d->ui->rowsBox->setValue(r);
+        d->ui->columnsBox->setValue(c);
+    }
+
+    d->ui->commentVisibleBox->setChecked(d->ui->commentBox->toPlainText().length() > 0);
+
+    return s;
+}
+
+

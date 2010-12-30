@@ -63,7 +63,7 @@ QWorld::QWorld(QWidget* parent) :
 void QWorld::SetSize(int rows, int cols)
 {
     if (cols < 100) energy->scale = 12;
-    world->SetSize(rows, cols);
+    //world->SetSize(rows, cols);
     setMaximumSize(sizeHint());
 }
 

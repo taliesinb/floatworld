@@ -40,6 +40,8 @@ public:
     MainWindow();
     void SetSpeed(float speed);
 
+    void showEvent(QShowEvent *);
+
 private slots:
 
     void speed_trigger(QAction*);

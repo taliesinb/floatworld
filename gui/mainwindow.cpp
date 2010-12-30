@@ -75,9 +75,17 @@ MainWindow::MainWindow()
         objectComboBox->addItem(name);
     }
     objectComboBox->setCurrentIndex(0);
+
     connect(objectComboBox, SIGNAL(activated(QString)), this, SLOT(ObjectSelected(QString)));
     connect(qworld, SIGNAL(CellClicked(Pos)), this, SLOT(CreateObjectAt(Pos)));
     update();
+}
+
+void MainWindow::showEvent(QShowEvent *)
+{
+    world->UpdateQtHook();
+    qworld->UpdateQtHook();
+    qworld->Draw();
 }
 
 void MainWindow::ObjectSelected(QString s)

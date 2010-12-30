@@ -72,7 +72,7 @@ void EnergyDisk::DrawFull(Matrix& m)
     float r2 = radius * radius;
     for (int i = -radius; i <= radius; i++)
         for (int j = -radius; j <= radius; j++)
-            if (abs(i) + abs(j) < radius || (i * i) + (j * j) < r2)
+            if ((i * i) + (j * j) < r2-1)
                 Inject(m, i, j, energy);
 }
 
@@ -87,7 +87,7 @@ void EnergyDisk::DrawStochastic(Matrix& m, int n)
         do {
             r = rng.Integer(-radius, radius);
             c = rng.Integer(-radius, radius);
-        } while (r * r + c * c > r2);
+        } while (r * r + c * c >= r2);
         Inject(m, r, c, de);
     }
 }
