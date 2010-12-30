@@ -73,6 +73,8 @@ NewWorldDialog::NewWorldDialog(QWidget *parent) :
     ui->splitter->setStretchFactor(1,2);
     ui->objectTable->setFocus();
 
+    ui->commentBox->setVisible(false);
+
     connect(ui->saveTemplate, SIGNAL(released()), this, SLOT(SaveTemplate()));
     connect(ui->loadTemplate, SIGNAL(released()), this, SLOT(LoadTemplate()));
     connect(ui->copyObject, SIGNAL(released()), this, SLOT(CopyObject()));
@@ -80,7 +82,7 @@ NewWorldDialog::NewWorldDialog(QWidget *parent) :
     connect(ui->removeObject, SIGNAL(released()), this, SLOT(RemoveObject()));
     connect(ui->objectTable, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)), this, SLOT(SelectObject(QListWidgetItem*)));
     connect(ui->numberBox, SIGNAL(valueChanged(int)), this, SLOT(SetObjectNumber(int)));
-
+    connect(ui->commentVisibleBox, SIGNAL(toggled(bool)), ui->commentBox, SLOT(setVisible(bool)));
     connect(this, SIGNAL(accepted()), SLOT(CreateWorld()));
 }
 
@@ -195,6 +197,9 @@ std::ostream& operator<<(std::ostream& s, NewWorldDialog* d)
 {
     d->WorldSizeChanged();
 
+    QString str = d->ui->commentBox->toPlainText();
+    s << "\"comment\": " << str << std::endl;
+
     QLinkedList<ObjectListItem*> items = d->AllItems();
     s << items;
     s << std::endl;
@@ -204,6 +209,11 @@ std::ostream& operator<<(std::ostream& s, NewWorldDialog* d)
 std::istream& operator>>(std::istream& s, NewWorldDialog* d)
 {
     d->ui->objectTable->clear();
+    d->ui->commentBox->clear();
+
+    QString str;
+    s >> "\"comment\": " >> str >> whitespace;
+    d->ui->commentBox->setPlainText(str);
 
     QLinkedList<ObjectListItem*> items;
     s >> items;
@@ -225,6 +235,8 @@ std::istream& operator>>(std::istream& s, NewWorldDialog* d)
         d->ui->rowsBox->setValue(r);
         d->ui->columnsBox->setValue(c);
     }
+
+    d->ui->commentVisibleBox->setChecked(d->ui->commentBox->toPlainText().length() > 0);
 
     return s;
 }

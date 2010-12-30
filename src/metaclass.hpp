@@ -7,10 +7,14 @@
 
 #include <iostream>
 #include <QLinkedList>
+#include <QString>
 
 static const char* whitespace = "\t";
 
 std::istream& operator>>(std::istream& is, const char* str);
+
+std::istream& operator>>(std::istream& is, QString& s);
+std::ostream& operator<<(std::ostream& os, QString& s);
 
 extern bool human_readable;
 

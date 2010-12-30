@@ -182,5 +182,4 @@ void ExplodingBlock::Interact(Creat &c)
             if (dr * dr + dc * dc < r)
                 if (Creat* victim = world->CreatAt(world->Wrap(pos + Pos(dr, dc))))
                     if (suicide || victim != &c) victim->alive = false;
-
 }

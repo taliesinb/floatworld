@@ -17,6 +17,49 @@ using namespace std;
 RegisterAbstractClass(Object, None);
 RegisterVar(Object, rng);
 
+std::istream& operator>>(std::istream& s, QString& str)
+{
+    char c;
+
+    s.get(c);
+    assert(c == '\"');
+
+    bool escaped = false;
+    do {
+        s.get(c);
+        if (escaped)
+        {
+            if (c == '"') str.append('"');
+            else if (c == '\\') str.append('\\');
+            else { str.append('\\'); str.append(c); }
+            escaped = false;
+        } else {
+            if (c == '"') break;
+            else if (c == '\\') escaped = true;
+            else str.append(c);
+        }
+    } while(true);
+
+    return s;
+}
+
+std::ostream& operator<<(std::ostream& os, QString& s)
+{
+    QByteArray bytes = s.toAscii();
+    int len = bytes.length();
+
+    os << "\"";
+    for(int i = 0; i < len; i++)
+    {
+        char c = bytes.at(i);
+        if (c == '\\') os << "\\\\";
+        else if (c == '\"') os << "\\\"";
+        else os << c;
+    }
+    os << "\"";
+    return os;
+}
+
 std::istream& operator>>(std::istream& is, const char* str)
 {
     if (str == whitespace)
