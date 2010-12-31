@@ -106,6 +106,7 @@ void NewWorldDialog::CreateDefaultObjects()
         energyF = 0, energyL, energyR, creatF, creatL, creatR, dirA, dirB,
         cons, energy, age, random,
         move = Creat::num_inputs + Creat::num_hidden,
+        interact,
         left,
         right,
         breed,

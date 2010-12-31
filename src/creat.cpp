@@ -35,6 +35,7 @@ const char* neuron_labels = "energy in front\n"
 "hidden 3\n"
 "hidden 4\n"
 "move forward\n"
+"interact\n"
 "turn left\n"
 "turn right\n"
 "reproduce";
@@ -44,6 +45,7 @@ const char* outputs = "hidden 1\n"
                       "hidden 3\n"
                       "hidden 4\n"
                       "move forward\n"
+                      "interact\n"
                       "turn left\n"
                       "turn right\n"
                       "reproduce";
@@ -53,7 +55,7 @@ RegisterBinding(Creat, age, "age", 0, 1000);
 RegisterBinding(Creat, max_age, "max age", 0, 1000);
 RegisterBinding(Creat, interaction_count, "interacts");
 RegisterBinding(Creat, children, "children");
-RegisterBinding(Creat, action, "action", "None\nForward\nLeft\nRight\nReproduce", false);
+RegisterBinding(Creat, action, "action", "None\nForward\nInteract\nLeft\nRight\nReproduce", false);
 RegisterBinding(Creat, state, "neurons", 7, true, neuron_labels, "");
 RegisterBinding(Creat, weights, "weights", 7, false, outputs, neuron_labels);
 
@@ -199,20 +201,15 @@ void Creat::MoveForward()
     Pos front;
     if (int jump = world->jump_range)
     {
-        float excess = qBound(0.0, (state(num_inputs + num_hidden + ActionForward - 1) - 1.2) * 2 * jump, double(jump));
-        int dist = round(excess);
+        float excess = qBound(0.0, state(num_inputs + num_hidden + ActionForward - 1) - 1.0, double(jump));
+        int dist = floor(excess);
         energy -= dist;
         front = world->Wrap(pos + Pos(orient) * (1 + dist));
     } else {
         front = Front();
     }
 
-    if (Occupant* other = world->SolidOccupantAt(front))
-    {
-        interacted = true;
-        other->Interact(*this);
-        interaction_count++;
-    } else
+    if (!world->SolidOccupantAt(front))
     {
         float de = world->energy(pos);
         energy += de;
@@ -220,6 +217,20 @@ void Creat::MoveForward()
         Move(front);
     }
 }
+
+void Creat::Interact()
+{
+    Pos front = Front();
+
+    if (Occupant* other = world->SolidOccupantAt(front))
+    {
+        interacted = true;
+        other->Interact(*this);
+        interaction_count++;
+    }
+}
+
+
 
 void Creat::DoNothing()
 {

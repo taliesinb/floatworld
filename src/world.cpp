@@ -166,6 +166,7 @@ void World::SetupActions()
 {
     action_lookup[ActionNone] = &Creat::DoNothing;
     action_lookup[ActionForward] = &Creat::MoveForward;
+    action_lookup[ActionInteract] = &Creat::Interact;
     action_lookup[ActionLeft] = &Creat::TurnLeft;
     action_lookup[ActionRight] = &Creat::TurnRight;
     action_lookup[ActionReproduce] = &Creat::Reproduce;

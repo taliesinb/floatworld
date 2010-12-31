@@ -10,6 +10,7 @@ enum CreatAction
 {
     ActionNone = 0,
     ActionForward,
+    ActionInteract,
     ActionLeft,
     ActionRight,
     ActionReproduce,
@@ -40,7 +41,7 @@ public:
     static const int num_int_inputs = 4;
     static const int num_inputs = num_ext_inputs + num_int_inputs;
     static const int num_hidden = 4;
-    static const int num_outputs = 4;
+    static const int num_outputs = 5;
     static const int num_neurons = num_inputs + num_hidden + num_outputs;
 
     static const int off_ext_inputs = 0;
@@ -95,6 +96,7 @@ public:
     void UpdateInputs();
     void DoNothing();
     void MoveForward();
+    void Interact();
     void TurnLeft();
     void TurnRight();
     void Reproduce();
