@@ -64,7 +64,7 @@ void QWorld::SetSize(int rows, int cols)
 {
     if (cols < 100) energy->scale = 12;
     //world->SetSize(rows, cols);
-    setMaximumSize(sizeHint());
+    //setMaximumSize(sizeHint());
 }
 
 std::ostream& operator<<(std::ostream& s, QSize size)
@@ -152,7 +152,8 @@ void setScrollBarFraction(QScrollBar* s, float frac)
 
 void QWorld::SetZoom(int scale)
 {
-    if (scale * 2 < energy->scale && scroll_area->horizontalScrollBar()->maximum() == 0) return;
+    if (scale * 2 < energy->scale && scroll_area->horizontalScrollBar()->maximum() == 0 &&
+        scroll_area->verticalScrollBar()->maximum() == 0) return;
 
     tmp_x = getScrollBarFraction(scroll_area->horizontalScrollBar());
     tmp_y = getScrollBarFraction(scroll_area->verticalScrollBar());
