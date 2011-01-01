@@ -37,7 +37,7 @@ void ObjectListItem::UpdateLabel()
     if (number == 0)
         setText(prototype->Name());
     else
-        setText(QString("%1 x %2").arg(number).arg(prototype->Name()));
+        setText(QString("%2 (%1)").arg(number).arg(prototype->Name()));
 }
 
 NewWorldDialog::NewWorldDialog(QWidget *parent) :

@@ -19,7 +19,7 @@ MainWindow::MainWindow()
     connect(&ticker, SIGNAL(timeout()), this, SLOT(Tick()));
 
     world->SetupQtHook(false);
-    gridBox->setLayout(world->panel);
+    containerWorld->setLayout(world->panel);
 
     speed_group.addAction(actionPlaySlowest);
     speed_group.addAction(actionPlaySlow);
@@ -32,7 +32,7 @@ MainWindow::MainWindow()
     connect(&speed_group, SIGNAL(triggered(QAction*)), this, SLOT(speed_trigger(QAction*)));
     actionFF->setAutoRepeat(false);
 
-    renderSettingsBox->setLayout(qworld->panel);
+    containerRendering->setLayout(qworld->panel);
 
     connect(qworld, SIGNAL(OccupantSelected(Occupant*)), this, SLOT(DisplayInspector(Occupant*)));
 
@@ -68,15 +68,23 @@ MainWindow::MainWindow()
             }
         }
     }
-    objectComboBox->addItem("None");
+    comboNewObjectClass->addItem("None");
     foreach(Class* c, objects)
     {
         const char* name = c->name;
-        objectComboBox->addItem(name);
+        comboNewObjectClass->addItem(name);
     }
-    objectComboBox->setCurrentIndex(0);
+    comboNewObjectClass->setCurrentIndex(0);
 
-    connect(objectComboBox, SIGNAL(activated(QString)), this, SLOT(ObjectSelected(QString)));
+    menuView->addAction(dockWorld->toggleViewAction());
+    menuView->addAction(dockObjectInspector->toggleViewAction());
+    menuView->addAction(dockObjectCreator->toggleViewAction());
+    menuView->addAction(dockRendering->toggleViewAction());
+
+    dockObjectCreator->close();
+    dockRendering->close();
+
+    connect(comboNewObjectClass, SIGNAL(activated(QString)), this, SLOT(ObjectSelected(QString)));
     connect(qworld, SIGNAL(CellClicked(Pos)), this, SLOT(CreateObjectAt(Pos)));
     update();
 }
@@ -105,7 +113,7 @@ void MainWindow::ObjectSelected(QString s)
         selected_object = prototypes[s] = dynamic_cast<Occupant*>(Class::MakeNew(s.toAscii()));
 
     selected_object->SetupQtHook(false);
-    objectPanel->setLayout(selected_object->panel);
+    containerObjectInspector->setLayout(selected_object->panel);
 }
 
 void MainWindow::CreateObjectAt(Pos pos)
@@ -346,7 +354,7 @@ void MainWindow::on_actionZoomOut_triggered()
 
 void MainWindow::on_scatterButton_pressed()
 {
-    int num = scatterNumberBox->value();
+    int num = numberScatter->value();
     for (int i = 0; i < num; i++)
     {
         CreateObjectAt(world->RandomCell());
@@ -355,7 +363,6 @@ void MainWindow::on_scatterButton_pressed()
 
 void MainWindow::DisplayInspector(Occupant *occ)
 {
-    if (occ->panel)
-        occupantBox->setLayout(occ->panel);
+    if (occ->panel) containerObjectInspector->setLayout(occ->panel);
     qworld->Draw();
 }

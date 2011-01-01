@@ -125,7 +125,7 @@ World::World()
     births = 0;
     interaction_type = NoInteraction;
     hooks_enabled = true;
-    jump_range = 3;
+    jump_range = 1;
 
     SetupActions();
 }
@@ -346,7 +346,7 @@ float World::DirKernel(Pos pos, int dir)
         for (int j = -2; j <= 2; j++)
         {
         if (i == 0 && j == 0) continue;
-        if (abs(i) + abs(j) == 4) continue;
+        if (i * i + j * j > 5) continue;
 
         Creat* c = CreatAt(Wrap(pos + Pos(i,j)));
         if (c)
