@@ -56,6 +56,7 @@ public slots:
     void AddObject();
     void RemoveObject();
     void SelectObject(QListWidgetItem*);
+    void DeselectObject();
     void SetObjectNumber(int num);
     void CopyObject();
 

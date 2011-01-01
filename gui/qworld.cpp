@@ -38,13 +38,14 @@ QWorld::QWorld(QWidget* parent) :
     draw_block_colors = true;
 
     scroll_area->setWidgetResizable(true);
+    scroll_area->setAlignment(Qt::AlignCenter);
     scroll_area->setLineWidth(0);
     scroll_area->setFrameStyle(0);
     scroll_area->setWidget(energy);
     scroll_area->updateGeometry();
 
-    scroll_area->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-    scroll_area->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    //scroll_area->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    //scroll_area->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     QSize size = energy->sizeHint();
     scroll_area->setGeometry(0, 0, size.width(), size.height());
 
@@ -75,7 +76,7 @@ std::ostream& operator<<(std::ostream& s, QSize size)
 
 QSize QWorld::sizeHint() const
 {
-    return energy->sizeHint() + QSize(40,40);// + QSize(50,100);
+    return energy->sizeHint() + QSize(25,25);// + QSize(50,100);
 }
 
 void QWorld::SelectAtPos(Pos pos)

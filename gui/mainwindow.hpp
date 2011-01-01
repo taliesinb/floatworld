@@ -64,7 +64,7 @@ private slots:
     void on_actionLoad_triggered();
     void on_actionZoomIn_triggered();
     void on_actionZoomOut_triggered();
-    void on_scatterButton_pressed();
+    void on_buttonScatter_pressed();
 
     void ObjectSelected(QString);
     void CreateObjectAt(Pos pos);

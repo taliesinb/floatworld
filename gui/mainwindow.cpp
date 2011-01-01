@@ -343,16 +343,16 @@ void MainWindow::on_actionLoad_triggered()
 
 void MainWindow::on_actionZoomIn_triggered()
 {
-    qworld->SetZoom(qworld->CurrentZoom() + 1);
+    qworld->SetZoom(floor(qworld->CurrentZoom() * 1.2 + 1));
 }
 
 void MainWindow::on_actionZoomOut_triggered()
 {
-    int z = qworld->CurrentZoom() - 1;
+    int z = ceil((qworld->CurrentZoom() - 1) / 1.2);
     qworld->SetZoom(z < 2 ? 2 : z);
 }
 
-void MainWindow::on_scatterButton_pressed()
+void MainWindow::on_buttonScatter_pressed()
 {
     int num = numberScatter->value();
     for (int i = 0; i < num; i++)

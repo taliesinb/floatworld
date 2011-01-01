@@ -75,6 +75,8 @@ NewWorldDialog::NewWorldDialog(QWidget *parent) :
 
     ui->commentBox->setVisible(false);
 
+    connect(ui->objectTable, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)), ui->prototypeList, SLOT(clearSelection()));
+    connect(ui->prototypeList, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)), this, SLOT(DeselectObject()));
     connect(ui->saveTemplate, SIGNAL(released()), this, SLOT(SaveTemplate()));
     connect(ui->loadTemplate, SIGNAL(released()), this, SLOT(LoadTemplate()));
     connect(ui->copyObject, SIGNAL(released()), this, SLOT(CopyObject()));
@@ -252,6 +254,12 @@ void NewWorldDialog::SelectObject(QListWidgetItem* _item)
         ui->numberBox->setValue(item->number);
 }
 
+void NewWorldDialog::DeselectObject()
+{
+    SelectObject(NULL);
+    ui->objectTable->setCurrentRow(-1);
+}
+
 ObjectListItem* NewWorldDialog::CurrentItem()
 {
     return dynamic_cast<ObjectListItem*>(ui->objectTable->currentItem());
@@ -274,8 +282,6 @@ void NewWorldDialog::CreateWorld()
     std::stringstream s2;
     s2 << *w;
     s2 >> *mw->world;
-    std::cout << "AFTER CONSTRUCTION:\n";
-    std::cout << *mw->world;
 
     mw->qworld->SetSize(w->rows, w->cols);
 
