@@ -23,6 +23,7 @@ MatrixView::MatrixView(int size, bool flip, bool grid)
     border = 3;
     scale = size;
     draw_grid = grid;
+    setMouseTracking(true);
 }
 
 QSize MatrixView::sizeHint() const
@@ -125,14 +126,27 @@ void MatrixView::resizeEvent(QResizeEvent *)
 
 void MatrixView::mousePressEvent(QMouseEvent *event)
 {
-    int x = (event->x() - border) / scale;
-    int y = (event->y() - border) / scale;
+    int x = (event->x() - border - 1) / scale;
+    int y = (event->y() - border - 4) / scale;
     if (draw_flipped) swap(x, y);
     if (0 <= x && x < matrix->cols && 0 <= y && y < matrix->rows)
     {
         ClickedCell(Pos(y, x));
     }
 }
+void MatrixView::mouseMoveEvent(QMouseEvent *event)
+{
+    int x = (event->x() - border - 1) / scale;
+    int y = (event->y() - border - 4) / scale;
+    if (draw_flipped) swap(x, y);
+    Pos pos(y, x);
+    if (pos != last_hover && pos.Inside(matrix->rows, matrix->cols))
+    {
+        HoverCell(pos);
+        last_hover = pos;
+    }
+}
+
 IntLabel::IntLabel() : Binding(NULL)
 {
     setFrameStyle(QFrame::Panel | QFrame::Sunken);
@@ -266,14 +280,8 @@ MatrixWidget::MatrixWidget(int size, bool flip, QString rlabels, QString clabels
     color_func = &RedBlueColorFunc;
     row_labels = rlabels.split("\n");
     col_labels = clabels.split("\n");
-    connect(this, SIGNAL(ClickedCell(Pos)), this, SLOT(ShowTooltip(Pos)));
-    setMouseTracking(false);
-}
-
-void MatrixWidget::mouseMoveEvent(QMouseEvent *event)
-{
-    setFocus();
-    mousePressEvent(event);
+    connect(this, SIGNAL(HoverCell(Pos)), this, SLOT(setFocus()));
+    connect(this, SIGNAL(HoverCell(Pos)), this, SLOT(ShowTooltip(Pos)));
 }
 
 void MatrixWidget::keyPressEvent(QKeyEvent *event)
@@ -285,7 +293,7 @@ void MatrixWidget::keyPressEvent(QKeyEvent *event)
         matrix->operator ()(highlighted) -= 0.25;
     else return;
 
-    ClickedCell(draw_flipped ? highlighted.Transpose() : highlighted);
+    HoverCell(draw_flipped ? highlighted.Transpose() : highlighted);
     update();
 }
 

@@ -30,6 +30,7 @@ public:
     bool draw_grid;
     bool draw_flipped;
     Pos highlighted;
+    Pos last_hover;
 
     MatrixView(int size, bool flip, bool grid);
 
@@ -40,6 +41,7 @@ protected:
 
     void resizeEvent(QResizeEvent *);
     void mousePressEvent(QMouseEvent* event);
+    void mouseMoveEvent(QMouseEvent *event);
     void paintEvent(QPaintEvent *event);
 
 signals:
@@ -47,6 +49,7 @@ signals:
     void WasResized();
     void OverPaint(QPainter&);
     void ClickedCell(Pos pos);
+    void HoverCell(Pos pos);
 
     friend class GridWidget;
 
@@ -128,7 +131,6 @@ public:
     MatrixWidget(int pixel_size, bool flip, QString row_labels, QString column_labels);
     virtual void OnSetPointer();
     virtual void Synchronize(bool inbound);
-    void mouseMoveEvent(QMouseEvent *event);
     void keyPressEvent(QKeyEvent *event);
 
 private slots:

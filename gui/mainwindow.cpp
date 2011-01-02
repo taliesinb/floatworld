@@ -168,23 +168,23 @@ void MainWindow::Tick()
         world->hooks_enabled = false;
         for (int i = 0; i < speed * 2; i++)
         {
-            world->Step();
+            qworld->InvisibleStep();
             if (timer.elapsed() > 100) break;
         }
         world->hooks_enabled = true;
-        world->Step();
+        qworld->Step();
+
     } else {
         stepper += speed;
         if (stepper >= last_stepper + 1)
         {
             stepper = last_stepper + 1;
             last_stepper = stepper;
-            world->Step();
+            qworld->Step();
         }
     }
     qworld->SetDrawFraction(speed > 1 ? 1.0 : (stepper - floor(stepper)));
     qworld->Draw();
-    world->UpdateQtHook();
     if (world->num_creats == 0) Stop();
 }
 

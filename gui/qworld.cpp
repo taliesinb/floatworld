@@ -30,6 +30,8 @@ QWorld::QWorld(QWidget* parent) :
     energy = new MatrixView(6, false, false);
     energy->matrix = &world->energy;
 
+    hover_mode = true;
+
     draw_type = DrawAction;
     draw_hue_multiplier = 1.0;
     draw_creats = true;
@@ -58,6 +60,7 @@ QWorld::QWorld(QWidget* parent) :
     connect(this->panel, SIGNAL(value_changed()), this, SLOT(Draw()));
     connect(energy, SIGNAL(OverPaint(QPainter&)), this, SLOT(OnChildPaint(QPainter&)));
     connect(energy, SIGNAL(ClickedCell(Pos)), this, SLOT(SelectAtPos(Pos)));
+    connect(energy, SIGNAL(HoverCell(Pos)), this, SLOT(HoverAtPos(Pos)));
     connect(energy, SIGNAL(WasResized()), this, SLOT(RecenterZoom()));
 }
 
@@ -83,13 +86,49 @@ void QWorld::SelectAtPos(Pos pos)
 {
     Occupant* occ = world->OccupantAt(pos);
 
-    if (occ)
+    if (hover_mode == false && occ)
+    {
+        if (selected_occupant == occ) {
+            UnselectOccupant();
+            hover_mode = true;
+        } else
+            SelectOccupant(occ);
+    } else if (occ)
+    {
+        hover_mode = false;
+        SelectOccupant(occ);
+    } else {
+        hover_mode = true;
+        CellClicked(pos);
+    }
+
+    Draw();
+}
+
+void QWorld::AfterStep()
+{
+    if (selected_occupant)
+    {
+        if (hover_mode) HoverAtPos(energy->highlighted);
+        else energy->highlighted = selected_occupant->pos;
+    }
+}
+
+void QWorld::HoverAtPos(Pos pos)
+{
+    if (!hover_mode) return;
+
+    Occupant* occ = world->OccupantAt(pos);
+
+    if (occ && occ->pos != energy->highlighted)
     {
         UnselectOccupant();
         SelectOccupant(occ);
-    } else {
+    } else if (!occ)
+    {
         UnselectOccupant();
-        CellClicked(pos);
+        energy->highlighted.row = -1;
+        energy->highlighted.col = -1;
     }
 
     Draw();
@@ -107,6 +146,8 @@ void QWorld::UnselectOccupant()
 void QWorld::SelectedOccupantRemoved()
 {
     selected_occupant = NULL;
+    energy->highlighted = Pos(-1,-1);
+    hover_mode = true;
     Draw();
 }
 
@@ -352,6 +393,8 @@ void QWorld::SelectOccupant(Occupant *occ)
         connect(hm, SIGNAL(being_removed()), this,
                 SLOT(SelectedOccupantRemoved()));
         OccupantSelected(occ);
+
+        energy->highlighted = occ->pos;
     }
 }
 
@@ -359,7 +402,13 @@ void QWorld::Step()
 {
     world->Step();
     world->UpdateQtHook();
+    AfterStep();
     Draw();
+}
+
+void QWorld::InvisibleStep()
+{
+    world->Step();
 }
 
 void QWorld::SetDrawFraction(float frac)
@@ -386,7 +435,6 @@ QRgb WhiteBlueColorFunc(float value)
 void QWorld::Draw()
 {
     energy->color_func = draw_energy ? &WhiteBlueColorFunc : &BlackColorFunc;
-    if (selected_occupant) energy->highlighted = selected_occupant->pos;
     update();
 }
 
