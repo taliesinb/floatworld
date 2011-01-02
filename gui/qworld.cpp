@@ -92,7 +92,10 @@ void QWorld::SelectAtPos(Pos pos)
             UnselectOccupant();
             hover_mode = true;
         } else
+        {
             SelectOccupant(occ);
+            hover_mode = false;
+        }
     } else if (occ)
     {
         hover_mode = false;
@@ -128,7 +131,6 @@ void QWorld::DragToPos(Pos pos)
             creat->UpdatePanel();
         }
     }
-
     Draw();
 }
 
