@@ -98,22 +98,22 @@ void MatrixView::paintEvent(QPaintEvent*)
 
     OverPaint(painter);
 
-    if (highlighted.Inside(h, w))
+    if (recticule.Inside(h, w))
     {
         QPen pen;
         if (draw_grid) {
             pen.setWidth(1);
             pen.setColor(Qt::black);
             painter.setPen(pen);
-            painter.drawRect(QRect(border + scale * highlighted.col,
-                                   border + scale * highlighted.row,
+            painter.drawRect(QRect(border + scale * recticule.col,
+                                   border + scale * recticule.row,
                                    scale, scale));
         } else {
             pen.setWidth(1);
             pen.setColor(QColor(255,255,255,100));
             painter.setPen(pen);
-            painter.drawRect(QRect(border + scale * highlighted.col - 2,
-                                   border + scale * highlighted.row - 2,
+            painter.drawRect(QRect(border + scale * recticule.col - 2,
+                                   border + scale * recticule.row - 2,
                                    scale + 2, scale + 2));
         }
     }
@@ -133,7 +133,14 @@ void MatrixView::mousePressEvent(QMouseEvent *event)
     {
         ClickedCell(Pos(y, x));
     }
+    dragging = true;
 }
+
+void MatrixView::mouseReleaseEvent(QMouseEvent *)
+{
+    dragging = false;
+}
+
 void MatrixView::mouseMoveEvent(QMouseEvent *event)
 {
     int x = (event->x() - border - 1) / scale;
@@ -288,12 +295,12 @@ void MatrixWidget::keyPressEvent(QKeyEvent *event)
 {
     int key = event->key();
     if      (key == Qt::Key_Up)
-        matrix->operator ()(highlighted) += 0.25;
+        matrix->operator ()(recticule) += 0.25;
     else if (key == Qt::Key_Down)
-        matrix->operator ()(highlighted) -= 0.25;
+        matrix->operator ()(recticule) -= 0.25;
     else return;
 
-    HoverCell(draw_flipped ? highlighted.Transpose() : highlighted);
+    HoverCell(draw_flipped ? recticule.Transpose() : recticule);
     update();
 }
 
@@ -330,7 +337,7 @@ void MatrixWidget::ShowTooltip(Pos p)
     QToolTip::showText(mapToGlobal(QPoint(p.col, p.row) * scale) + QPoint(0, 10),
                        str);
 
-    highlighted = p;
+    recticule = p;
     update();
 }
 

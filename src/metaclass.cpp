@@ -164,7 +164,7 @@ void Object::Reset()
 {
 }
 
-BindingsPanel* Object::SetupQtHook(bool title)
+BindingsPanel* Object::SetupPanel(bool title)
 {
     if (panel) return panel;
     panel = new BindingsPanel(&GetClass(), this);

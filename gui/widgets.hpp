@@ -29,7 +29,8 @@ public:
     int border;
     bool draw_grid;
     bool draw_flipped;
-    Pos highlighted;
+    bool dragging;
+    Pos recticule;
     Pos last_hover;
 
     MatrixView(int size, bool flip, bool grid);
@@ -42,6 +43,7 @@ protected:
     void resizeEvent(QResizeEvent *);
     void mousePressEvent(QMouseEvent* event);
     void mouseMoveEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
     void paintEvent(QPaintEvent *event);
 
 signals:

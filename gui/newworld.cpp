@@ -247,7 +247,7 @@ void NewWorldDialog::SelectObject(QListWidgetItem* _item)
     ObjectListItem* item = dynamic_cast<ObjectListItem*>(_item);
     selected_object = item->prototype;
 
-    selected_object->SetupQtHook(true);
+    selected_object->SetupPanel(true);
     ui->objectPanel->setLayout(selected_object->panel);
 
     if (item->number)

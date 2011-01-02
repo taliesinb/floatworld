@@ -27,8 +27,8 @@ QWorld::QWorld(QWidget* parent) :
     world = new World();
 
     scroll_area = new QScrollArea;
-    energy = new MatrixView(6, false, false);
-    energy->matrix = &world->energy;
+    grid = new MatrixView(6, false, false);
+    grid->matrix = &world->energy;
 
     hover_mode = true;
 
@@ -43,30 +43,30 @@ QWorld::QWorld(QWidget* parent) :
     scroll_area->setAlignment(Qt::AlignCenter);
     scroll_area->setLineWidth(0);
     scroll_area->setFrameStyle(0);
-    scroll_area->setWidget(energy);
+    scroll_area->setWidget(grid);
     scroll_area->updateGeometry();
 
     //scroll_area->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     //scroll_area->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-    QSize size = energy->sizeHint();
+    QSize size = grid->sizeHint();
     scroll_area->setGeometry(0, 0, size.width(), size.height());
 
     QGridLayout *layout = new QGridLayout;
     layout->addWidget(scroll_area);
     setLayout(layout);
 
-    SetupQtHook(false);
+    SetupPanel(false);
 
     connect(this->panel, SIGNAL(value_changed()), this, SLOT(Draw()));
-    connect(energy, SIGNAL(OverPaint(QPainter&)), this, SLOT(OnChildPaint(QPainter&)));
-    connect(energy, SIGNAL(ClickedCell(Pos)), this, SLOT(SelectAtPos(Pos)));
-    connect(energy, SIGNAL(HoverCell(Pos)), this, SLOT(HoverAtPos(Pos)));
-    connect(energy, SIGNAL(WasResized()), this, SLOT(RecenterZoom()));
+    connect(grid, SIGNAL(OverPaint(QPainter&)), this, SLOT(OnChildPaint(QPainter&)));
+    connect(grid, SIGNAL(ClickedCell(Pos)), this, SLOT(SelectAtPos(Pos)));
+    connect(grid, SIGNAL(HoverCell(Pos)), this, SLOT(HoverAtPos(Pos)));
+    connect(grid, SIGNAL(WasResized()), this, SLOT(RecenterZoom()));
 }
 
 void QWorld::SetSize(int rows, int cols)
 {
-    if (cols < 100) energy->scale = 12;
+    if (cols < 100) grid->scale = 12;
     //world->SetSize(rows, cols);
     //setMaximumSize(sizeHint());
 }
@@ -79,7 +79,7 @@ std::ostream& operator<<(std::ostream& s, QSize size)
 
 QSize QWorld::sizeHint() const
 {
-    return energy->sizeHint() + QSize(25,25);// + QSize(50,100);
+    return grid->sizeHint() + QSize(25,25);// + QSize(50,100);
 }
 
 void QWorld::SelectAtPos(Pos pos)
@@ -109,26 +109,44 @@ void QWorld::AfterStep()
 {
     if (selected_occupant)
     {
-        if (hover_mode) HoverAtPos(energy->highlighted);
-        else energy->highlighted = selected_occupant->pos;
+        if (hover_mode) HoverAtPos(grid->recticule);
+        else grid->recticule = selected_occupant->pos;
     }
+}
+
+void QWorld::DragToPos(Pos pos)
+{
+    if (selected_occupant && !world->OccupantAt(pos))
+    {
+        selected_occupant->Move(pos);
+        selected_occupant->last_pos = pos;
+        grid->recticule = pos;
+        if (Creat* creat = dynamic_cast<Creat*>(selected_occupant))
+        {
+            creat->UpdateBrain();
+            creat->UpdateQtHook();
+        }
+    }
+
+    Draw();
 }
 
 void QWorld::HoverAtPos(Pos pos)
 {
+    if (grid->dragging) { DragToPos(pos); return; }
     if (!hover_mode) return;
 
     Occupant* occ = world->OccupantAt(pos);
 
-    if (occ && occ->pos != energy->highlighted)
+    if (occ && occ->pos != grid->recticule)
     {
         UnselectOccupant();
         SelectOccupant(occ);
     } else if (!occ)
     {
         UnselectOccupant();
-        energy->highlighted.row = -1;
-        energy->highlighted.col = -1;
+        grid->recticule.row = -1;
+        grid->recticule.col = -1;
     }
 
     Draw();
@@ -146,7 +164,7 @@ void QWorld::UnselectOccupant()
 void QWorld::SelectedOccupantRemoved()
 {
     selected_occupant = NULL;
-    energy->highlighted = Pos(-1,-1);
+    grid->recticule = Pos(-1,-1);
     hover_mode = true;
     Draw();
 }
@@ -194,13 +212,13 @@ void setScrollBarFraction(QScrollBar* s, float frac)
 
 void QWorld::SetZoom(int scale)
 {
-    if (scale * 2 < energy->scale && scroll_area->horizontalScrollBar()->maximum() == 0 &&
+    if (scale * 2 < grid->scale && scroll_area->horizontalScrollBar()->maximum() == 0 &&
         scroll_area->verticalScrollBar()->maximum() == 0) return;
 
     tmp_x = getScrollBarFraction(scroll_area->horizontalScrollBar());
     tmp_y = getScrollBarFraction(scroll_area->verticalScrollBar());
-    energy->scale = scale * 2;
-    energy->setMaximumSize(sizeHint());
+    grid->scale = scale * 2;
+    grid->setMaximumSize(sizeHint());
 
     updateGeometry();
 }
@@ -213,12 +231,12 @@ void QWorld::RecenterZoom()
 
 int QWorld::CurrentZoom()
 {
-    return energy->scale / 2;
+    return grid->scale / 2;
 }
 
 void QWorld::OnChildPaint(QPainter& painter)
 {
-    int scale = energy->scale;
+    int scale = grid->scale;
     bool poly = scale > 6;
 
     QColor color;
@@ -234,7 +252,7 @@ void QWorld::OnChildPaint(QPainter& painter)
     blockpen.setCosmetic(true);
 
     painter.save();
-    painter.translate(energy->border, energy->border);
+    painter.translate(grid->border, grid->border);
     painter.scale(scale, scale);
 
     foreach(Occupant* occ, world->occupant_list)
@@ -387,14 +405,14 @@ void QWorld::SelectOccupant(Occupant *occ)
 
         selected_occupant = occ;
 
-        BindingsPanel* hm = occ->SetupQtHook(true);
+        BindingsPanel* hm = occ->SetupPanel(true);
         connect(hm, SIGNAL(value_changed()), this,
                 SLOT(Draw()));
         connect(hm, SIGNAL(being_removed()), this,
                 SLOT(SelectedOccupantRemoved()));
         OccupantSelected(occ);
 
-        energy->highlighted = occ->pos;
+        grid->recticule = occ->pos;
     }
 }
 
@@ -434,13 +452,13 @@ QRgb WhiteBlueColorFunc(float value)
 
 void QWorld::Draw()
 {
-    energy->color_func = draw_energy ? &WhiteBlueColorFunc : &BlackColorFunc;
+    grid->color_func = draw_energy ? &WhiteBlueColorFunc : &BlackColorFunc;
     update();
 }
 
 void QWorld::SelectNextOccupant(bool forward)
 {
-    Pos p = world->Wrap(energy->highlighted);
+    Pos p = world->Wrap(grid->recticule);
     int sz = world->rows * world->cols;
     int start = p.row * world->cols + p.col;
     int index = start;

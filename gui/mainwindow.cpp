@@ -18,7 +18,7 @@ MainWindow::MainWindow()
     ticker.setInterval(1);
     connect(&ticker, SIGNAL(timeout()), this, SLOT(Tick()));
 
-    world->SetupQtHook(false);
+    world->SetupPanel(false);
     containerWorld->setLayout(world->panel);
 
     speed_group.addAction(actionPlaySlowest);
@@ -112,7 +112,7 @@ void MainWindow::ObjectSelected(QString s)
     else
         selected_object = prototypes[s] = dynamic_cast<Occupant*>(Class::MakeNew(s.toAscii()));
 
-    selected_object->SetupQtHook(false);
+    selected_object->SetupPanel(false);
     containerObjectInspector->setLayout(selected_object->panel);
 }
 
