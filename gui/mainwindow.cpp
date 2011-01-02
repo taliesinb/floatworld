@@ -15,11 +15,16 @@ MainWindow::MainWindow()
 
     world = qworld->world;
 
+    containerObjectCreator->setLayout(new QGridLayout);
+    containerObjectInspector->setLayout(new QGridLayout);
+    containerRendering->setLayout(new QGridLayout);
+    containerWorld->setLayout(new QGridLayout);
+
     ticker.setInterval(1);
     connect(&ticker, SIGNAL(timeout()), this, SLOT(Tick()));
 
-    world->SetupQtHook(false);
-    containerWorld->setLayout(world->panel);
+    QWidget* widget = world->SetupPanel(false);
+    containerWorld->layout()->addWidget(widget);
 
     speed_group.addAction(actionPlaySlowest);
     speed_group.addAction(actionPlaySlow);
@@ -32,7 +37,7 @@ MainWindow::MainWindow()
     connect(&speed_group, SIGNAL(triggered(QAction*)), this, SLOT(speed_trigger(QAction*)));
     actionFF->setAutoRepeat(false);
 
-    containerRendering->setLayout(qworld->panel);
+    containerRendering->layout()->addWidget(qworld->panel);
 
     connect(qworld, SIGNAL(OccupantSelected(Occupant*)), this, SLOT(DisplayInspector(Occupant*)));
 
@@ -91,15 +96,15 @@ MainWindow::MainWindow()
 
 void MainWindow::showEvent(QShowEvent *)
 {
-    world->UpdateQtHook();
-    qworld->UpdateQtHook();
+    world->UpdatePanel();
+    qworld->UpdatePanel();
     qworld->Draw();
 }
 
 void MainWindow::ObjectSelected(QString s)
 {   
     if (selected_object)
-        selected_object->DeleteQtHook();
+        selected_object->DeletePanel();
 
     if (s == "None")
     {
@@ -112,8 +117,8 @@ void MainWindow::ObjectSelected(QString s)
     else
         selected_object = prototypes[s] = dynamic_cast<Occupant*>(Class::MakeNew(s.toAscii()));
 
-    selected_object->SetupQtHook(false);
-    containerObjectInspector->setLayout(selected_object->panel);
+    selected_object->SetupPanel(false);
+    containerObjectCreator->layout()->addWidget(selected_object->panel);
 }
 
 void MainWindow::CreateObjectAt(Pos pos)
@@ -195,7 +200,7 @@ void MainWindow::ff_pressed()
 
 void MainWindow::ff_released()
 {
-    world->UpdateQtHook();
+    world->UpdatePanel();
     speed_trigger(speed_group.checkedAction());
 }
 
@@ -231,7 +236,7 @@ void MainWindow::on_actionStepBack_triggered()
         s >> *qworld->world;
         human_readable = true;
         world_cache.pop_back();
-        world->UpdateQtHook();
+        world->UpdatePanel();
         if (id > 0)
             qworld->SelectOccupant(qworld->world->LookupOccupantByID(id));
         qworld->SetDrawFraction(1.0);
@@ -337,7 +342,7 @@ void MainWindow::on_actionLoad_triggered()
         f >> *qworld->world;
         f.close();
     }
-    world->UpdateQtHook();
+    world->UpdatePanel();
     qworld->Draw();
 }
 
@@ -363,6 +368,6 @@ void MainWindow::on_buttonScatter_pressed()
 
 void MainWindow::DisplayInspector(Occupant *occ)
 {
-    if (occ->panel) containerObjectInspector->setLayout(occ->panel);
+    if (occ->panel) containerObjectInspector->layout()->addWidget(occ->panel);
     qworld->Draw();
 }

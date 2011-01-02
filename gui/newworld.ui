@@ -429,7 +429,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QFrame" name="objectPanel">
+          <widget class="QFrame" name="containerObject">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
              <horstretch>3</horstretch>

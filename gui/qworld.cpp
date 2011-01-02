@@ -55,7 +55,7 @@ QWorld::QWorld(QWidget* parent) :
     layout->addWidget(scroll_area);
     setLayout(layout);
 
-    SetupQtHook(false);
+    SetupPanel(false);
 
     connect(this->panel, SIGNAL(value_changed()), this, SLOT(Draw()));
     connect(energy, SIGNAL(OverPaint(QPainter&)), this, SLOT(OnChildPaint(QPainter&)));
@@ -139,7 +139,7 @@ void QWorld::UnselectOccupant()
     Occupant* occ = selected_occupant;
     selected_occupant = NULL;
     if (occ)
-        occ->DeleteQtHook();
+        occ->DeletePanel();
     Draw();
 }
 
@@ -170,7 +170,7 @@ void QWorld::UpdateOccupant()
                 if (!creat->alive) creat->Remove();
                 else if (creat->energy < 0) creat->alive = false;
             }
-            occ->UpdateQtHook();
+            occ->UpdatePanel();
         }
 
         Draw();
@@ -368,7 +368,7 @@ void QWorld::keyReleaseEvent(QKeyEvent* event)
     (creat->*(world->action_lookup[creat->action]))();
     creat->UpdateInputs();
     creat->UpdateBrain();
-    creat->UpdateQtHook();
+    creat->UpdatePanel();
 
     SetDrawFraction(1.0);
     Draw();
@@ -387,7 +387,7 @@ void QWorld::SelectOccupant(Occupant *occ)
 
         selected_occupant = occ;
 
-        BindingsPanel* hm = occ->SetupQtHook(true);
+        BindingsPanel* hm = occ->SetupPanel(true);
         connect(hm, SIGNAL(value_changed()), this,
                 SLOT(Draw()));
         connect(hm, SIGNAL(being_removed()), this,
@@ -401,7 +401,7 @@ void QWorld::SelectOccupant(Occupant *occ)
 void QWorld::Step()
 {
     world->Step();
-    world->UpdateQtHook();
+    world->UpdatePanel();
     AfterStep();
     Draw();
 }

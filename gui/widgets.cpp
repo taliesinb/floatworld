@@ -337,7 +337,9 @@ void MatrixWidget::ShowTooltip(Pos p)
 BindingsPanel::BindingsPanel(Class *mc, Object *obj)
     : mclass(mc), object(obj)
 {
-    setSpacing(6);
+    layout = new QFormLayout(this);
+    setLayout(layout);
+    layout->setSpacing(6);
 }
 
 BindingsPanel::~BindingsPanel()
@@ -365,6 +367,24 @@ void BindingsPanel::UpdateChildren()
     }
 }
 
+void BindingsPanel::CreateTitle()
+{
+    QLabel* label = new QLabel;
+    label->setText(mclass->name);
+
+    QFont font;
+    font.setPointSize(15);
+    font.setBold(true);
+    label->setFont(font);
+    label->setAlignment(Qt::AlignHCenter);
+    layout->addRow("type", label);
+
+    QFrame* line = new QFrame();
+    line->setFrameShape(QFrame::HLine);
+    line->setFrameShadow(QFrame::Sunken);
+    layout->addRow(line);
+}
+
 void BindingsPanel::ConstructChildren()
 {
     int old_size = widgets.size();
@@ -379,14 +399,14 @@ void BindingsPanel::ConstructChildren()
         QFrame* line = new QFrame();
         line->setFrameShape(QFrame::HLine);
         line->setFrameShadow(QFrame::Sunken);
-        addRow(line);
+        layout->addRow(line);
     }
     for (int i = 0; i < mclass->nqvars; i++)
     {
         QWidget* widget = (*mclass->factories[i])(object);
         const char* sig = dynamic_cast<Binding*>(widget)->changesignal;
         if (sig) QObject::connect(widget, sig, this, SLOT(child_changed()));
-        addRow(mclass->labels[i], widget);
+        layout->addRow(mclass->labels[i], widget);
         widgets.push_back(widget);
     }
 }

@@ -153,6 +153,10 @@ Object::Object()
     panel = NULL;
 }
 
+Object::~Object()
+{
+}
+
 const char* Object::Name()
 {
     const char* name = typeid(*this).name();
@@ -164,46 +168,24 @@ void Object::Reset()
 {
 }
 
-BindingsPanel* Object::SetupQtHook(bool title)
+BindingsPanel* Object::SetupPanel(bool title)
 {
     if (panel) return panel;
     panel = new BindingsPanel(&GetClass(), this);
-    if (title)
-    {
-        QLabel* label = new QLabel;
-        label->setText(GetClass().name);
-        QFont font;
-        font.setPointSize(15);
-        font.setBold(true);
-        label->setFont(font);
-        label->setAlignment(Qt::AlignHCenter);
-        panel->addRow("type", label);
-        QFrame* line = new QFrame();
-        line->setFrameShape(QFrame::HLine);
-        line->setFrameShadow(QFrame::Sunken);
-        panel->addRow(line);
-    }
+    if (title) panel->CreateTitle();
     panel->ConstructChildren();
     panel->UpdateChildren();
     return panel;
 }
 
-void Object::UpdateQtHook()
+void Object::UpdatePanel()
 {
-    if (panel)
-    {
-        panel->UpdateChildren();
-    }
+    if (panel) panel->UpdateChildren();
 }
 
-void Object::DeleteQtHook()
+void Object::DeletePanel()
 {
     if (!panel) return;
-
-    QLayoutItem *child;
-    while ((child = panel->takeAt(0)))
-        child->widget()->deleteLater();
-
     delete panel;
     panel = NULL;
 }
