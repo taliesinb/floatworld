@@ -127,7 +127,7 @@ void Creat::Die()
 void Creat::HookWasChanged()
 {
     UpdateBrain();
-    UpdateQtHook();
+    UpdatePanel();
 }
 
 void Creat::AddToLineage(Pos w)

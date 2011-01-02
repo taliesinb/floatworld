@@ -124,7 +124,8 @@ void QWorld::DragToPos(Pos pos)
         if (Creat* creat = dynamic_cast<Creat*>(selected_occupant))
         {
             creat->UpdateBrain();
-            creat->UpdateQtHook();
+            creat->UpdateInputs();
+            creat->UpdatePanel();
         }
     }
 
@@ -157,7 +158,7 @@ void QWorld::UnselectOccupant()
     Occupant* occ = selected_occupant;
     selected_occupant = NULL;
     if (occ)
-        occ->DeleteQtHook();
+        occ->DeletePanel();
     Draw();
 }
 
@@ -188,7 +189,7 @@ void QWorld::UpdateOccupant()
                 if (!creat->alive) creat->Remove();
                 else if (creat->energy < 0) creat->alive = false;
             }
-            occ->UpdateQtHook();
+            occ->UpdatePanel();
         }
 
         Draw();
@@ -386,7 +387,7 @@ void QWorld::keyReleaseEvent(QKeyEvent* event)
     (creat->*(world->action_lookup[creat->action]))();
     creat->UpdateInputs();
     creat->UpdateBrain();
-    creat->UpdateQtHook();
+    creat->UpdatePanel();
 
     SetDrawFraction(1.0);
     Draw();
@@ -419,7 +420,7 @@ void QWorld::SelectOccupant(Occupant *occ)
 void QWorld::Step()
 {
     world->Step();
-    world->UpdateQtHook();
+    world->UpdatePanel();
     AfterStep();
     Draw();
 }

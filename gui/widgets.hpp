@@ -140,7 +140,7 @@ private slots:
 
 };
 
-class BindingsPanel : public QFormLayout
+class BindingsPanel : public QWidget
 {
     Q_OBJECT
 
@@ -148,6 +148,7 @@ public:
 
     Class* mclass;
     Object* object;
+    QFormLayout* layout;
     std::list<QWidget*> widgets;
 
     BindingsPanel(Class* mc, Object* obj);
@@ -163,6 +164,7 @@ signals:
 public:
     void ConstructChildren();
     void UpdateChildren();
+    void CreateTitle();
 };
 
 

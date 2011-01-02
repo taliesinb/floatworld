@@ -73,6 +73,8 @@ NewWorldDialog::NewWorldDialog(QWidget *parent) :
     ui->splitter->setStretchFactor(1,2);
     ui->objectTable->setFocus();
 
+    ui->containerObject->setLayout(new QGridLayout);
+
     ui->commentBox->setVisible(false);
 
     connect(ui->objectTable, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)), ui->prototypeList, SLOT(clearSelection()));
@@ -240,7 +242,7 @@ void NewWorldDialog::CopyObject()
 void NewWorldDialog::SelectObject(QListWidgetItem* _item)
 {
     if (selected_object)
-        selected_object->DeleteQtHook();
+        selected_object->DeletePanel();
 
     if (!_item) return;
 
@@ -248,7 +250,7 @@ void NewWorldDialog::SelectObject(QListWidgetItem* _item)
     selected_object = item->prototype;
 
     selected_object->SetupPanel(true);
-    ui->objectPanel->setLayout(selected_object->panel);
+    ui->containerObject->layout()->addWidget(selected_object->panel);
 
     if (item->number)
         ui->numberBox->setValue(item->number);
