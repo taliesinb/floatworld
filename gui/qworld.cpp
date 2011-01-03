@@ -103,6 +103,8 @@ void QWorld::SelectAtPos(Pos pos)
     } else {
         hover_mode = true;
         CellClicked(pos);
+        UnselectOccupant();
+        grid->recticule = Pos(-1,-1);
     }
 
     Draw();
