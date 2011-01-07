@@ -101,7 +101,7 @@ World::World()
     initial_brain = NULL;
     occupant_grid = NULL;
 
-    energy_decay_rate = 0.0;
+    energy_decay_rate = 0.02;
     enable_mutation = true;
     path_energy = 0;
 
@@ -125,7 +125,7 @@ World::World()
     births = 0;
     interaction_type = NoInteraction;
     hooks_enabled = true;
-    jump_range = 1;
+    jump_range = 0;
 
     SetupActions();
 }
