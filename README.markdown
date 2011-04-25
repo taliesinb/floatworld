@@ -42,6 +42,21 @@ Then run
 
 The executable should then appear under `build/floatworld.app/Contents/MacOS`. I'm not providing a packaged executable as of yet.
 
+### Building floatworld (Ubuntu 10.10 MM)
+
+Ubuntu does not include the most recent Qt version by default in the package system, meaning you'll need to build it if you don't already have it installed.
+
+#### Qt install from source on Ubuntu:
+
+1. Install Qt-sdk from package manager (this should install Qt dependencies):
+`sudo apt-get install qt-sdk qt4-qmake`.
+2. Download and extract Qt source: [Qt-4.7.0rc1 from Nokia](http://get.qt.nokia.com/qt/source/qt-everywhere-opensource-src-4.7.0-rc1.tar.gz)
+3. In the qt-everywhere-opensource-src-4.7.0-rc1 directory, compile Qt (note that this will take ~6G of storage space when complete ):
+Run `sudo ./configure` and `sudo make`.
+4. Once the source is compiled, install Qt using `sudo make install`.
+5. Go to the floatworld/ directory and run `qmake floatworld.pro -r`
+6. Run `make` to build floatworld in build/ .
+
 ## Existing functionality
 
 *   Simulation at various speeds
