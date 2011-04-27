@@ -94,6 +94,8 @@ void MainWindow::showEvent(QShowEvent *)
     world->UpdateQtHook();
     qworld->UpdateQtHook();
     qworld->Draw();
+    repaint();
+    show();
 }
 
 void MainWindow::ObjectSelected(QString s)

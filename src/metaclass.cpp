@@ -62,7 +62,7 @@ std::ostream& operator<<(std::ostream& os, QString& s)
 
 std::istream& operator>>(std::istream& is, const char* str)
 {
-    if (str == whitespace)
+    if (*str == '\0')
     {
         char ch;
         do is.get(ch); while (ch && isspace(ch));
@@ -173,10 +173,9 @@ BindingsPanel* Object::SetupQtHook(bool title)
         QLabel* label = new QLabel;
         label->setText(GetClass().name);
         QFont font;
-        font.setPointSize(15);
         font.setBold(true);
         label->setFont(font);
-        label->setAlignment(Qt::AlignHCenter);
+        label->setAlignment(Qt::AlignLeft);
         panel->addRow("type", label);
         QFrame* line = new QFrame();
         line->setFrameShape(QFrame::HLine);

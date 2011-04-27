@@ -65,7 +65,7 @@
      <x>0</x>
      <y>0</y>
      <width>1096</width>
-     <height>22</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -155,8 +155,11 @@
      <height>100</height>
     </size>
    </property>
+   <property name="autoFillBackground">
+    <bool>false</bool>
+   </property>
    <property name="features">
-    <set>QDockWidget::AllDockWidgetFeatures</set>
+    <set>QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetMovable</set>
    </property>
    <property name="windowTitle">
     <string>World Parameters</string>
@@ -180,7 +183,7 @@
     </size>
    </property>
    <property name="features">
-    <set>QDockWidget::AllDockWidgetFeatures</set>
+    <set>QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetMovable</set>
    </property>
    <property name="windowTitle">
     <string>Object Inspector</string>
@@ -199,12 +202,12 @@
    </property>
    <property name="minimumSize">
     <size>
-     <width>78</width>
+     <width>79</width>
      <height>200</height>
     </size>
    </property>
    <property name="features">
-    <set>QDockWidget::AllDockWidgetFeatures</set>
+    <set>QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetMovable</set>
    </property>
    <property name="windowTitle">
     <string>Rendering Options</string>
@@ -221,8 +224,11 @@
      <height>258</height>
     </size>
    </property>
+   <property name="autoFillBackground">
+    <bool>false</bool>
+   </property>
    <property name="features">
-    <set>QDockWidget::AllDockWidgetFeatures</set>
+    <set>QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetMovable</set>
    </property>
    <property name="windowTitle">
     <string>Object Creator</string>

@@ -23,16 +23,17 @@ MatrixView::MatrixView(int size, bool flip, bool grid)
     border = 3;
     scale = size;
     draw_grid = grid;
+    draw_frame = true;
 }
 
 QSize MatrixView::sizeHint() const
 {
-    return draw_flipped ?
+       return draw_flipped ?
             QSize(matrix->rows * scale + 2 * border + 1,
                   matrix->cols * scale + 2 * border + 1) :
             QSize(matrix->cols * scale + 2 * border + 1,
                   matrix->rows * scale + 2 * border + 1);
-}
+   }
 
 QSize MatrixView::minimumSizeHint() const
 {

@@ -75,6 +75,10 @@ NewWorldDialog::NewWorldDialog(QWidget *parent) :
 
     ui->commentBox->setVisible(false);
 
+    DeselectObject();
+
+    is_start = true;
+
     connect(ui->objectTable, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)), ui->prototypeList, SLOT(clearSelection()));
     connect(ui->prototypeList, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)), this, SLOT(DeselectObject()));
     connect(ui->saveTemplate, SIGNAL(released()), this, SLOT(SaveTemplate()));
@@ -82,7 +86,7 @@ NewWorldDialog::NewWorldDialog(QWidget *parent) :
     connect(ui->copyObject, SIGNAL(released()), this, SLOT(CopyObject()));
     connect(ui->addObject, SIGNAL(released()), this, SLOT(AddObject()));
     connect(ui->removeObject, SIGNAL(released()), this, SLOT(RemoveObject()));
-    connect(ui->objectTable, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)), this, SLOT(SelectObject(QListWidgetItem*)));
+    connect(ui->objectTable, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)), this, SLOT(SelectObject(QListWidgetItem*,QListWidgetItem*)));
     connect(ui->numberBox, SIGNAL(valueChanged(int)), this, SLOT(SetObjectNumber(int)));
     connect(ui->commentVisibleBox, SIGNAL(toggled(bool)), ui->commentBox, SLOT(setVisible(bool)));
     connect(this, SIGNAL(accepted()), SLOT(CreateWorld()));
@@ -121,18 +125,17 @@ void NewWorldDialog::CreateDefaultObjects()
     ObjectListItem* world = new ObjectListItem(Class::Lookup("World"));
     world->SetNumber(0);
     ui->objectTable->addItem(world);
-    ui->radioSmallSize->setChecked(true);
+    ui->radioMediumSize->setChecked(true);
     WorldSizeChanged();
 
     ObjectListItem* circle = new ObjectListItem(Class::Lookup("EnergyDisk"));
-    circle->SetNumber(5);
+    circle->SetNumber(10);
     ui->objectTable->addItem(circle);
 
     ObjectListItem* adam = new ObjectListItem(Class::Lookup("Creat"));
     adam->prototype = creat;
     adam->SetNumber(40);
     ui->objectTable->addItem(adam);
-
 }
 
 NewWorldDialog::~NewWorldDialog()
@@ -237,12 +240,17 @@ void NewWorldDialog::CopyObject()
     }
 }
 
-void NewWorldDialog::SelectObject(QListWidgetItem* _item)
+void NewWorldDialog::SelectObject(QListWidgetItem* _item, QListWidgetItem* _old)
 {
+    if (_old == NULL && is_start) return;
+
     if (selected_object)
         selected_object->DeleteQtHook();
 
     if (!_item) return;
+
+    ui->paramInstructionLabel->hide();
+    ui->objParamLayout->show();
 
     ObjectListItem* item = dynamic_cast<ObjectListItem*>(_item);
     selected_object = item->prototype;
@@ -256,8 +264,11 @@ void NewWorldDialog::SelectObject(QListWidgetItem* _item)
 
 void NewWorldDialog::DeselectObject()
 {
+    is_start = false;
     SelectObject(NULL);
     ui->objectTable->setCurrentRow(-1);
+    ui->paramInstructionLabel->show();
+    ui->objParamLayout->hide();
 }
 
 ObjectListItem* NewWorldDialog::CurrentItem()

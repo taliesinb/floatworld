@@ -9,7 +9,7 @@
 #include <QLinkedList>
 #include <QString>
 
-static const char* whitespace = "\t";
+static const char* whitespace = "\0";
 
 std::istream& operator>>(std::istream& is, const char* str);
 

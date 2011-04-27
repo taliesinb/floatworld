@@ -29,6 +29,7 @@ public:
     int border;
     bool draw_grid;
     bool draw_flipped;
+    bool draw_frame;
     Pos highlighted;
 
     MatrixView(int size, bool flip, bool grid);

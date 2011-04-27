@@ -37,6 +37,9 @@ QWorld::QWorld(QWidget* parent) :
     draw_energy = true;
     draw_block_colors = true;
 
+    energy->border = 0;
+    energy->update();
+
     scroll_area->setWidgetResizable(true);
     scroll_area->setAlignment(Qt::AlignCenter);
     scroll_area->setLineWidth(0);
@@ -387,6 +390,7 @@ void QWorld::Draw()
 {
     energy->color_func = draw_energy ? &WhiteBlueColorFunc : &BlackColorFunc;
     if (selected_occupant) energy->highlighted = selected_occupant->pos;
+    energy->update();
     update();
 }
 
