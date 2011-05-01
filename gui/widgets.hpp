@@ -29,7 +29,9 @@ public:
     int border;
     bool draw_grid;
     bool draw_flipped;
-    Pos highlighted;
+    bool dragging;
+    Pos recticule;
+    Pos last_hover;
 
     MatrixView(int size, bool flip, bool grid);
 
@@ -40,6 +42,8 @@ protected:
 
     void resizeEvent(QResizeEvent *);
     void mousePressEvent(QMouseEvent* event);
+    void mouseMoveEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
     void paintEvent(QPaintEvent *event);
 
 signals:
@@ -47,6 +51,7 @@ signals:
     void WasResized();
     void OverPaint(QPainter&);
     void ClickedCell(Pos pos);
+    void HoverCell(Pos pos);
 
     friend class GridWidget;
 
@@ -128,7 +133,6 @@ public:
     MatrixWidget(int pixel_size, bool flip, QString row_labels, QString column_labels);
     virtual void OnSetPointer();
     virtual void Synchronize(bool inbound);
-    void mouseMoveEvent(QMouseEvent *event);
     void keyPressEvent(QKeyEvent *event);
 
 private slots:
@@ -136,7 +140,7 @@ private slots:
 
 };
 
-class BindingsPanel : public QFormLayout
+class BindingsPanel : public QWidget
 {
     Q_OBJECT
 
@@ -144,6 +148,7 @@ public:
 
     Class* mclass;
     Object* object;
+    QFormLayout* layout;
     std::list<QWidget*> widgets;
 
     BindingsPanel(Class* mc, Object* obj);
@@ -159,6 +164,7 @@ signals:
 public:
     void ConstructChildren();
     void UpdateChildren();
+    void CreateTitle();
 };
 
 

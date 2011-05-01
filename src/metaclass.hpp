@@ -9,7 +9,7 @@
 #include <QLinkedList>
 #include <QString>
 
-static const char* whitespace = "\t";
+static const char* whitespace = "\0";
 
 std::istream& operator>>(std::istream& is, const char* str);
 
@@ -31,14 +31,17 @@ public:
     BindingsPanel* panel;
 
     Object();
+    ~Object();
+
     Class& GetClass();
     void Write(std::ostream& os);
     void Read(std::istream& is);
 
+    BindingsPanel* SetupPanel(bool title);
+    void UpdatePanel();
+    void DeletePanel();
+
     virtual void Reset();
-    BindingsPanel* SetupQtHook(bool title);
-    void UpdateQtHook();
-    void DeleteQtHook();
     virtual void HookWasChanged();
 
     const char* Name();

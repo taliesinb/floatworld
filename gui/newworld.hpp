@@ -40,6 +40,7 @@ public:
 
     Object* selected_object;
 
+    bool is_start;
     QLinkedList<ObjectListItem*> AllItems();
     ObjectListItem* CurrentItem();
     World* GetWorld();
@@ -55,7 +56,7 @@ public slots:
     void WorldSizeChanged();
     void AddObject();
     void RemoveObject();
-    void SelectObject(QListWidgetItem*);
+    void SelectObject(QListWidgetItem*, QListWidgetItem* old=NULL);
     void DeselectObject();
     void SetObjectNumber(int num);
     void CopyObject();

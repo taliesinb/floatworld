@@ -17,9 +17,10 @@ class QWorld : public QWidget, public Object
 
 private:
     QScrollArea* scroll_area;
-    MatrixView* energy;
+    MatrixView* grid;
     float draw_fraction;
     float tmp_x, tmp_y;
+    bool hover_mode;
 
 public:
     enum {
@@ -56,9 +57,13 @@ public:
 
 public slots:
     void Step();
+    void InvisibleStep();
+    void AfterStep();
     void Draw();
     void SetDrawFraction(float frac);
     void SelectAtPos(Pos pos);
+    void HoverAtPos(Pos pos);
+    void DragToPos(Pos pos);
     void UnselectOccupant();
     void UpdateOccupant();
     void SelectedOccupantRemoved();

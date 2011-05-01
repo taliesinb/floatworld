@@ -127,7 +127,7 @@ void Creat::Die()
 void Creat::HookWasChanged()
 {
     UpdateBrain();
-    UpdateQtHook();
+    UpdatePanel();
 }
 
 void Creat::AddToLineage(Pos w)
@@ -421,7 +421,6 @@ void Creat::UpdateInputs()
     state(off_int_inputs + 0) = 1.0;
     state(off_int_inputs + 1) = (2.0 * energy / world->action_cost[ActionReproduce]) - 1.0;
     state(off_int_inputs + 2) = (2.0 * age / max_age) - 1.0;
-    state(off_int_inputs + 3) = rng.Float(-1.0, 1.0);
 }
 
 // TODO: Update for new weight matrix
@@ -507,6 +506,7 @@ void Creat::Update()
 
     last_orient = orient;
 
+    state(off_int_inputs + 3) = rng.Float(-1.0, 1.0);
     UpdateInputs();
     UpdateBrain();
 

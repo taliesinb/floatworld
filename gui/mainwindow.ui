@@ -65,7 +65,7 @@
      <x>0</x>
      <y>0</y>
      <width>1096</width>
-     <height>22</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -75,6 +75,7 @@
     <addaction name="actionNew"/>
     <addaction name="actionSave"/>
     <addaction name="actionLoad"/>
+    <addaction name="actionRestart"/>
     <addaction name="actionClearCreats"/>
     <addaction name="actionClearAll"/>
    </widget>
@@ -139,10 +140,11 @@
    <addaction name="separator"/>
    <addaction name="actionStepBack"/>
    <addaction name="actionStep"/>
-   <addaction name="actionIndividualStep"/>
+   <addaction name="separator"/>
    <addaction name="actionPrevOccupant"/>
    <addaction name="actionDeleteSelected"/>
    <addaction name="actionNextOccupant"/>
+   <addaction name="actionIndividualStep"/>
    <addaction name="separator"/>
    <addaction name="actionZoomOut"/>
    <addaction name="actionZoomIn"/>
@@ -155,8 +157,11 @@
      <height>100</height>
     </size>
    </property>
+   <property name="autoFillBackground">
+    <bool>false</bool>
+   </property>
    <property name="features">
-    <set>QDockWidget::AllDockWidgetFeatures</set>
+    <set>QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetMovable</set>
    </property>
    <property name="windowTitle">
     <string>World Parameters</string>
@@ -175,12 +180,12 @@
    </property>
    <property name="minimumSize">
     <size>
-     <width>250</width>
+     <width>275</width>
      <height>100</height>
     </size>
    </property>
    <property name="features">
-    <set>QDockWidget::AllDockWidgetFeatures</set>
+    <set>QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetMovable</set>
    </property>
    <property name="windowTitle">
     <string>Object Inspector</string>
@@ -199,12 +204,12 @@
    </property>
    <property name="minimumSize">
     <size>
-     <width>78</width>
+     <width>79</width>
      <height>200</height>
     </size>
    </property>
    <property name="features">
-    <set>QDockWidget::AllDockWidgetFeatures</set>
+    <set>QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetMovable</set>
    </property>
    <property name="windowTitle">
     <string>Rendering Options</string>
@@ -221,8 +226,11 @@
      <height>258</height>
     </size>
    </property>
+   <property name="autoFillBackground">
+    <bool>false</bool>
+   </property>
    <property name="features">
-    <set>QDockWidget::AllDockWidgetFeatures</set>
+    <set>QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetMovable</set>
    </property>
    <property name="windowTitle">
     <string>Object Creator</string>
@@ -454,7 +462,7 @@
   <action name="actionIndividualStep">
    <property name="icon">
     <iconset resource="floatworld.qrc">
-     <normaloff>:/icons/right-stop-1.png</normaloff>:/icons/right-stop-1.png</iconset>
+     <normaloff>:/icons/redo.png</normaloff>:/icons/redo.png</iconset>
    </property>
    <property name="text">
     <string>Step selected</string>
@@ -634,7 +642,7 @@
   <action name="actionDeleteSelected">
    <property name="icon">
     <iconset resource="floatworld.qrc">
-     <normaloff>:/icons/trash.png</normaloff>:/icons/trash.png</iconset>
+     <normaloff>:/icons/shred.png</normaloff>:/icons/shred.png</iconset>
    </property>
    <property name="text">
     <string>Delete selected</string>

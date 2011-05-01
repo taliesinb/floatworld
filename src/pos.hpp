@@ -51,6 +51,9 @@ class Pos
     bool operator==(Pos pos) {
       return row == pos.row && col == pos.col;
     }
+    bool operator!=(Pos pos) {
+      return row != pos.row || col != pos.col;
+    }
 };
 std::ostream& operator<<(std::ostream& os, const Pos& p);
 std::istream& operator>>(std::istream& is, Pos& p);
