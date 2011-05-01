@@ -73,6 +73,8 @@ NewWorldDialog::NewWorldDialog(QWidget *parent) :
     ui->splitter->setStretchFactor(1,2);
     ui->objectTable->setFocus();
 
+    ui->containerObject->setLayout(new QGridLayout);
+
     ui->commentBox->setVisible(false);
 
     DeselectObject();
@@ -90,6 +92,8 @@ NewWorldDialog::NewWorldDialog(QWidget *parent) :
     connect(ui->numberBox, SIGNAL(valueChanged(int)), this, SLOT(SetObjectNumber(int)));
     connect(ui->commentVisibleBox, SIGNAL(toggled(bool)), ui->commentBox, SLOT(setVisible(bool)));
     connect(this, SIGNAL(accepted()), SLOT(CreateWorld()));
+
+
 }
 
 void NewWorldDialog::WorldSizeChanged()
@@ -245,18 +249,18 @@ void NewWorldDialog::SelectObject(QListWidgetItem* _item, QListWidgetItem* _old)
     if (_old == NULL && is_start) return;
 
     if (selected_object)
-        selected_object->DeleteQtHook();
+        selected_object->DeletePanel();
 
     if (!_item) return;
 
-    ui->paramInstructionLabel->hide();
-    ui->objParamLayout->show();
+    ui->instructionLabel->hide();
+    ui->objParamPanel->show();
 
     ObjectListItem* item = dynamic_cast<ObjectListItem*>(_item);
     selected_object = item->prototype;
 
-    selected_object->SetupQtHook(true);
-    ui->objectPanel->setLayout(selected_object->panel);
+    selected_object->SetupPanel(true);
+    ui->containerObject->layout()->addWidget(selected_object->panel);
 
     if (item->number)
         ui->numberBox->setValue(item->number);
@@ -267,8 +271,8 @@ void NewWorldDialog::DeselectObject()
     is_start = false;
     SelectObject(NULL);
     ui->objectTable->setCurrentRow(-1);
-    ui->paramInstructionLabel->show();
-    ui->objParamLayout->hide();
+    ui->instructionLabel->show();
+    ui->objParamPanel->hide();
 }
 
 ObjectListItem* NewWorldDialog::CurrentItem()
